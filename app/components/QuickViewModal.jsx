@@ -1,12 +1,23 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "../context/CartContext";
 
 export default function QuickViewModal({ isOpen, onClose, product }) {
+    const { addToCart, setIsCartOpen } = useCart();
+
+    const handleAddToCart = () => {
+        if (product) {
+            addToCart(product);
+            setIsCartOpen(true);
+            onClose();
+        }
+    };
+
     if (!product) return null;
 
     return (
         <AnimatePresence>
-            {isOpen && (
+            {isOpen && product && (
                 <>
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -25,11 +36,22 @@ export default function QuickViewModal({ isOpen, onClose, product }) {
                             onClick={onClose}
                             className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
                             </svg>
                         </button>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="relative h-[400px]">
                                 <img
@@ -39,14 +61,25 @@ export default function QuickViewModal({ isOpen, onClose, product }) {
                                 />
                             </div>
                             <div className="flex flex-col justify-center">
-                                <p className="text-[#8B6B4C] text-sm mb-2">{product.category}</p>
-                                <h3 className="text-2xl font-semibold mb-4">{product.name}</h3>
-                                <p className="text-xl text-[#8B6B4C] mb-6">${product.price}</p>
-                                <p className="text-gray-600 mb-6">
-                                    Experience the elegance of our handcrafted {product.category.toLowerCase()}. 
-                                    Each piece is made with the finest materials and attention to detail.
+                                <p className="text-[#8B6B4C] text-sm mb-2">
+                                    {product.category}
                                 </p>
-                                <button className="bg-[#8B6B4C] text-white px-8 py-3 rounded hover:bg-[#725939] transition-colors">
+                                <h3 className="text-2xl font-semibold mb-4">
+                                    {product.name}
+                                </h3>
+                                <p className="text-xl text-[#8B6B4C] mb-6">
+                                    ${product.price}
+                                </p>
+                                <p className="text-gray-600 mb-6">
+                                    Experience the elegance of our handcrafted{" "}
+                                    {product.category.toLowerCase()}. Each piece is
+                                    made with the finest materials and attention to
+                                    detail.
+                                </p>
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="w-full bg-[#8B6B4C] text-white py-3 rounded hover:bg-[#725939] transition-colors"
+                                >
                                     Add to Cart
                                 </button>
                             </div>

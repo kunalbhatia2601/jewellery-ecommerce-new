@@ -1,13 +1,15 @@
 "use client";
-import React, { useRef, useState } from "react"; // Add useState
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import QuickViewModal from "./QuickViewModal"; // Add import
+import QuickViewModal from "./QuickViewModal";
+import { products } from '../data/products';
+import { useCart } from '../context/CartContext';
 
 export default function NewArrivals() {
     const scrollRef = useRef(null);
-    // Add state for modal
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { addToCart, setIsCartOpen } = useCart();
 
     const scroll = (direction) => {
         const container = scrollRef.current;
@@ -42,53 +44,13 @@ export default function NewArrivals() {
         }
     };
 
-    const products = [
-        {
-            id: 1,
-            name: "Diamond Pendant Necklace",
-            price: 1299,
-            image: "/product1.jpg",
-            category: "Necklaces"
-        },
-        {
-            id: 2,
-            name: "Rose Gold Ring",
-            price: 899,
-            image: "/product2.jpg",
-            category: "Rings"
-        },
-        {
-            id: 3,
-            name: "Pearl Drop Earrings",
-            price: 599,
-            image: "/product3.jpg",
-            category: "Earrings"
-        },
-        {
-            id: 4,
-            name: "Sapphire Bracelet",
-            price: 1499,
-            image: "/product4.jpg",
-            category: "Bracelets"
-        },
-        {
-            id: 5,
-            name: "Gold Chain Necklace",
-            price: 799,
-            image: "/product5.jpg",
-            category: "Necklaces"
-        },
-        {
-            id: 6,
-            name: "Diamond Stud Earrings",
-            price: 999,
-            image: "/product6.jpg",
-            category: "Earrings"
-        },
-    ];
+    const handleAddToCart = (product) => {
+        addToCart(product);
+        setIsCartOpen(true);
+    };
 
     return (
-        <section className="py-16 px-4 bg-white">
+        <section id="new-arrivals" className="py-16 px-4 bg-white">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col items-center mb-12">
                     <h2 className="text-3xl font-semibold text-[#8B6B4C] relative">
@@ -136,16 +98,23 @@ export default function NewArrivals() {
                                     className="w-full h-[350px] object-cover transform group-hover:scale-105 transition-transform duration-500"
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300">
-                                    <button 
-                                        onClick={() => {
-                                            setSelectedProduct(product);
-                                            setIsModalOpen(true);
-                                        }}
-                                        className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-[#8B6B4C] px-6 py-2 
-                                            opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#8B6B4C] hover:text-white rounded"
-                                    >
-                                        Quick View
-                                    </button>
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedProduct(product);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="bg-white text-[#8B6B4C] px-6 py-2 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#8B6B4C] hover:text-white rounded"
+                                        >
+                                            Quick View
+                                        </button>
+                                        <button 
+                                            onClick={() => handleAddToCart(product)}
+                                            className="bg-white text-[#8B6B4C] px-6 py-2 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#8B6B4C] hover:text-white rounded"
+                                        >
+                                            Add to Cart
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="mt-4 text-center px-2">

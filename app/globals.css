@@ -33,3 +33,11 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.pt-navbar {
+    padding-top: 80px; /* Adjust this value based on your navbar height */
+}
