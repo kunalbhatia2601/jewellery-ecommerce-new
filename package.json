@@ -16,6 +16,7 @@
     "esm": "^3.2.25",
     "framer-motion": "^12.23.22",
     "jsonwebtoken": "^9.0.2",
+    "lightningcss": "^1.30.2",
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.3",
     "next": "15.5.4",
