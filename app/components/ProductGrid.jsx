@@ -18,9 +18,12 @@ export default function ProductGrid({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { addToCart, setIsCartOpen } = useCart();
 
-    const handleAddToCart = (product) => {
-        addToCart(product);
-        setIsCartOpen(true);
+    const handleAddToCart = async (product) => {
+        const result = await addToCart(product);
+        // Only open cart if item was successfully added (user is authenticated)
+        if (result !== false) {
+            setIsCartOpen(true);
+        }
     };
 
     if (loading) {

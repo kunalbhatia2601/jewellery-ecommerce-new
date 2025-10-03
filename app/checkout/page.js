@@ -1,7 +1,8 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import AddressForm from '../components/checkout/AddressForm';
 import CheckoutSummary from '../components/checkout/CheckoutSummary';
 import RazorpayScript from '../components/RazorpayScript';
@@ -9,8 +10,17 @@ import RazorpayScript from '../components/RazorpayScript';
 export default function CheckoutPage() {
     const router = useRouter();
     const { cartItems, clearCart } = useCart();
+    const { user, triggerLoginModal } = useAuth();
     const [loading, setLoading] = useState(false);
     const [shippingData, setShippingData] = useState(null);
+
+    // Redirect to home if user not authenticated
+    useEffect(() => {
+        if (!user) {
+            triggerLoginModal();
+            router.push('/');
+        }
+    }, [user, router, triggerLoginModal]);
 
     const handleCheckout = async (shippingAddress) => {
         try {
@@ -138,6 +148,19 @@ export default function CheckoutPage() {
             setLoading(false);
         }
     };
+
+    // Don't render checkout if user is not authenticated
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
+                    <p className="text-gray-600 mb-6">Please log in to continue with checkout</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B6B4C] mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pt-24">

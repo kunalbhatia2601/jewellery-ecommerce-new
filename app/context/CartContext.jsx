@@ -9,7 +9,7 @@ export function CartProvider({ children }) {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
-    const { user } = useAuth();
+    const { user, triggerLoginModal } = useAuth();
 
     useEffect(() => {
         setMounted(true);
@@ -111,32 +111,10 @@ export function CartProvider({ children }) {
     const addToCart = async (product) => {
         try {
             if (!user) {
-                // Handle guest cart - store in local state
-                const cartItem = {
-                    id: product._id || product.id,
-                    product: product._id || product.id,
-                    name: product.name,
-                    price: product.sellingPrice || product.price,
-                    image: product.image,
-                    quantity: 1
-                };
-
-                setCartItems(prev => {
-                    const existingIndex = prev.findIndex(item => item.id === cartItem.id);
-                    let newItems;
-                    if (existingIndex > -1) {
-                        newItems = prev.map((item, index) => 
-                            index === existingIndex 
-                                ? { ...item, quantity: item.quantity + 1 }
-                                : item
-                        );
-                    } else {
-                        newItems = [...prev, cartItem];
-                    }
-                    saveGuestCart(newItems);
-                    return newItems;
-                });
-                return;
+                // User not authenticated - show login modal with helpful message
+                alert('Please log in or sign up to add items to your cart!');
+                triggerLoginModal();
+                return false; // Return false to indicate cart addition failed
             }
 
             // Normalize product data for API
@@ -168,10 +146,12 @@ export function CartProvider({ children }) {
             
             // Show success feedback (you can replace this with a toast notification)
             console.log('Item added to cart successfully');
+            return true; // Return true on success
         } catch (error) {
             console.error('Add to cart error:', error);
             // Show user-friendly error message
             alert('Failed to add item to cart. Please try again.');
+            return false; // Return false on error
         }
     };
 

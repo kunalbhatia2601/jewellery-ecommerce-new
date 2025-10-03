@@ -315,7 +315,13 @@ export default function Navbar() {
 
                         {/* Cart */}
                         <motion.button 
-                            onClick={() => setIsCartOpen(true)}
+                            onClick={() => {
+                                if (user) {
+                                    setIsCartOpen(true);
+                                } else {
+                                    triggerLoginModal();
+                                }
+                            }}
                             className="relative p-4 rounded-2xl bg-white/60 backdrop-blur-lg border border-white/30 hover:bg-white/90 hover:border-[#D4AF76]/50 transition-all duration-300 shadow-sm"
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
@@ -463,7 +469,13 @@ export default function Navbar() {
                     {/* Cart */}
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <button 
-                            onClick={() => setIsCartOpen(true)}
+                            onClick={() => {
+                                if (user) {
+                                    setIsCartOpen(true);
+                                } else {
+                                    triggerLoginModal();
+                                }
+                            }}
                             className="flex flex-col items-center p-2 space-y-1 relative"
                         >
                             <motion.div

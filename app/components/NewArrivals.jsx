@@ -51,9 +51,12 @@ export default function NewArrivals() {
         }
     };
 
-    const handleAddToCart = (product) => {
-        addToCart(product);
-        setIsCartOpen(true);
+    const handleAddToCart = async (product) => {
+        const result = await addToCart(product);
+        // Only open cart if item was successfully added (user is authenticated)
+        if (result !== false) {
+            setIsCartOpen(true);
+        }
     };
 
     return (

@@ -29,11 +29,14 @@ export default function QuickViewModal({ isOpen, onClose, product }) {
         };
     }, [isOpen, hideNavbar, showNavbar]);
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (product) {
-            addToCart(product);
-            setIsCartOpen(true);
-            onClose();
+            const result = await addToCart(product);
+            // Only open cart and close modal if item was successfully added
+            if (result !== false) {
+                setIsCartOpen(true);
+                onClose();
+            }
         }
     };
 
