@@ -10,18 +10,24 @@ export const runtime = 'nodejs';
 // Get specific order details (Admin only)
 export async function GET(req, { params }) {
     try {
+        console.log('Admin order API called for orderId:', params.orderId);
+        
         // Verify admin authentication
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
+        console.log('Token exists:', !!token);
+
         if (!token) {
             return NextResponse.json(
-                { error: 'Unauthorized' },
+                { error: 'Unauthorized - No token' },
                 { status: 401 }
             );
         }
 
         const decoded = verifyToken(token.value);
+        console.log('Token decoded:', !!decoded, 'userId:', decoded?.userId);
+        
         if (!decoded || !decoded.userId) {
             return NextResponse.json(
                 { error: 'Invalid token' },
@@ -34,6 +40,8 @@ export async function GET(req, { params }) {
         const User = require('@/models/User').default;
         const user = await User.findById(decoded.userId).select('isAdmin');
 
+        console.log('User found:', !!user, 'isAdmin:', user?.isAdmin);
+
         if (!user || !user.isAdmin) {
             return NextResponse.json(
                 { error: 'Admin access required' },
@@ -42,9 +50,12 @@ export async function GET(req, { params }) {
         }
 
         const { orderId } = params;
+        console.log('Fetching order with ID:', orderId);
 
         // Fetch the order with all details
         const order = await Order.findById(orderId);
+
+        console.log('Order found:', !!order);
 
         if (!order) {
             return NextResponse.json(

@@ -17,15 +17,22 @@ function AdminOrderDetailsPage() {
 
     const fetchOrder = async () => {
         try {
+            console.log('Fetching order with ID:', orderId);
             const res = await fetch(`/api/admin/orders/${orderId}`);
+            console.log('API Response status:', res.status);
+            
             if (res.ok) {
                 const data = await res.json();
+                console.log('Order data received:', data);
                 setOrder(data);
             } else {
-                console.error('Failed to fetch order');
+                const errorData = await res.json().catch(() => ({}));
+                console.error('Failed to fetch order:', res.status, errorData);
+                alert(`Failed to fetch order: ${errorData.error || 'Unknown error'}`);
             }
         } catch (error) {
             console.error('Error fetching order:', error);
+            alert(`Error fetching order: ${error.message}`);
         } finally {
             setLoading(false);
         }
