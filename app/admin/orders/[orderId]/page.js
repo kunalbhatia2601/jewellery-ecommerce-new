@@ -1,6 +1,7 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import AdminLayout from '../../../components/AdminLayout';
 import withAdminAuth from '../../../components/withAdminAuth';
 import Link from 'next/link';
@@ -11,11 +12,7 @@ function AdminOrderDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
 
-    useEffect(() => {
-        fetchOrder();
-    }, [orderId]);
-
-    const fetchOrder = async () => {
+    const fetchOrder = useCallback(async () => {
         try {
             console.log('Fetching order with ID:', orderId);
             const res = await fetch(`/api/admin/orders/${orderId}`);
@@ -36,7 +33,11 @@ function AdminOrderDetailsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [orderId]);
+
+    useEffect(() => {
+        fetchOrder();
+    }, [fetchOrder]);
 
     const updateOrderStatus = async (newStatus) => {
         try {
@@ -158,9 +159,11 @@ function AdminOrderDetailsPage() {
                                 {order.items.map((item) => (
                                     <div key={item._id} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-b-0">
                                         {item.image && (
-                                            <img
+                                            <Image
                                                 src={item.image}
                                                 alt={item.name}
+                                                width={64}
+                                                height={64}
                                                 className="w-16 h-16 object-cover rounded-lg"
                                             />
                                         )}
