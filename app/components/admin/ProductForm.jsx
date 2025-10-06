@@ -13,13 +13,22 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         stock: '',
         sku: '',
         image: '',
-        isActive: true
+        isActive: true,
+        // Dynamic pricing fields
+        pricingMethod: 'fixed',
+        goldWeight: '',
+        goldPurity: '22',
+        makingChargePercent: '15',
+        stoneValue: '',
+        isDynamicPricing: false
     });
 
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [calculatedPrice, setCalculatedPrice] = useState(null);
+    const [calculatingPrice, setCalculatingPrice] = useState(false);
 
     const categories = [
         'Diamond',
@@ -30,6 +39,14 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         'Vintage',
         'Contemporary',
         'Traditional'
+    ];
+
+    const goldPurities = [
+        { value: '24', label: '24K (99.9% Pure)' },
+        { value: '22', label: '22K (91.7% Pure)' },
+        { value: '18', label: '18K (75% Pure)' },
+        { value: '14', label: '14K (58.3% Pure)' },
+        { value: '10', label: '10K (41.7% Pure)' }
     ];
 
     useEffect(() => {
@@ -45,11 +62,66 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 stock: product.stock || '',
                 sku: product.sku || '',
                 image: product.image || '',
-                isActive: product.isActive !== undefined ? product.isActive : true
+                isActive: product.isActive !== undefined ? product.isActive : true,
+                // Dynamic pricing fields
+                pricingMethod: product.pricingMethod || 'fixed',
+                goldWeight: product.goldWeight || '',
+                goldPurity: product.goldPurity || '22',
+                makingChargePercent: product.makingChargePercent || '15',
+                stoneValue: product.stoneValue || '',
+                isDynamicPricing: product.isDynamicPricing || false
             });
             setImagePreview(product.image || '');
         }
     }, [product]);
+
+    const calculateDynamicPrice = async () => {
+        if (!formData.goldWeight || parseFloat(formData.goldWeight) <= 0) {
+            return;
+        }
+
+        setCalculatingPrice(true);
+        try {
+            const response = await fetch('/api/gold-price', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    goldWeight: parseFloat(formData.goldWeight),
+                    goldPurity: parseFloat(formData.goldPurity),
+                    makingChargePercent: parseFloat(formData.makingChargePercent),
+                    gstPercent: 3,
+                    currency: 'INR'
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                setCalculatedPrice(result.data);
+                
+                // Auto-update pricing fields if dynamic pricing is enabled
+                if (formData.isDynamicPricing) {
+                    const calculatedSellingPrice = result.data.breakdown.finalPrice;
+                    const stoneValue = parseFloat(formData.stoneValue) || 0;
+                    const totalPrice = calculatedSellingPrice + stoneValue;
+                    
+                    setFormData(prev => ({
+                        ...prev,
+                        sellingPrice: totalPrice.toFixed(2),
+                        price: totalPrice.toFixed(2),
+                        mrp: (totalPrice * 1.1).toFixed(2), // 10% margin for MRP
+                        costPrice: (totalPrice * 0.7).toFixed(2) // Assumed 30% margin
+                    }));
+                }
+            }
+        } catch (error) {
+            console.error('Price calculation error:', error);
+        } finally {
+            setCalculatingPrice(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -71,13 +143,39 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
             }));
         }
 
-        // Auto-set price to sellingPrice
-        if (name === 'sellingPrice') {
+        // Handle pricing method change
+        if (name === 'pricingMethod') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: newValue,
+                isDynamicPricing: newValue === 'dynamic'
+            }));
+        }
+
+        // Handle dynamic pricing toggle
+        if (name === 'isDynamicPricing') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: newValue,
+                pricingMethod: newValue ? 'dynamic' : 'fixed'
+            }));
+        }
+
+        // Auto-set price to sellingPrice for fixed pricing
+        if (name === 'sellingPrice' && formData.pricingMethod === 'fixed') {
             setFormData(prev => ({
                 ...prev,
                 sellingPrice: newValue,
                 price: newValue
             }));
+        }
+
+        // Trigger price calculation for dynamic pricing fields
+        if (['goldWeight', 'goldPurity', 'makingChargePercent', 'stoneValue'].includes(name) && 
+            formData.isDynamicPricing) {
+            setTimeout(() => {
+                calculateDynamicPrice();
+            }, 500); // Debounce
         }
     };
 
@@ -190,7 +288,15 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 costPrice: parseFloat(formData.costPrice),
                 sellingPrice: parseFloat(formData.sellingPrice),
                 price: parseFloat(formData.sellingPrice),
-                stock: parseInt(formData.stock) || 0
+                stock: parseInt(formData.stock) || 0,
+                // Dynamic pricing fields
+                goldWeight: parseFloat(formData.goldWeight) || 0,
+                goldPurity: parseFloat(formData.goldPurity) || 22,
+                makingChargePercent: parseFloat(formData.makingChargePercent) || 15,
+                stoneValue: parseFloat(formData.stoneValue) || 0,
+                isDynamicPricing: formData.isDynamicPricing,
+                pricingMethod: formData.pricingMethod,
+                lastPriceUpdate: formData.isDynamicPricing ? new Date() : undefined
             };
 
             await onSubmit(submitData);
@@ -278,7 +384,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            MRP (₹) *
+                            MRP (₹ INR) *
                         </label>
                         <input
                             type="number"
@@ -294,7 +400,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Cost Price (₹) *
+                            Cost Price (₹ INR) *
                         </label>
                         <input
                             type="number"
@@ -310,7 +416,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Selling Price (₹) *
+                            Selling Price (₹ INR) *
                         </label>
                         <input
                             type="number"
@@ -393,6 +499,186 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Pricing Method Selection */}
+                <div className="border-t border-gray-200 pt-6">
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                            Pricing Method
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex items-center p-4 border border-gray-300 rounded-lg">
+                                <input
+                                    type="radio"
+                                    name="pricingMethod"
+                                    value="fixed"
+                                    checked={formData.pricingMethod === 'fixed'}
+                                    onChange={handleInputChange}
+                                    className="h-4 w-4 text-[#8B6B4C] focus:ring-[#8B6B4C] border-gray-300"
+                                />
+                                <div className="ml-3">
+                                    <label className="block text-sm font-medium text-gray-900">
+                                        Fixed Pricing
+                                    </label>
+                                    <p className="text-xs text-gray-500">Set manual prices</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center p-4 border border-gray-300 rounded-lg">
+                                <input
+                                    type="radio"
+                                    name="pricingMethod"
+                                    value="dynamic"
+                                    checked={formData.pricingMethod === 'dynamic'}
+                                    onChange={handleInputChange}
+                                    className="h-4 w-4 text-[#8B6B4C] focus:ring-[#8B6B4C] border-gray-300"
+                                />
+                                <div className="ml-3">
+                                    <label className="block text-sm font-medium text-gray-900">
+                                        Dynamic Pricing
+                                    </label>
+                                    <p className="text-xs text-gray-500">Based on live gold rates</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Dynamic Pricing Fields */}
+                    {formData.pricingMethod === 'dynamic' && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 space-y-4">
+                            <div className="flex items-center mb-4">
+                                <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h3 className="text-lg font-medium text-yellow-800">Gold Specifications</h3>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Gold Weight (grams) *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="goldWeight"
+                                        value={formData.goldWeight}
+                                        onChange={handleInputChange}
+                                        step="0.1"
+                                        min="0.1"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
+                                        placeholder="e.g., 5.5"
+                                        required={formData.pricingMethod === 'dynamic'}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Gold Purity
+                                    </label>
+                                    <select
+                                        name="goldPurity"
+                                        value={formData.goldPurity}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
+                                    >
+                                        {goldPurities.map((purity) => (
+                                            <option key={purity.value} value={purity.value}>
+                                                {purity.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Making Charge (%)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="makingChargePercent"
+                                        value={formData.makingChargePercent}
+                                        onChange={handleInputChange}
+                                        step="0.5"
+                                        min="0"
+                                        max="100"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Stone/Diamond Value (₹ INR)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="stoneValue"
+                                        value={formData.stoneValue}
+                                        onChange={handleInputChange}
+                                        min="0"
+                                        step="0.01"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
+                                        placeholder="0"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Price Calculator Button */}
+                            <div className="flex items-center space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={calculateDynamicPrice}
+                                    disabled={calculatingPrice || !formData.goldWeight}
+                                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                >
+                                    {calculatingPrice && (
+                                        <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    )}
+                                    <span>Calculate Price</span>
+                                </button>
+                                
+                                {calculatedPrice && (
+                                    <div className="text-sm">
+                                        <span className="text-gray-600">Calculated Price: </span>
+                                        <span className="font-semibold text-green-600">
+                                            ₹{calculatedPrice.breakdown.finalPrice.toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Price Breakdown */}
+                            {calculatedPrice && (
+                                <div className="bg-white border border-gray-200 rounded-lg p-4 mt-4">
+                                    <h4 className="text-sm font-medium text-gray-900 mb-2">Price Breakdown</h4>
+                                    <div className="space-y-1 text-xs">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Gold Value:</span>
+                                            <span>₹{calculatedPrice.breakdown.pureGoldValue.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Making Charges:</span>
+                                            <span>₹{calculatedPrice.breakdown.makingCharges.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">GST:</span>
+                                            <span>₹{calculatedPrice.breakdown.gstAmount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Stone Value:</span>
+                                            <span>₹{parseFloat(formData.stoneValue || 0).toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between font-medium border-t border-gray-200 pt-1">
+                                            <span>Total:</span>
+                                            <span>₹{(calculatedPrice.breakdown.finalPrice + parseFloat(formData.stoneValue || 0)).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div>
