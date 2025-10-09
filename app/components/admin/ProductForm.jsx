@@ -13,6 +13,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         stock: '',
         sku: '',
         image: '',
+        images: [],
         isActive: true,
         // Dynamic pricing fields
         pricingMethod: 'fixed',
@@ -33,6 +34,8 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
+    const [imageFiles, setImageFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [calculatedPrice, setCalculatedPrice] = useState(null);
     const [calculatingPrice, setCalculatingPrice] = useState(false);
@@ -159,9 +162,14 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 stoneValue: product.stoneValue || '',
                 isDynamicPricing: product.isDynamicPricing || false,
                 // Enhanced stone specifications
-                stones: product.stones || []
+                stones: product.stones || [],
+                images: product.images || []
             });
             setImagePreview(product.image || '');
+            // Set up multiple image previews
+            if (product.images && product.images.length > 0) {
+                setImagePreviews(product.images.map(img => img.url));
+            }
         }
     }, [product]);
 
@@ -452,6 +460,82 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         }
     };
 
+    // Handle multiple image selection
+    const handleMultipleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        // Validate files
+        const validFiles = files.filter(file => {
+            if (!file.type.startsWith('image/')) {
+                alert(`${file.name} is not an image file`);
+                return false;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`${file.name} is too large (max 5MB)`);
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length === 0) return;
+
+        // Check total image limit
+        const currentImages = imageFiles.length;
+        const totalImages = currentImages + validFiles.length;
+        if (totalImages > 10) {
+            alert(`Maximum 10 images allowed. You can add ${10 - currentImages} more images.`);
+            return;
+        }
+
+        setImageFiles(prev => [...prev, ...validFiles]);
+
+        // Create previews
+        validFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImagePreviews(prev => [...prev, e.target.result]);
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    // Remove image from multiple images
+    const removeProductImage = (index) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+        
+        // Update formData images
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }));
+    };
+
+    // Move image up/down in order
+    const moveImage = (index, direction) => {
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= imageFiles.length) return;
+
+        // Move in imageFiles
+        const newImageFiles = [...imageFiles];
+        [newImageFiles[index], newImageFiles[newIndex]] = [newImageFiles[newIndex], newImageFiles[index]];
+        setImageFiles(newImageFiles);
+
+        // Move in previews
+        const newPreviews = [...imagePreviews];
+        [newPreviews[index], newPreviews[newIndex]] = [newPreviews[newIndex], newPreviews[index]];
+        setImagePreviews(newPreviews);
+
+        // Move in formData
+        const newImages = [...formData.images];
+        [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
+        setFormData(prev => ({
+            ...prev,
+            images: newImages
+        }));
+    };
+
     const uploadImage = async () => {
         if (!imageFile) return null;
 
@@ -531,7 +615,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 return;
             }
 
-            // Upload image if a new file is selected
+            // Upload single image if a new file is selected
             let imageUrl = formData.image;
             if (imageFile) {
                 imageUrl = await uploadImage();
@@ -542,9 +626,52 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 }
             }
 
+            // Upload multiple images if new files are selected
+            let uploadedImages = [...formData.images]; // Keep existing images
+            if (imageFiles.length > 0) {
+                const uploadPromises = imageFiles.map(async (file, index) => {
+                    try {
+                        const formData = new FormData();
+                        formData.append('image', file);
+
+                        const response = await fetch('/api/admin/upload', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Upload failed');
+                        }
+
+                        return {
+                            url: result.imageUrl,
+                            alt: `Product image ${uploadedImages.length + index + 1}`,
+                            isPrimary: uploadedImages.length === 0 && index === 0, // First image is primary
+                            order: uploadedImages.length + index
+                        };
+                    } catch (error) {
+                        console.error(`Failed to upload image ${index + 1}:`, error);
+                        return null;
+                    }
+                });
+
+                const uploadResults = await Promise.all(uploadPromises);
+                const successfulUploads = uploadResults.filter(result => result !== null);
+                uploadedImages = [...uploadedImages, ...successfulUploads];
+            }
+
+            // Set primary image URL for backward compatibility
+            if (!imageUrl && uploadedImages.length > 0) {
+                const primaryImage = uploadedImages.find(img => img.isPrimary) || uploadedImages[0];
+                imageUrl = primaryImage.url;
+            }
+
             const submitData = {
                 ...formData,
                 image: imageUrl,
+                images: uploadedImages,
                 mrp: parseFloat(formData.mrp),
                 costPrice: parseFloat(formData.costPrice),
                 sellingPrice: parseFloat(formData.sellingPrice),
@@ -1124,6 +1251,116 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                                 </p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* Multiple Images Upload */}
+                <div className="border-t border-gray-200 pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-medium text-gray-900">Additional Images</h3>
+                        <span className="text-sm text-gray-500">({imagePreviews.length}/10 images)</span>
+                    </div>
+                    
+                    <div className="space-y-4">
+                        {/* Multiple Image Upload Input */}
+                        <div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleMultipleImageChange}
+                                className="hidden"
+                                id="multiple-image-upload"
+                            />
+                            <label
+                                htmlFor="multiple-image-upload"
+                                className="cursor-pointer bg-blue-50 hover:bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg px-6 py-4 text-center transition-colors block"
+                            >
+                                <div className="space-y-2">
+                                    <svg className="mx-auto h-8 w-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    <div className="text-sm text-gray-600">
+                                        <span className="font-medium text-blue-600">Add multiple images</span>
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                        Select multiple PNG, JPG, GIF files up to 5MB each (Max 10 images)
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        {/* Image Previews Grid */}
+                        {imagePreviews.length > 0 && (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                {imagePreviews.map((preview, index) => (
+                                    <div key={index} className="relative group">
+                                        <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
+                                            <img
+                                                src={preview}
+                                                alt={`Preview ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        
+                                        {/* Image Controls */}
+                                        <div className="absolute top-2 right-2 flex space-x-1">
+                                            {/* Move Up */}
+                                            {index > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => moveImage(index, 'up')}
+                                                    className="bg-white/80 hover:bg-white text-gray-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    title="Move up"
+                                                >
+                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            
+                                            {/* Move Down */}
+                                            {index < imagePreviews.length - 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => moveImage(index, 'down')}
+                                                    className="bg-white/80 hover:bg-white text-gray-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    title="Move down"
+                                                >
+                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            
+                                            {/* Remove */}
+                                            <button
+                                                type="button"
+                                                onClick={() => removeProductImage(index)}
+                                                className="bg-red-500/80 hover:bg-red-500 text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                title="Remove image"
+                                            >
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        
+                                        {/* Image Order */}
+                                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                                            {index + 1}
+                                        </div>
+                                        
+                                        {/* Primary Badge */}
+                                        {index === 0 && (
+                                            <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                                Primary
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 

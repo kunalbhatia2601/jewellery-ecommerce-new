@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import QuickViewModal from './QuickViewModal';
+import ImageCarousel from './ImageCarousel';
 import { useCart } from '../context/CartContext';
 
 export default function ProductGrid({ 
@@ -78,11 +79,12 @@ export default function ProductGrid({
                             {/* Mobile Layout - Amazon Style with Rounded Cards */}
                             <div className="lg:hidden bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                                 <div className="relative aspect-square overflow-hidden">
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover"
+                                    <ImageCarousel 
+                                        images={product.images && product.images.length > 0 ? product.images : product.image}
+                                        productName={product.name}
+                                        showThumbnails={false}
+                                        showDots={product.images && product.images.length > 1}
+                                        autoPlay={false}
                                     />
                                     {product.stock !== undefined && product.stock === 0 && (
                                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -130,13 +132,14 @@ export default function ProductGrid({
                             {/* Desktop Layout - Original Design with More Rounded Cards */}
                             <div className="hidden lg:block relative overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100">
                                 <div className="relative aspect-square overflow-hidden">
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                    <ImageCarousel 
+                                        images={product.images && product.images.length > 0 ? product.images : product.image}
+                                        productName={product.name}
+                                        showThumbnails={false}
+                                        showDots={product.images && product.images.length > 3}
+                                        autoPlay={false}
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                                     
                                     {/* Hover Actions */}
                                     <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">

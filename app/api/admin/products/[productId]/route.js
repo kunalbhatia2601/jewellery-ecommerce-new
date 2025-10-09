@@ -44,7 +44,7 @@ export async function GET(req, { params }) {
             );
         }
 
-        const { productId } = params;
+        const { productId } = await params;
         
         await connectDB();
         const product = await Product.findById(productId);
@@ -76,7 +76,7 @@ export async function PUT(req, { params }) {
             );
         }
 
-        const { productId } = params;
+        const { productId } = await params;
         const data = await req.json();
 
         // Validate required fields
@@ -164,7 +164,7 @@ export async function DELETE(req, { params }) {
             );
         }
 
-        const { productId } = params;
+        const { productId } = await params;
 
         await connectDB();
         const product = await Product.findByIdAndDelete(productId);

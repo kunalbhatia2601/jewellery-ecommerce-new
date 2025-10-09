@@ -29,9 +29,28 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    images: [{
+        url: {
+            type: String,
+            required: true
+        },
+        alt: {
+            type: String,
+            default: ''
+        },
+        isPrimary: {
+            type: Boolean,
+            default: false
+        },
+        order: {
+            type: Number,
+            default: 0
+        }
+    }],
+    // Backward compatibility - primary image URL
     image: {
         type: String,
-        required: true
+        required: false // Made optional since we have images array
     },
     stock: {
         type: Number,
