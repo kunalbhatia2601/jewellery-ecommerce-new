@@ -3,7 +3,7 @@ import { shiprocket } from '@/lib/shiprocket';
 
 export async function GET(req, { params }) {
     try {
-        const { awbCode } = params;
+        const { awbCode } = await params;
         const tracking = await shiprocket.trackByAWB(awbCode);
         
         return NextResponse.json(tracking);

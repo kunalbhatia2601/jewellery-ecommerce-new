@@ -4,7 +4,6 @@ const couponSchema = new mongoose.Schema({
     code: {
         type: String,
         required: true,
-        unique: true,
         uppercase: true,
         trim: true,
         minlength: 3,
@@ -111,7 +110,7 @@ const couponSchema = new mongoose.Schema({
 });
 
 // Index for faster lookups
-couponSchema.index({ code: 1 });
+couponSchema.index({ code: 1 }, { unique: true });
 couponSchema.index({ validFrom: 1, validUntil: 1 });
 couponSchema.index({ isActive: 1 });
 

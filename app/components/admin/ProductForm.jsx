@@ -31,17 +31,8 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [calculatedPrice, setCalculatedPrice] = useState(null);
     const [calculatingPrice, setCalculatingPrice] = useState(false);
-
-    const categories = [
-        'Diamond',
-        'Gold',
-        'Silver',
-        'Platinum',
-        'Wedding',
-        'Vintage',
-        'Contemporary',
-        'Traditional'
-    ];
+    const [categories, setCategories] = useState([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
 
     const goldPurities = [
         { value: '24', label: '24K (99.9% Pure)' },
@@ -69,6 +60,49 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
     const stoneSettings = [
         'Prong', 'Bezel', 'Channel', 'Pave', 'Halo', 'Tension', 'Cluster', 'Other'
     ];
+
+    // Fetch categories on component mount
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('/api/categories');
+                if (response.ok) {
+                    const categoriesData = await response.json();
+                    setCategories(categoriesData);
+                } else {
+                    console.error('Failed to fetch categories');
+                    // Fallback to hardcoded categories
+                    setCategories([
+                        { name: 'Diamond' },
+                        { name: 'Gold' },
+                        { name: 'Silver' },
+                        { name: 'Platinum' },
+                        { name: 'Wedding' },
+                        { name: 'Vintage' },
+                        { name: 'Contemporary' },
+                        { name: 'Traditional' }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                // Fallback to hardcoded categories
+                setCategories([
+                    { name: 'Diamond' },
+                    { name: 'Gold' },
+                    { name: 'Silver' },
+                    { name: 'Platinum' },
+                    { name: 'Wedding' },
+                    { name: 'Vintage' },
+                    { name: 'Contemporary' },
+                    { name: 'Traditional' }
+                ]);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         if (product) {
@@ -469,12 +503,22 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                             onChange={handleInputChange}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
                             required
+                            disabled={loadingCategories}
                         >
-                            <option value="">Select Category</option>
+                            <option value="">
+                                {loadingCategories ? 'Loading categories...' : 'Select Category'}
+                            </option>
                             {categories.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
+                                <option key={cat.name || cat} value={cat.name || cat}>
+                                    {cat.name || cat}
+                                </option>
                             ))}
                         </select>
+                        {loadingCategories && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Loading available categories...
+                            </p>
+                        )}
                     </div>
 
                     <div>
