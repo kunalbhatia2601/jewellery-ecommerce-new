@@ -83,10 +83,10 @@ export default function ModelShowcase() {
                     className="text-center mb-12 md:mb-16"
                 >
                     <div className="inline-block mb-4 md:mb-6">
-                        <p className="text-xs md:text-sm lg:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
+                        <div className="text-xs md:text-sm lg:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
                             Model Gallery
                             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF76] to-transparent" />
-                        </p>
+                        </div>
                     </div>
                     <h2 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-light text-white tracking-tight mb-6 md:mb-8">
                         Elegance in Motion

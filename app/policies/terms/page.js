@@ -20,7 +20,7 @@ export default function TermsAndConditions() {
             <p className="mb-2">You agree to use this website only for lawful purposes and in a way that does not:</p>
             <ul className="list-disc pl-6 space-y-1">
               <li>Infringe the rights of others</li>
-              <li>Restrict or inhibit anyone else's use of the website</li>
+              <li>Restrict or inhibit anyone else&apos;s use of the website</li>
               <li>Violate any applicable laws or regulations</li>
             </ul>
           </section>

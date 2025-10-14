@@ -59,7 +59,7 @@ export default function ShippingPolicy() {
             <ul className="list-disc pl-6 space-y-1 mt-2">
               <li>The tracking link provided in the shipping confirmation email</li>
               <li>Your account dashboard on our website</li>
-              <li>Courier partner's website using the tracking number</li>
+              <li>Courier partner&apos;s website using the tracking number</li>
             </ul>
           </section>
 

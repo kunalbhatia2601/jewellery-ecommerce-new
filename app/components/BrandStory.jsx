@@ -71,10 +71,10 @@ export default function BrandStory() {
                     className="text-center mb-20"
                 >
                     <div className="inline-block mb-6">
-                        <p className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
+                        <div className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
                             Our Heritage
                             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF76] to-transparent" />
-                        </p>
+                        </div>
                     </div>
                     <h2 className="text-4xl md:text-6xl lg:text-7xl font-light text-white tracking-tight mb-8">
                         Crafting Dreams

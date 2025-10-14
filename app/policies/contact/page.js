@@ -5,7 +5,7 @@ export default function ContactUs() {
         <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Contact Us</h1>
           <p className="text-gray-700 mb-8">
-            We'd love to hear from you! Whether you have a question about our products, pricing, 
+            We&apos;d love to hear from you! Whether you have a question about our products, pricing, 
             or anything else, our team is ready to answer all your questions.
           </p>
 

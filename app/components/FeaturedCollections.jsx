@@ -138,10 +138,10 @@ export default function FeaturedCollections() {
                     className="text-center mb-16 lg:mb-20"
                 >
                     <div className="inline-block">
-                        <p className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase mb-4 relative">
+                        <div className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase mb-4 relative">
                             Curated Collections
                             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF76] to-transparent" />
-                        </p>
+                        </div>
                     </div>
                     <h2 className="text-4xl md:text-6xl lg:text-7xl font-light text-[#2C2C2C] tracking-tight mb-6">
                         Signature Collections

@@ -120,7 +120,7 @@ export default function Hero() {
                         className="space-y-8"
                     >
                         {/* Subtitle */}
-                        <motion.p 
+                        <motion.div 
                             key={`subtitle-${currentSlide}`}
                             initial={{ opacity: 0.7 }}
                             animate={{ opacity: 1 }}
@@ -129,7 +129,7 @@ export default function Hero() {
                         >
                             <span className="relative z-10">{slides[currentSlide].subtitle}</span>
                             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-[1px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                        </motion.p>
+                        </motion.div>
 
                         {/* Main Title */}
                         <motion.h1 

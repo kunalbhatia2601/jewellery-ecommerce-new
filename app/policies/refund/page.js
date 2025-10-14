@@ -108,7 +108,7 @@ export default function RefundPolicy() {
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Late or Missing Refunds</h2>
             <p>
-              If you haven't received your refund within the specified timeframe, please:
+              If you haven&apos;t received your refund within the specified timeframe, please:
             </p>
             <ol className="list-decimal pl-6 space-y-1 mt-2">
               <li>Check your bank account again</li>

@@ -1,11 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function Newsletter() {
     const [email, setEmail] = useState("");
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [particles, setParticles] = useState([]);
+
+    // Generate particles only on client side to avoid hydration mismatch
+    useEffect(() => {
+        const particleArray = [...Array(15)].map((_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            top: Math.random() * 100,
+            duration: 4 + Math.random() * 2,
+            delay: Math.random() * 2,
+        }));
+        setParticles(particleArray);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -58,22 +71,22 @@ export default function Newsletter() {
             
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
-                {[...Array(15)].map((_, i) => (
+                {particles.map((particle) => (
                     <motion.div
-                        key={i}
+                        key={particle.id}
                         className="absolute w-2 h-2 bg-[#D4AF76] rounded-full opacity-20"
                         style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
+                            left: `${particle.left}%`,
+                            top: `${particle.top}%`,
                         }}
                         animate={{
                             scale: [1, 1.5, 1],
                             opacity: [0.2, 0.5, 0.2],
                         }}
                         transition={{
-                            duration: 4 + Math.random() * 2,
+                            duration: particle.duration,
                             repeat: Infinity,
-                            delay: Math.random() * 2,
+                            delay: particle.delay,
                         }}
                     />
                 ))}
@@ -97,10 +110,10 @@ export default function Newsletter() {
                                 viewport={{ once: true }}
                                 className="inline-block mb-6"
                             >
-                                <p className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
+                                <div className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
                                     Join Our Circle
                                     <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-gradient-to-r from-[#D4AF76] to-transparent" />
-                                </p>
+                                </div>
                             </motion.div>
                             
                             <motion.h2 

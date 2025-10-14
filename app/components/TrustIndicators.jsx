@@ -77,10 +77,10 @@ export default function TrustIndicators() {
                     className="text-center mb-16"
                 >
                     <div className="inline-block mb-4">
-                        <p className="text-sm text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
+                        <div className="text-sm text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
                             Trust & Excellence
                             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF76] to-transparent" />
-                        </p>
+                        </div>
                     </div>
                     <h2 className="text-3xl md:text-5xl font-light text-[#2C2C2C] tracking-tight">
                         Certified Quality & Security

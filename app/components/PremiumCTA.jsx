@@ -1,11 +1,24 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation';
 import { CldImage } from 'next-cloudinary';
 
 export default function PremiumCTA() {
     const router = useRouter();
+    const [particles, setParticles] = useState([]);
+
+    // Generate particles only on client side to avoid hydration mismatch
+    useEffect(() => {
+        const particleArray = [...Array(20)].map((_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            top: Math.random() * 100,
+            duration: 3 + Math.random() * 2,
+            delay: Math.random() * 2,
+        }));
+        setParticles(particleArray);
+    }, []);
 
     const features = [
         {
@@ -53,22 +66,22 @@ export default function PremiumCTA() {
 
             {/* Animated Particles */}
             <div className="absolute inset-0 overflow-hidden">
-                {[...Array(20)].map((_, i) => (
+                {particles.map((particle) => (
                     <motion.div
-                        key={i}
+                        key={particle.id}
                         className="absolute w-1 h-1 bg-[#D4AF76] rounded-full"
                         style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
+                            left: `${particle.left}%`,
+                            top: `${particle.top}%`,
                         }}
                         animate={{
                             y: [-20, 20],
                             opacity: [0, 1, 0],
                         }}
                         transition={{
-                            duration: 3 + Math.random() * 2,
+                            duration: particle.duration,
                             repeat: Infinity,
-                            delay: Math.random() * 2,
+                            delay: particle.delay,
                         }}
                     />
                 ))}
@@ -92,10 +105,10 @@ export default function PremiumCTA() {
                                 viewport={{ once: true }}
                                 className="inline-block mb-6"
                             >
-                                <p className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
+                                <div className="text-sm md:text-base text-[#D4AF76] font-light tracking-[0.2em] uppercase relative">
                                     Exclusive Experience
                                     <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-gradient-to-r from-[#D4AF76] to-transparent" />
-                                </p>
+                                </div>
                             </motion.div>
                             
                             <motion.h2 
