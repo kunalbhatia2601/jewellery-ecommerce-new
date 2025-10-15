@@ -117,6 +117,11 @@ const productSchema = new mongoose.Schema({
         enum: ['gold', 'silver', 'platinum', 'mixed'],
         default: 'gold'
     },
+    // Tags for target audience
+    tags: [{
+        type: String,
+        enum: ['Men', 'Women', 'Kids'],
+    }],
     // Enhanced stone/gem specifications
     stones: [{
         type: {

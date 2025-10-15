@@ -15,6 +15,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         image: '',
         images: [],
         isActive: true,
+        tags: [],
         // Dynamic pricing fields
         pricingMethod: 'fixed',
         metalType: 'gold',
@@ -149,6 +150,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 sku: product.sku || '',
                 image: product.image || '',
                 isActive: product.isActive !== undefined ? product.isActive : true,
+                tags: product.tags || [],
                 // Dynamic pricing fields
                 pricingMethod: product.pricingMethod || 'fixed',
                 metalType: product.metalType || 'gold',
@@ -1590,6 +1592,41 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
                         required
                     />
+                </div>
+
+                {/* Tags Selection */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Target Audience
+                    </label>
+                    <div className="flex flex-wrap gap-4">
+                        {['Men', 'Women', 'Kids'].map((tag) => (
+                            <label key={tag} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.tags.includes(tag)}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setFormData({
+                                                ...formData,
+                                                tags: [...formData.tags, tag]
+                                            });
+                                        } else {
+                                            setFormData({
+                                                ...formData,
+                                                tags: formData.tags.filter(t => t !== tag)
+                                            });
+                                        }
+                                    }}
+                                    className="h-4 w-4 text-[#8B6B4C] focus:ring-[#8B6B4C] border-gray-300 rounded"
+                                />
+                                <span className="text-sm text-gray-700">{tag}</span>
+                            </label>
+                        ))}
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500">
+                        Select one or more target audiences for this product
+                    </p>
                 </div>
 
                 <div className="flex items-center">
