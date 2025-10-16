@@ -5,7 +5,7 @@ import AdminLayout from '@/app/components/AdminLayout';
 import GoldPriceDashboard from '@/app/components/GoldPriceDashboard';
 import JewelryPriceCalculator from '@/app/components/JewelryPriceCalculator';
 
-const GoldPriceManagement = () => {
+const MetalRatesManagement = () => {
   const [loading, setLoading] = useState({
     updatePrices: false,
     priceHistory: false,
@@ -44,7 +44,7 @@ const GoldPriceManagement = () => {
                   {result.errors > 0 && ` (${result.errors} errors)`}
                 </p>
                 <p className="text-sm text-green-600 mt-1">
-                  Current gold price: ₹{result.currentGoldPrice?.toFixed(2)}/gram
+                  Current metal rates: Gold ₹{result.currentGoldPrice?.toFixed(2)}/g, Silver ₹{result.currentSilverPrice?.toFixed(2)}/g
                 </p>
               </div>
               
@@ -211,13 +211,13 @@ const GoldPriceManagement = () => {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gold Price Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Metal Rates Management</h1>
           <p className="text-gray-600">
-            Monitor live precious metal prices and calculate jewelry pricing based on current market rates.
+            Monitor live gold & silver prices and calculate jewelry pricing based on current market rates.
           </p>
         </div>
 
-        {/* Live Gold Price Dashboard */}
+        {/* Live Metal Price Dashboard */}
         <section>
           <GoldPriceDashboard />
         </section>
@@ -324,11 +324,12 @@ const GoldPriceManagement = () => {
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-3">How Dynamic Pricing Works</h3>
           <div className="text-blue-800 space-y-2">
-            <p>• <strong>Live Rates:</strong> Gold prices are fetched from international markets in real-time</p>
-            <p>• <strong>Auto Calculation:</strong> Product prices are calculated based on gold weight, purity, and making charges</p>
+            <p>• <strong>Live Rates:</strong> Gold & Silver prices are fetched from Bullions.co.in in real-time</p>
+            <p>• <strong>Auto Calculation:</strong> Product prices are calculated based on metal weight, purity, and making charges</p>
+            <p>• <strong>Supported Metals:</strong> Gold (24K, 22K, 20K, 18K) and Silver (999 purity only)</p>
             <p>• <strong>INR Primary:</strong> All pricing optimized for Indian market with INR as primary currency</p>
             <p>• <strong>Caching:</strong> Prices are cached for 5 minutes to reduce API calls</p>
-            <p>• <strong>Fallback:</strong> If API is unavailable, system uses fallback prices</p>
+            <p>• <strong>Fallback:</strong> If scraper is unavailable, system uses fallback prices</p>
           </div>
         </section>
       </div>
@@ -484,4 +485,4 @@ const PricingSettingsForm = ({ settings, onSave }) => {
   );
 };
 
-export default withAdminAuth(GoldPriceManagement);
+export default withAdminAuth(MetalRatesManagement);

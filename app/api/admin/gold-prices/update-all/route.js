@@ -10,18 +10,22 @@ export async function POST(request) {
     // Connect to database
     await connectDB();
     
-    // Get current gold price
+    // Get current metal prices
     const goldPriceResult = await fetchLiveGoldPrice('INR');
     if (!goldPriceResult.success) {
       return NextResponse.json({
         success: false,
-        error: 'Failed to fetch current gold price'
+        error: 'Failed to fetch current metal prices'
       }, { status: 500 });
     }
 
     // The fetchLiveGoldPrice returns the data directly, not nested in a 'data' property
     const currentGoldPrice = goldPriceResult.perGram.gold;
-    console.log('Current gold price per gram (INR):', currentGoldPrice);
+    const currentSilverPrice = goldPriceResult.perGram.silver;
+    console.log('Current metal prices (INR):', {
+      gold: currentGoldPrice,
+      silver: currentSilverPrice
+    });
 
     // Find all products with dynamic pricing enabled (any metal type)
     const dynamicProducts = await Product.find({ 
@@ -41,8 +45,6 @@ export async function POST(request) {
           ? `${product.goldWeight}g Gold ${product.goldPurity}K`
           : product.metalType === 'silver'
           ? `${product.silverWeight}g Silver ${product.silverPurity}`
-          : product.metalType === 'platinum'
-          ? `${product.platinumWeight}g Platinum ${product.platinumPurity}`
           : 'Mixed metals';
         console.log(`- ${product.name}: ${metalInfo}, current price: ₹${product.price || 0}`);
       });
@@ -80,9 +82,7 @@ export async function POST(request) {
           goldWeight: product.goldWeight || 0,
           goldPurity: product.goldPurity || 22,
           silverWeight: product.silverWeight || 0,
-          silverPurity: product.silverPurity || 925,
-          platinumWeight: product.platinumWeight || 0,
-          platinumPurity: product.platinumPurity || 950,
+          silverPurity: product.silverPurity || 999,
           makingChargePercent: product.makingChargePercent || 15,
           stoneValue: product.stoneValue || 0,
           gstPercent: product.gstPercent || 3,
@@ -175,6 +175,7 @@ export async function POST(request) {
       updated: successCount,
       errors: errorCount,
       currentGoldPrice: currentGoldPrice,
+      currentSilverPrice: currentSilverPrice,
       details: updateResults,
       timestamp: new Date().toISOString()
     });
