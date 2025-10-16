@@ -310,8 +310,8 @@ const JewelryPriceCalculator = ({ onPriceCalculated }) => {
                   required={metalType !== 'silver'}
                 >
                   {goldPurities.map((purity) => (
-                    <option key={purity} value={purity}>
-                      {purity}K Gold
+                    <option key={purity.key} value={purity.value}>
+                      {purity.label}
                     </option>
                   ))}
                 </select>
@@ -356,8 +356,8 @@ const JewelryPriceCalculator = ({ onPriceCalculated }) => {
                   required={metalType !== 'gold'}
                 >
                   {silverPurities.map((purity) => (
-                    <option key={purity} value={purity}>
-                      {purity} Silver
+                    <option key={purity.key} value={purity.value}>
+                      {purity.label}
                     </option>
                   ))}
                 </select>
