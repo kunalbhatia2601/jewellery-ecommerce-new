@@ -49,17 +49,44 @@ const GoldPriceManagement = () => {
               </div>
               
               {result.details && result.details.length > 0 && (
-                <div className="max-h-48 overflow-y-auto">
+                <div className="max-h-64 overflow-y-auto">
                   <h5 className="font-medium text-gray-900 mb-2">Updated Products:</h5>
                   {result.details.filter(item => item.success).slice(0, 10).map((item, index) => (
-                    <div key={index} className="text-sm bg-gray-50 p-2 rounded mb-1">
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-gray-600">
-                        ₹{item.oldPrice?.toFixed(2)} → ₹{item.newPrice?.toFixed(2)} 
-                        <span className={`ml-2 ${item.priceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          ({item.priceChange >= 0 ? '+' : ''}₹{item.priceChange?.toFixed(2)})
-                        </span>
+                    <div key={index} className="text-sm bg-white border border-gray-200 p-3 rounded-lg mb-2 shadow-sm">
+                      <div className="font-medium text-gray-900 mb-1">{item.name}</div>
+                      
+                      {/* MRP Update */}
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-gray-500">MRP:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-600">₹{item.oldMRP?.toFixed(2)}</span>
+                          <span className="text-gray-400">→</span>
+                          <span className="font-semibold text-gray-900">₹{item.newMRP?.toFixed(2)}</span>
+                          <span className={`ml-1 font-medium ${item.mrpChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            ({item.mrpChange >= 0 ? '+' : ''}₹{item.mrpChange?.toFixed(2)})
+                          </span>
+                        </div>
                       </div>
+                      
+                      {/* Selling Price Update */}
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-500">Selling:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-600">₹{item.oldSellingPrice?.toFixed(2)}</span>
+                          <span className="text-gray-400">→</span>
+                          <span className="font-semibold text-blue-600">₹{item.newSellingPrice?.toFixed(2)}</span>
+                          <span className={`ml-1 font-medium ${item.sellingPriceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            ({item.sellingPriceChange >= 0 ? '+' : ''}₹{item.sellingPriceChange?.toFixed(2)})
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Discount Info */}
+                      {item.discountPercent > 0 && (
+                        <div className="text-xs text-purple-600 mt-1">
+                          Discount: {item.discountPercent}% off
+                        </div>
+                      )}
                     </div>
                   ))}
                   {result.details.filter(item => item.success).length > 10 && (
