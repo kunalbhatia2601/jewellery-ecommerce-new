@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createPaymentOrder } from '@/lib/razorpay';
 import config from '@/lib/config';
-import { rateLimit, getClientIP } from '@/lib/rateLimit';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 
@@ -23,24 +22,6 @@ export async function POST(req) {
             return NextResponse.json(
                 { error: 'Invalid token' },
                 { status: 401 }
-            );
-        }
-        
-        // Rate limiting: 10 payment creation attempts per 10 minutes per user
-        const rateLimitResult = rateLimit(`payment_create_${decoded.userId}`, 10, 10 * 60 * 1000);
-        
-        if (!rateLimitResult.allowed) {
-            return NextResponse.json(
-                { 
-                    error: `Too many payment requests. Please try again in ${Math.ceil(rateLimitResult.waitTime / 60)} minutes.`,
-                    retryAfter: rateLimitResult.retryAfter
-                },
-                { 
-                    status: 429,
-                    headers: {
-                        'Retry-After': rateLimitResult.retryAfter.toString()
-                    }
-                }
             );
         }
         
