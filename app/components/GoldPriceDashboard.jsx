@@ -14,12 +14,14 @@ const GoldPriceDashboard = () => {
     { code: 'INR', symbol: '₹', name: 'Indian Rupee' }
   ];
 
-  const fetchGoldPrice = async (selectedCurrency = currency) => {
+  const fetchGoldPrice = async (selectedCurrency = currency, forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`/api/gold-price?currency=${selectedCurrency}&cache=true`);
+      // Use cache for auto-refresh, but bypass cache for manual refresh button
+      const cacheParam = forceRefresh ? 'false' : 'true';
+      const response = await fetch(`/api/gold-price?currency=${selectedCurrency}&cache=${cacheParam}`);
       const result = await response.json();
       
       if (!result.success) {
@@ -244,7 +246,7 @@ const GoldPriceDashboard = () => {
       {/* Refresh Button */}
       <div className="flex justify-center">
         <button
-          onClick={() => fetchGoldPrice()}
+          onClick={() => fetchGoldPrice(currency, true)}
           disabled={loading}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
         >

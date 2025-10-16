@@ -60,11 +60,11 @@ const couponSchema = new mongoose.Schema({
     },
     applicableCategories: [{
         type: String,
-        enum: ['Diamond', 'Gold', 'Silver', 'Platinum', 'Wedding', 'Vintage', 'Contemporary', 'Traditional']
+        enum: ['Diamond', 'Gold', 'Silver', 'Wedding', 'Vintage', 'Contemporary', 'Traditional']
     }],
     excludedCategories: [{
         type: String,
-        enum: ['Diamond', 'Gold', 'Silver', 'Platinum', 'Wedding', 'Vintage', 'Contemporary', 'Traditional']
+        enum: ['Diamond', 'Gold', 'Silver', 'Wedding', 'Vintage', 'Contemporary', 'Traditional']
     }],
     applicableProducts: [{
         type: mongoose.Schema.Types.ObjectId,

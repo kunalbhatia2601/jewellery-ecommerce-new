@@ -55,9 +55,7 @@ export async function POST(request) {
           goldWeight: product.goldWeight || 0,
           goldPurity: product.goldPurity || 22,
           silverWeight: product.silverWeight || 0,
-          silverPurity: product.silverPurity || 925,
-          platinumWeight: product.platinumWeight || 0,
-          platinumPurity: product.platinumPurity || 950,
+          silverPurity: product.silverPurity || 999,
           makingChargePercent: product.makingChargePercent || 15,
           stoneValue: product.stoneValue || 0,
           gstPercent: 3, // Default GST
@@ -156,7 +154,7 @@ export async function GET(request) {
         { pricingMethod: 'dynamic' },
         { isDynamicPricing: true }
       ]
-    }).select('name sku metalType goldWeight goldPurity silverWeight silverPurity platinumWeight platinumPurity makingChargePercent stoneValue lastPriceUpdate sellingPrice');
+    }).select('name sku metalType goldWeight goldPurity silverWeight silverPurity makingChargePercent stoneValue lastPriceUpdate sellingPrice');
 
     return NextResponse.json({
       success: true,

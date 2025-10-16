@@ -22,9 +22,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         goldWeight: '',
         goldPurity: '22',
         silverWeight: '',
-        silverPurity: '925',
-        platinumWeight: '',
-        platinumPurity: '950',
+        silverPurity: '999',
         makingChargePercent: '15',
         stoneValue: '',
         isDynamicPricing: false,
@@ -93,7 +91,6 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                         { name: 'Diamond' },
                         { name: 'Gold' },
                         { name: 'Silver' },
-                        { name: 'Platinum' },
                         { name: 'Wedding' },
                         { name: 'Vintage' },
                         { name: 'Contemporary' },
@@ -107,7 +104,6 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                     { name: 'Diamond' },
                     { name: 'Gold' },
                     { name: 'Silver' },
-                    { name: 'Platinum' },
                     { name: 'Wedding' },
                     { name: 'Vintage' },
                     { name: 'Contemporary' },
@@ -142,9 +138,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 goldWeight: product.goldWeight || '',
                 goldPurity: product.goldPurity || '22',
                 silverWeight: product.silverWeight || '',
-                silverPurity: product.silverPurity || '925',
-                platinumWeight: product.platinumWeight || '',
-                platinumPurity: product.platinumPurity || '950',
+                silverPurity: product.silverPurity || '999',
                 makingChargePercent: product.makingChargePercent || '15',
                 stoneValue: product.stoneValue || '',
                 isDynamicPricing: product.isDynamicPricing || false,
@@ -221,7 +215,6 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         const selectedMetal = formData.metalType;
         const isGold = selectedMetal === 'gold';
         const isSilver = selectedMetal === 'silver';
-        const isPlatinum = selectedMetal === 'platinum';
         const isMixed = selectedMetal === 'mixed';
         
         // Validate only the selected metal type
@@ -242,16 +235,8 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 }
                 break;
                 
-            case 'platinum':
-                const platinumWeight = parseFloat(formData.platinumWeight);
-                if (!formData.platinumWeight || isNaN(platinumWeight) || platinumWeight <= 0) {
-                    alert('Platinum weight is required for pricing calculation. Please enter a value like 5.5 grams.');
-                    return;
-                }
-                break;
-                
             default:
-                alert('Please select a valid metal type (Gold, Silver, or Platinum).');
+                alert('Please select a valid metal type (Gold or Silver).');
                 return;
         }
 
@@ -287,20 +272,6 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                     body: JSON.stringify({
                         silverWeight: parseFloat(formData.silverWeight),
                         silverPurity: parseFloat(formData.silverPurity),
-                        makingChargePercent: parseFloat(formData.makingChargePercent),
-                        gstPercent: 3,
-                        currency: 'INR'
-                    })
-                });
-            } else if (isPlatinum) {
-                response = await fetch('/api/platinum-price', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        platinumWeight: parseFloat(formData.platinumWeight),
-                        platinumPurity: parseFloat(formData.platinumPurity),
                         makingChargePercent: parseFloat(formData.makingChargePercent),
                         gstPercent: 3,
                         currency: 'INR'
@@ -378,8 +349,6 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
             let defaultMakingCharge = '15';
             if (newValue === 'silver') {
                 defaultMakingCharge = '20'; // Silver typically has higher making charges
-            } else if (newValue === 'platinum') {
-                defaultMakingCharge = '10'; // Platinum typically has lower making charges
             }
             
             setFormData(prev => ({
@@ -674,9 +643,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 goldWeight: parseFloat(formData.goldWeight) || 0,
                 goldPurity: parseFloat(formData.goldPurity) || 22,
                 silverWeight: parseFloat(formData.silverWeight) || 0,
-                silverPurity: parseFloat(formData.silverPurity) || 925,
-                platinumWeight: parseFloat(formData.platinumWeight) || 0,
-                platinumPurity: parseFloat(formData.platinumPurity) || 950,
+                silverPurity: parseFloat(formData.silverPurity) || 999,
                 makingChargePercent: parseFloat(formData.makingChargePercent) || 15,
                 stoneValue: parseFloat(formData.stoneValue) || 0,
                 isDynamicPricing: formData.isDynamicPricing,
