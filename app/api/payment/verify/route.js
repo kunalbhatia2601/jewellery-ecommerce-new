@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
-import paymentConfig from '@/lib/payment-config';
+import config from '@/lib/config';
 import { orderAutomationService } from '@/lib/orderAutomationService';
 
 export async function POST(req) {
@@ -17,7 +17,7 @@ export async function POST(req) {
         // Verify signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
-            .createHmac("sha256", paymentConfig.razorpay.keySecret)
+            .createHmac("sha256", config.razorpay.keySecret)
             .update(body.toString())
             .digest("hex");
 

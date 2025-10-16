@@ -28,21 +28,9 @@ const heroVideoSchema = new mongoose.Schema({
     duration: {
         type: Number, // Duration in seconds
         default: 0
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
-});
-
-// Update timestamp on save
-heroVideoSchema.pre('save', function(next) {
-    this.updatedAt = Date.now();
-    next();
+}, {
+    timestamps: true // Automatically adds createdAt and updatedAt
 });
 
 // Create index for ordering

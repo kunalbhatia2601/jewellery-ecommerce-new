@@ -100,13 +100,10 @@ const couponSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         },
-        discountApplied: {
-            type: Number,
-            required: true
-        }
+        discountApplied: Number
     }]
 }, {
-    timestamps: true
+    timestamps: true // Automatically adds createdAt and updatedAt
 });
 
 // Index for faster lookups

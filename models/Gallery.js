@@ -36,21 +36,9 @@ const gallerySchema = new mongoose.Schema({
     },
     tags: [{
         type: String
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-// Update timestamp on save
-gallerySchema.pre('save', function(next) {
-    this.updatedAt = Date.now();
-    next();
+    }]
+}, {
+    timestamps: true // Automatically adds createdAt and updatedAt
 });
 
 export default mongoose.models.Gallery || mongoose.model('Gallery', gallerySchema);

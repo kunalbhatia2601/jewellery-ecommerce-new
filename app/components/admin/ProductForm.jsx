@@ -126,7 +126,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 mrp: product.mrp || '',
                 costPrice: product.costPrice || '',
                 sellingPrice: product.sellingPrice || '',
-                price: product.price || product.sellingPrice || '',
+                price: product.sellingPrice || '',
                 stock: product.stock || '',
                 sku: product.sku || '',
                 image: product.image || '',

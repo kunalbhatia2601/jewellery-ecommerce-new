@@ -9,10 +9,6 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    price: {
-        type: Number,
-        required: true
-    },
     mrp: {
         type: Number,
         required: true
@@ -47,7 +43,7 @@ const productSchema = new mongoose.Schema({
             default: 0
         }
     }],
-    // Backward compatibility - primary image URL
+    // Primary image URL (single image for backward compatibility with existing data)
     image: {
         type: String,
         required: false // Made optional since we have images array

@@ -481,7 +481,7 @@ function ProductListItem({ product, index }) {
                                 {product.name}
                             </h3>
                             <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-[#2C2C2C] font-medium">
-                                ₹{(product.sellingPrice || product.price).toLocaleString('en-IN')}
+                                ₹{product.sellingPrice.toLocaleString('en-IN')}
                             </p>
                         </div>
                     </div>

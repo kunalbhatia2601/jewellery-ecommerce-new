@@ -121,7 +121,6 @@ export async function POST(req) {
                     // Calculate Selling Price = MRP - (MRP × discount%)
                     const discountMultiplier = 1 - (data.discountPercent / 100);
                     data.sellingPrice = data.mrp * discountMultiplier;
-                    data.price = data.sellingPrice; // For backward compatibility
                     
                     data.isDynamicPricing = true;
                     data.pricingMethod = 'dynamic';
