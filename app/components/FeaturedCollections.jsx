@@ -19,8 +19,8 @@ export default function FeaturedCollections() {
                 const data = await response.json();
                 setCategories(data);
                 
-                // Create featured collections from real categories
-                const featured = data.slice(0, 3).map((category, index) => ({
+                // Create featured collections from all categories
+                const featured = data.map((category, index) => ({
                     id: category._id,
                     title: category.name,
                     subtitle: category.description?.substring(0, 50) + "..." || "Premium Collection",
@@ -31,48 +31,6 @@ export default function FeaturedCollections() {
                     color: getCollectionColor(index),
                     realData: true
                 }));
-                
-                // If we have fewer than 3 categories, add some default ones
-                if (featured.length < 3) {
-                    const defaultCollections = [
-                        {
-                            id: "default-1",
-                            title: "Signature Collection",
-                            subtitle: "Handcrafted Excellence",
-                            description: "Our most exquisite pieces, representing the pinnacle of craftsmanship and design innovation.",
-                            image: "carousel1_l76hra.jpg",
-                            products: 25,
-                            category: "signature",
-                            color: "from-rose-100 to-pink-50",
-                            realData: false
-                        },
-                        {
-                            id: "default-2",
-                            title: "Heritage Collection",
-                            subtitle: "Timeless Traditions",
-                            description: "Classic designs that honor our rich heritage while embracing contemporary elegance.",
-                            image: "carousel2_gycam4.jpg",
-                            products: 18,
-                            category: "heritage",
-                            color: "from-amber-100 to-yellow-50",
-                            realData: false
-                        },
-                        {
-                            id: "default-3",
-                            title: "Modern Luxe",
-                            subtitle: "Contemporary Sophistication",
-                            description: "Bold, innovative designs for the modern connoisseur who appreciates cutting-edge aesthetics.",
-                            image: "carousel3_xpvlxx.jpg",
-                            products: 22,
-                            category: "modern",
-                            color: "from-purple-100 to-indigo-50",
-                            realData: false
-                        }
-                    ];
-                    
-                    const needed = 3 - featured.length;
-                    featured.push(...defaultCollections.slice(0, needed));
-                }
                 
                 setFeaturedCollections(featured);
                 setLoading(false);
@@ -152,16 +110,18 @@ export default function FeaturedCollections() {
                 </motion.div>
 
                 {/* Collections Grid */}
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                    {/* Collection Cards */}
+                <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+                    {/* Collection Cards - Scrollable */}
                     <motion.div 
                         initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                         viewport={{ once: true }}
-                        className="space-y-6"
+                        className="relative"
                     >
-                        {featuredCollections.map((collection, index) => (
+                        {/* Scroll container */}
+                        <div className="overflow-y-auto max-h-[600px] lg:max-h-[700px] space-y-6 pr-2 scrollbar-thin scrollbar-thumb-[#D4AF76] scrollbar-track-gray-100 hover:scrollbar-thumb-[#8B6B4C]">
+                            {featuredCollections.map((collection, index) => (
                             <motion.button
                                 key={collection.id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -216,6 +176,23 @@ export default function FeaturedCollections() {
                                 </div>
                             </motion.button>
                         ))}
+                        </div>
+                        
+                        {/* Scroll indicator - Only show if there are more than 3 collections */}
+                        {featuredCollections.length > 3 && (
+                            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none flex items-end justify-center pb-2">
+                                <motion.div
+                                    animate={{ y: [0, 5, 0] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                    className="text-xs text-[#D4AF76] flex items-center gap-1"
+                                >
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                    Scroll for more
+                                </motion.div>
+                            </div>
+                        )}
                     </motion.div>
 
                     {/* Featured Image */}

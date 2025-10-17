@@ -118,7 +118,7 @@ export default function ProductDetail({ productId }) {
                         <p className="text-gray-600 font-light mb-6">
                             The product you're looking for doesn't exist or has been removed.
                         </p>
-                        <Link href="/collections">
+                        <Link href="/products">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -150,7 +150,7 @@ export default function ProductDetail({ productId }) {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    <Link href="/collections" className="hover:text-[#D4AF76] transition-colors">Collections</Link>
+                    <Link href="/products" className="hover:text-[#D4AF76] transition-colors">Collections</Link>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
