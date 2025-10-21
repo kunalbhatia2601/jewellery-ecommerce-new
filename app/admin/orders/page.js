@@ -66,9 +66,12 @@ function AdminOrdersPage() {
 
             const data = await res.json();
 
-            if (res.ok) {
+            if (res.ok && data.success) {
                 await fetchOrders(); // Refresh orders
                 alert(`✅ Tracking synced!\n\nPrevious: ${data.data.previousStatus}\nNew: ${data.data.newStatus}\nStatus: ${data.data.statusLabel}`);
+            } else if (res.ok && !data.success) {
+                // Successful API call but no updates (e.g., shipment too new)
+                alert(`ℹ️ No updates available\n\nCurrent Status: ${data.data.currentStatus}\n\n${data.data.shiprocketMessage}\n\n${data.data.hint || ''}`);
             } else {
                 alert(`Failed to sync tracking:\n${data.message || data.error}`);
             }
@@ -207,7 +210,7 @@ function AdminOrdersPage() {
                                                 {order.shipping?.awbCode ? (
                                                     <>
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {order.shipping.awbCode}
+                                                            AWB: {order.shipping.awbCode}
                                                         </div>
                                                         <div className="text-sm text-gray-500">
                                                             {order.shipping.courier}
@@ -225,7 +228,13 @@ function AdminOrdersPage() {
                                                     <div className="text-sm text-yellow-600">
                                                         Shipment Created
                                                         <br />
-                                                        <span className="text-xs">ID: {order.shipping.shipmentId}</span>
+                                                        <span className="text-xs">Shipment ID: {order.shipping.shipmentId}</span>
+                                                        {order.shipping.shiprocketOrderId && (
+                                                            <>
+                                                                <br />
+                                                                <span className="text-xs">SR Order ID: {order.shipping.shiprocketOrderId}</span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <span className="text-sm text-gray-500">Not shipped</span>

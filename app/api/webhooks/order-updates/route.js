@@ -99,6 +99,7 @@ export async function POST(req) {
             current_timestamp,
             order_id,
             sr_order_id,
+            shipment_id,
             awb_assigned_date,
             pickup_scheduled_date,
             etd,
@@ -113,32 +114,39 @@ export async function POST(req) {
         const statusCode = shipment_status_id || current_status_id;
         const statusLabel = shipment_status || current_status;
 
-        if (!awb && !sr_order_id) {
+        if (!shipment_id && !awb && !sr_order_id) {
             // Return 200 as per Shiprocket requirement
             return NextResponse.json(
-                { success: false, message: 'AWB or SR Order ID required' },
+                { success: false, message: 'Shipment ID, AWB, or SR Order ID required' },
                 { status: 200, headers: corsHeaders }
             );
         }
 
         await connectDB();
 
-        // Find order by AWB code or Shiprocket order ID
+        // Find order by Shipment ID first (most reliable), then AWB, then Shiprocket order ID
         let order;
-        if (awb) {
+        if (shipment_id) {
+            order = await Order.findOne({ 'shipping.shipmentId': shipment_id });
+            console.log(`🔍 Looking up order by Shipment ID: ${shipment_id}`, order ? '✅ Found' : '❌ Not found');
+        }
+        if (!order && awb) {
             order = await Order.findOne({ 'shipping.awbCode': awb });
+            console.log(`🔍 Looking up order by AWB: ${awb}`, order ? '✅ Found' : '❌ Not found');
         }
         if (!order && sr_order_id) {
             order = await Order.findOne({ 'shipping.shiprocketOrderId': sr_order_id });
+            console.log(`🔍 Looking up order by SR Order ID: ${sr_order_id}`, order ? '✅ Found' : '❌ Not found');
         }
         if (!order && order_id) {
             // Try to extract our order ID from the order_id field (format: "orderId_srOrderId")
             const ourOrderId = order_id.split('_')[0];
             order = await Order.findOne({ orderNumber: ourOrderId });
+            console.log(`🔍 Looking up order by Order Number: ${ourOrderId}`, order ? '✅ Found' : '❌ Not found');
         }
 
         if (!order) {
-            console.log(`Order not found for AWB: ${awb}, Shipment ID: ${shipment_id}`);
+            console.log(`❌ Order not found for any identifier - Shipment ID: ${shipment_id}, AWB: ${awb}, SR Order ID: ${sr_order_id}`);
             // Return 200 as per Shiprocket requirement
             return NextResponse.json(
                 { success: false, message: 'Order not found' },
@@ -201,6 +209,7 @@ export async function POST(req) {
         const updateData = {
             'shipping.currentLocation': currentLocation,
             'shipping.lastUpdateAt': parseShiprocketDate(current_timestamp),
+            'shipping.shipmentId': shipment_id,
             'shipping.shiprocketOrderId': sr_order_id,
             'shipping.awbCode': awb
         };
