@@ -20,6 +20,15 @@ import { processAutomaticRefund } from '@/lib/refundService';
  * 9. Refund completed → Status: 'completed'
  */
 
+// Handle GET requests for webhook verification
+export async function GET(req) {
+    return NextResponse.json({
+        status: 'active',
+        endpoint: 'shiprocket-return-webhook',
+        message: 'Webhook endpoint is ready to receive POST requests'
+    }, { status: 200 });
+}
+
 // Verify webhook signature
 function verifyWebhookSignature(payload, signature, secret) {
     if (!secret) {

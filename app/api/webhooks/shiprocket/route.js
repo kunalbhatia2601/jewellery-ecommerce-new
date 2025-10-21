@@ -3,6 +3,15 @@ import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 
+// Handle GET requests for webhook verification
+export async function GET(req) {
+    return NextResponse.json({
+        status: 'active',
+        endpoint: 'shiprocket-forward-webhook',
+        message: 'Webhook endpoint is ready to receive POST requests'
+    }, { status: 200 });
+}
+
 // Verify webhook signature for security
 function verifyWebhookSignature(payload, signature, secret) {
     if (!secret) {
