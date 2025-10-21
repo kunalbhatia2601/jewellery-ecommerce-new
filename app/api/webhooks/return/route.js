@@ -13,12 +13,19 @@ export const fetchCache = 'force-no-store';
 // CORS headers for webhook accessibility
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-shiprocket-signature',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
+    'Access-Control-Allow-Headers': 'Content-Type, x-shiprocket-signature, Authorization',
+    'Content-Type': 'application/json',
 };
 
 /**
  * AUTOMATED RETURN WORKFLOW WEBHOOK
+ * 
+ * ⚠️ IMPORTANT: Shiprocket URL Naming Requirement
+ * This endpoint is named "return" instead of "shiprocket-return" because Shiprocket 
+ * does NOT allow keywords like "shiprocket", "kartrocket", "sr", or "kr" in webhook URLs.
+ * 
+ * Webhook URL: https://www.nandikajewellers.in/api/webhooks/return
  * 
  * This webhook handles the complete automated return process:
  * 1. User requests return → Status: 'requested'
@@ -394,11 +401,22 @@ export async function GET() {
     return NextResponse.json({
         status: 'active',
         webhook: 'automated-return-workflow',
-        description: 'Handles automated return processing with Shiprocket integration',
+        description: 'Handles automated return processing and tracking',
         timestamp: new Date().toISOString(),
         endpoint: '/api/webhooks/return',
-        methods: ['GET', 'POST', 'OPTIONS']
+        methods: ['GET', 'POST', 'OPTIONS', 'HEAD'],
+        note: 'URL does not contain restricted keywords (shiprocket, kartrocket, sr, kr)'
     }, {
+        headers: corsHeaders
+    });
+}
+
+/**
+ * HEAD endpoint for webhook verification
+ */
+export async function HEAD() {
+    return new NextResponse(null, {
+        status: 200,
         headers: corsHeaders
     });
 }

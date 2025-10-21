@@ -11,9 +11,22 @@ export const fetchCache = 'force-no-store';
 // CORS headers for webhook accessibility
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-shiprocket-signature',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
+    'Access-Control-Allow-Headers': 'Content-Type, x-shiprocket-signature, Authorization',
+    'Content-Type': 'application/json',
 };
+
+/**
+ * SHIPMENT TRACKING WEBHOOK
+ * 
+ * ⚠️ IMPORTANT: Shiprocket URL Naming Requirement
+ * This endpoint is named "tracking" instead of "shiprocket-tracking" because Shiprocket 
+ * does NOT allow keywords like "shiprocket", "kartrocket", "sr", or "kr" in webhook URLs.
+ * 
+ * Webhook URL: https://www.nandikajewellers.in/api/webhooks/tracking
+ * 
+ * This webhook receives automatic tracking updates from Shiprocket for order shipments.
+ */
 
 // Verify webhook signature for security
 function verifyWebhookSignature(payload, signature, secret) {
@@ -50,8 +63,13 @@ export async function OPTIONS(req) {
 // Shiprocket webhook handler for automatic tracking updates
 export async function POST(req) {
     try {
+        // Log incoming request details for debugging
+        console.log('📦 Tracking Webhook - Request URL:', req.url);
+        console.log('📦 Tracking Webhook - Method:', req.method);
+        console.log('📦 Tracking Webhook - Headers:', Object.fromEntries(req.headers.entries()));
+        
         const webhookData = await req.json();
-        console.log('Shiprocket webhook received:', JSON.stringify(webhookData, null, 2));
+        console.log('📦 Tracking webhook received:', JSON.stringify(webhookData, null, 2));
 
         // Verify webhook authenticity
         const signature = req.headers.get('x-shiprocket-signature');
@@ -208,12 +226,23 @@ export async function POST(req) {
 export async function GET() {
     return NextResponse.json({
         status: 'active',
-        webhook: 'shiprocket-order-tracking',
-        description: 'Handles Shiprocket order tracking updates',
+        webhook: 'order-tracking',
+        description: 'Handles shipment tracking updates for orders',
         timestamp: new Date().toISOString(),
         endpoint: '/api/webhooks/tracking',
-        methods: ['GET', 'POST', 'OPTIONS']
+        methods: ['GET', 'POST', 'OPTIONS', 'HEAD'],
+        note: 'URL does not contain restricted keywords (shiprocket, kartrocket, sr, kr)'
     }, {
+        headers: corsHeaders
+    });
+}
+
+/**
+ * HEAD endpoint for webhook verification
+ */
+export async function HEAD() {
+    return new NextResponse(null, {
+        status: 200,
         headers: corsHeaders
     });
 }
