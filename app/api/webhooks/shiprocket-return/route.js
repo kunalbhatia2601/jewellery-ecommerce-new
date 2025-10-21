@@ -371,14 +371,3 @@ export async function POST(req) {
         );
     }
 }
-
-/**
- * GET endpoint for webhook health check
- */
-export async function GET() {
-    return NextResponse.json({
-        status: 'active',
-        webhook: 'automated-return-workflow',
-        description: 'Handles automated return processing with Shiprocket integration'
-    });
-}
