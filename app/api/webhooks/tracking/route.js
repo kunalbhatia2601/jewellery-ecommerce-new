@@ -211,7 +211,7 @@ export async function GET() {
         webhook: 'shiprocket-order-tracking',
         description: 'Handles Shiprocket order tracking updates',
         timestamp: new Date().toISOString(),
-        endpoint: '/api/webhooks/shiprocket',
+        endpoint: '/api/webhooks/tracking',
         methods: ['GET', 'POST', 'OPTIONS']
     }, {
         headers: corsHeaders

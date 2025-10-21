@@ -396,7 +396,7 @@ export async function GET() {
         webhook: 'automated-return-workflow',
         description: 'Handles automated return processing with Shiprocket integration',
         timestamp: new Date().toISOString(),
-        endpoint: '/api/webhooks/shiprocket-return',
+        endpoint: '/api/webhooks/return',
         methods: ['GET', 'POST', 'OPTIONS']
     }, {
         headers: corsHeaders
