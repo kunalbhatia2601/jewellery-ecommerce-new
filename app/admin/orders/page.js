@@ -53,6 +53,31 @@ function AdminOrdersPage() {
         }
     };
 
+    // Manual sync from Shiprocket (for when webhooks don't trigger)
+    const syncTrackingFromShiprocket = async (orderId, orderNumber) => {
+        if (!confirm(`Force sync tracking status from Shiprocket for order #${orderNumber}?\n\nThis will fetch the latest status directly from Shiprocket API.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/admin/orders/${orderId}/sync-tracking`, {
+                method: 'POST'
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                await fetchOrders(); // Refresh orders
+                alert(`✅ Tracking synced!\n\nPrevious: ${data.data.previousStatus}\nNew: ${data.data.newStatus}\nStatus: ${data.data.statusLabel}`);
+            } else {
+                alert(`Failed to sync tracking:\n${data.message || data.error}`);
+            }
+        } catch (error) {
+            console.error('Failed to sync tracking:', error);
+            alert('Failed to sync tracking from Shiprocket');
+        }
+    };
+
     const filteredOrders = orders.filter(order => {
         const matchesFilter = filter === 'all' || order.status === filter;
         const matchesSearch = order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -217,6 +242,15 @@ function AdminOrdersPage() {
                                                     <div className="text-xs text-purple-600 bg-purple-50 px-3 py-1 rounded">
                                                         🤖 Auto-creating shipment...
                                                     </div>
+                                                )}
+                                                {order.shipping?.shipmentId && (
+                                                    <button
+                                                        onClick={() => syncTrackingFromShiprocket(order._id, order._id.slice(-8))}
+                                                        className="text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded text-xs font-semibold"
+                                                        title="Force sync status from Shiprocket (use if webhook didn't trigger)"
+                                                    >
+                                                        🔄 Sync Status
+                                                    </button>
                                                 )}
                                                 {order.shipping?.awbCode && (
                                                     <button

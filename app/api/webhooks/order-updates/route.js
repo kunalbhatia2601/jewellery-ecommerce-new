@@ -209,6 +209,12 @@ export async function POST(req) {
         if (statusCode && statusMapping[statusCode]) {
             updateData['shipping.status'] = statusMapping[statusCode].shipping;
             updateData['status'] = statusMapping[statusCode].order;
+            
+            // Log status change clearly
+            console.log(`📊 Status Update for Order ${order.orderNumber}:`);
+            console.log(`   Current Status: ${order.status} → ${statusMapping[statusCode].order}`);
+            console.log(`   Shipping Status: ${order.shipping.status} → ${statusMapping[statusCode].shipping}`);
+            console.log(`   Status Code: ${statusCode} (${statusLabel})`);
         }
 
         // Add courier name if provided
