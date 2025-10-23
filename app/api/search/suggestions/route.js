@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import Subcategory from '@/models/Subcategory';
 
 export async function GET(request) {
     try {
@@ -17,7 +18,7 @@ export async function GET(request) {
         // Create regex for case-insensitive partial matching
         const searchRegex = new RegExp(query, 'i');
 
-        // Search in products
+        // Search in products with subcategory population
         const productSuggestions = await Product.find({
             isActive: true,
             $or: [
@@ -28,7 +29,8 @@ export async function GET(request) {
                 { 'stones.type': { $regex: searchRegex } }
             ]
         })
-        .select('name image images category sellingPrice _id')
+        .select('name image images category subcategory sellingPrice _id')
+        .populate('subcategory', 'name slug')
         .limit(5)
         .lean();
 
@@ -41,6 +43,19 @@ export async function GET(request) {
             ]
         })
         .select('name image slug')
+        .limit(3)
+        .lean();
+
+        // Search in subcategories
+        const subcategorySuggestions = await Subcategory.find({
+            isActive: true,
+            $or: [
+                { name: { $regex: searchRegex } },
+                { description: { $regex: searchRegex } }
+            ]
+        })
+        .select('name image slug category')
+        .populate('category', 'name slug')
         .limit(3)
         .lean();
 
@@ -103,6 +118,7 @@ export async function GET(request) {
                     type: 'product',
                     image: imageUrl,
                     category: product.category,
+                    subcategory: product.subcategory?.name || null,
                     price: product.sellingPrice,
                     url: `/products/${product._id}`
                 };
@@ -115,6 +131,16 @@ export async function GET(request) {
                     type: 'category',
                     image: imageUrl,
                     url: `/collections/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}`
+                };
+            }),
+            ...subcategorySuggestions.map(subcategory => {
+                const imageUrl = getImageUrl(subcategory.image, 'category');
+                return {
+                    id: subcategory._id.toString(),
+                    text: `${subcategory.name} (${subcategory.category?.name || 'Subcategory'})`,
+                    type: 'subcategory',
+                    image: imageUrl,
+                    url: `/products?category=${encodeURIComponent(subcategory.category?.name || '')}&subcategory=${subcategory._id}`
                 };
             })
         ];

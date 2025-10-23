@@ -180,6 +180,9 @@ export default function SearchBar({ className = "", placeholder = "Search for je
             router.push(`/products/${suggestion.id}`);
         } else if (suggestion.type === 'category') {
             router.push(suggestion.url);
+        } else if (suggestion.type === 'subcategory') {
+            // Navigate to products page with category and subcategory filters
+            router.push(suggestion.url);
         } else {
             // For popular searches, go to products with search
             setSearchQuery(suggestion.text);
@@ -285,6 +288,7 @@ export default function SearchBar({ className = "", placeholder = "Search for je
         switch (type) {
             case 'product': return 'Product';
             case 'category': return 'Collection';
+            case 'subcategory': return 'Subcategory';
             case 'popular': return 'Popular';
             default: return '';
         }
@@ -408,13 +412,13 @@ export default function SearchBar({ className = "", placeholder = "Search for je
                                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                 >
                                     <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200 relative flex items-center justify-center">
-                                        {suggestion.image && !imageErrors[suggestion.id] ? (
+                                        {(suggestion.images?.[0]?.url || suggestion.image) && !imageErrors[suggestion.id] ? (
                                             <img
-                                                src={suggestion.image}
+                                                src={suggestion.images?.[0]?.url || suggestion.image}
                                                 alt={suggestion.text}
                                                 className="w-full h-full object-cover"
                                                 onLoad={() => handleImageLoad(suggestion.id)}
-                                                onError={() => handleImageError(suggestion.id, suggestion.image)}
+                                                onError={() => handleImageError(suggestion.id, suggestion.images?.[0]?.url || suggestion.image)}
                                             />
                                         ) : (
                                             <div className="w-full h-full bg-gradient-to-br from-[#D4AF76]/20 to-[#8B6B4C]/20 flex items-center justify-center">
@@ -435,7 +439,18 @@ export default function SearchBar({ className = "", placeholder = "Search for je
                                             )}
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                            {suggestion.category ? `${getTypeLabel(suggestion.type)} • ${suggestion.category}` : getTypeLabel(suggestion.type)}
+                                            {suggestion.type === 'product' && suggestion.category ? (
+                                                <>
+                                                    {getTypeLabel(suggestion.type)} • {suggestion.category}
+                                                    {suggestion.subcategory && (
+                                                        <> • <span className="text-[#8B6B4C]">{suggestion.subcategory}</span></>
+                                                    )}
+                                                </>
+                                            ) : suggestion.category ? (
+                                                `${getTypeLabel(suggestion.type)} • ${suggestion.category}`
+                                            ) : (
+                                                getTypeLabel(suggestion.type)
+                                            )}
                                         </p>
                                     </div>
 
@@ -451,6 +466,13 @@ export default function SearchBar({ className = "", placeholder = "Search for je
                                             <div className="w-6 h-6 rounded-full bg-[#8B6B4C]/20 flex items-center justify-center">
                                                 <svg className="w-3 h-3 text-[#8B6B4C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                        {suggestion.type === 'subcategory' && (
+                                            <div className="w-6 h-6 rounded-full bg-[#C19A6B]/20 flex items-center justify-center">
+                                                <svg className="w-3 h-3 text-[#C19A6B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
                                                 </svg>
                                             </div>
                                         )}

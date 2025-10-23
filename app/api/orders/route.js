@@ -216,7 +216,9 @@ export async function POST(req) {
                 name: product.name,
                 price: product.sellingPrice || product.price,
                 quantity: item.quantity,
-                image: product.image || product.images?.[0]?.url
+                image: product.image || product.images?.[0]?.url,
+                category: product.category,
+                subcategory: product.subcategory || null
             };
         });
 

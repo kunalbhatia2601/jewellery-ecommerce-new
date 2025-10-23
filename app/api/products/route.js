@@ -11,6 +11,7 @@ export async function GET(req) {
         const page = parseInt(searchParams.get('page')) || 1;
         const limit = parseInt(searchParams.get('limit')) || 20;
         const category = searchParams.get('category');
+        const subcategory = searchParams.get('subcategory');
         const search = searchParams.get('search');
         const sortBy = searchParams.get('sortBy') || 'createdAt';
         const sortOrder = searchParams.get('sortOrder') === 'asc' ? 1 : -1;
@@ -31,6 +32,11 @@ export async function GET(req) {
         // Add category filter
         if (category && category !== 'all') {
             query.category = category;
+        }
+        
+        // Add subcategory filter
+        if (subcategory && subcategory !== 'all') {
+            query.subcategory = subcategory;
         }
         
         // Add search filter
@@ -61,6 +67,7 @@ export async function GET(req) {
         const [products, totalCount] = await Promise.all([
             Product.find(query)
                 .select('-costPrice') // Exclude cost price from public API
+                .populate('subcategory', 'name slug')
                 .sort(sort)
                 .skip(skip)
                 .limit(limit)
@@ -88,6 +95,7 @@ export async function GET(req) {
             },
             filters: {
                 category: category || 'all',
+                subcategory: subcategory || 'all',
                 search: search || '',
                 minPrice,
                 maxPrice: maxPrice === Infinity ? null : maxPrice,

@@ -6,6 +6,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         name: '',
         description: '',
         category: '',
+        subcategory: '',
         mrp: '',
         costPrice: '',
         sellingPrice: '',
@@ -39,6 +40,8 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
     const [calculatedPrice, setCalculatedPrice] = useState(null);
     const [calculatingPrice, setCalculatingPrice] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+    const [filteredSubcategories, setFilteredSubcategories] = useState([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
 
     const goldPurities = [
@@ -76,13 +79,14 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         'Prong', 'Bezel', 'Channel', 'Pave', 'Halo', 'Tension', 'Cluster', 'Other'
     ];
 
-    // Fetch categories on component mount
+    // Fetch categories and subcategories on component mount
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchCategoriesAndSubcategories = async () => {
             try {
-                const response = await fetch('/api/categories');
-                if (response.ok) {
-                    const categoriesData = await response.json();
+                // Fetch categories
+                const categoriesResponse = await fetch('/api/categories');
+                if (categoriesResponse.ok) {
+                    const categoriesData = await categoriesResponse.json();
                     setCategories(categoriesData);
                 } else {
                     console.error('Failed to fetch categories');
@@ -96,6 +100,13 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                         { name: 'Contemporary' },
                         { name: 'Traditional' }
                     ]);
+                }
+
+                // Fetch subcategories
+                const subcategoriesResponse = await fetch('/api/subcategories?includeInactive=true');
+                if (subcategoriesResponse.ok) {
+                    const subcategoriesData = await subcategoriesResponse.json();
+                    setSubcategories(subcategoriesData.subcategories || []);
                 }
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -114,8 +125,25 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
             }
         };
 
-        fetchCategories();
+        fetchCategoriesAndSubcategories();
     }, []);
+
+    // Filter subcategories based on selected category
+    useEffect(() => {
+        if (formData.category && categories.length > 0) {
+            const selectedCategory = categories.find(cat => cat.name === formData.category);
+            if (selectedCategory) {
+                const filtered = subcategories.filter(sub => 
+                    sub.category._id === selectedCategory._id || sub.category === selectedCategory._id
+                );
+                setFilteredSubcategories(filtered);
+            } else {
+                setFilteredSubcategories([]);
+            }
+        } else {
+            setFilteredSubcategories([]);
+        }
+    }, [formData.category, categories, subcategories]);
 
     useEffect(() => {
         if (product) {
@@ -123,6 +151,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                 name: product.name || '',
                 description: product.description || '',
                 category: product.category || '',
+                subcategory: product.subcategory?._id || product.subcategory || '',
                 mrp: product.mrp || '',
                 costPrice: product.costPrice || '',
                 sellingPrice: product.sellingPrice || '',
@@ -722,7 +751,11 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                                 <select
                                     name="category"
                                     value={formData.category}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        handleInputChange(e);
+                                        // Reset subcategory when category changes
+                                        setFormData(prev => ({ ...prev, subcategory: '' }));
+                                    }}
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent transition-all"
                                     required
                                     disabled={loadingCategories}
@@ -736,6 +769,37 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Subcategory (Optional)
+                                </label>
+                                <select
+                                    name="subcategory"
+                                    value={formData.subcategory}
+                                    onChange={handleInputChange}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent transition-all"
+                                    disabled={!formData.category || filteredSubcategories.length === 0}
+                                >
+                                    <option value="">
+                                        {!formData.category 
+                                            ? 'Select a category first' 
+                                            : filteredSubcategories.length === 0 
+                                            ? 'No subcategories available' 
+                                            : 'Select Subcategory (Optional)'}
+                                    </option>
+                                    {filteredSubcategories.map(subcat => (
+                                        <option key={subcat._id} value={subcat._id}>
+                                            {subcat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {formData.category && filteredSubcategories.length === 0 && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        No subcategories defined for this category yet.
+                                    </p>
+                                )}
                             </div>
 
                             <div>

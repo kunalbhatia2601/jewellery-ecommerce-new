@@ -15,7 +15,13 @@ const orderSchema = new mongoose.Schema({
         name: String,
         price: Number,
         quantity: Number,
-        image: String
+        image: String,
+        category: String,
+        subcategory: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Subcategory',
+            default: null
+        }
     }],
     shippingAddress: {
         fullName: {

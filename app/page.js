@@ -14,6 +14,7 @@ import PremiumCTA from './components/PremiumCTA';
 import TrustIndicators from './components/TrustIndicators';
 import Newsletter from './components/Newsletter';
 import VideoShowcaseSection from './components/HeroVideoShowcase';
+import CategoryShowcase from './components/CategoryShowcase';
 
 // Force dynamic rendering to avoid SSG issues with useSearchParams
 export const dynamic = 'force-dynamic';
@@ -31,16 +32,9 @@ export default function Home() {
       
       {/* Hero Section */}
       <Hero />
-      
-      {/* Category Story Badges - Mobile Only */}
-      <div className="md:hidden">
-        <CategoryStoryBadges />
-      </div>
-      
-      {/* Featured Collections - Desktop Only */}
-      <div className="hidden md:block">
-        <FeaturedCollections />
-      </div>
+
+      {/* Category Showcase - New */}
+      <CategoryShowcase />
       
       {/* New Arrivals Section */}
       <NewArrivals />

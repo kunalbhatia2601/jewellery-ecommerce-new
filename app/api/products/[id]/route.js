@@ -6,9 +6,11 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
         
-        const { id } = await params;
+        const { id} = await params;
         
-        const product = await Product.findById(id).lean();
+        const product = await Product.findById(id)
+            .populate('subcategory', 'name slug')
+            .lean();
         
         if (!product) {
             return NextResponse.json(

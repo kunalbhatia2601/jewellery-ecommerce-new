@@ -46,7 +46,9 @@ export async function GET() {
         }
 
         await connectDB();
-        const products = await Product.find({}).sort({ createdAt: -1 });
+        const products = await Product.find({})
+            .populate('subcategory', 'name slug')
+            .sort({ createdAt: -1 });
         return NextResponse.json(products);
     } catch (error) {
         console.error('Admin products fetch error:', error);

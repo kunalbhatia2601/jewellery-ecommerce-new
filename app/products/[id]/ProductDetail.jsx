@@ -52,11 +52,33 @@ export default function ProductDetail({ productId }) {
 
     const fetchRelatedProducts = async (category, currentProductId) => {
         try {
-            const response = await fetch(`/api/products?category=${category}&limit=4`);
+            // First try to get products from same subcategory
+            if (product?.subcategory) {
+                const subcategoryId = typeof product.subcategory === 'object' 
+                    ? product.subcategory._id 
+                    : product.subcategory;
+                
+                const response = await fetch(`/api/products?subcategory=${subcategoryId}&limit=8`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const productsData = data.success ? data.data : data;
+                    // Filter out current product
+                    const filtered = productsData.filter(p => p._id !== currentProductId);
+                    
+                    if (filtered.length >= 4) {
+                        setRelatedProducts(filtered.slice(0, 4));
+                        return;
+                    }
+                }
+            }
+            
+            // Fallback to category-based recommendations
+            const response = await fetch(`/api/products?category=${category}&limit=8`);
             if (response.ok) {
                 const data = await response.json();
+                const productsData = data.success ? data.data : data;
                 // Filter out current product
-                const filtered = data.filter(p => p._id !== currentProductId);
+                const filtered = productsData.filter(p => p._id !== currentProductId);
                 setRelatedProducts(filtered.slice(0, 4));
             }
         } catch (error) {
@@ -432,39 +454,100 @@ export default function ProductDetail({ productId }) {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
+                        className="mt-16"
                     >
-                        <h2 className="text-3xl font-light text-[#2C2C2C] mb-8">You May Also Like</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            {relatedProducts.map((relatedProduct) => (
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-light text-[#2C2C2C] mb-2">
+                                    Similar Products
+                                </h2>
+                                <p className="text-sm md:text-base text-gray-600 font-light">
+                                    {product?.subcategory?.name || product?.category 
+                                        ? `More from ${product?.subcategory?.name || product?.category}` 
+                                        : 'You may also like these'
+                                    }
+                                </p>
+                            </div>
+                            <Link 
+                                href={`/products${
+                                    product?.subcategory?._id 
+                                        ? `?subcategory=${product.subcategory._id}` 
+                                        : product?.category 
+                                        ? `?category=${product.category}` 
+                                        : ''
+                                }`}
+                                className="hidden md:flex items-center gap-2 text-sm text-[#D4AF76] hover:text-[#8B6B4C] transition-colors font-medium"
+                            >
+                                View All
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                            {relatedProducts.map((relatedProduct, index) => (
                                 <Link 
                                     key={relatedProduct._id} 
                                     href={`/products/${relatedProduct._id}`}
                                 >
                                     <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.5, delay: index * 0.1 }}
                                         whileHover={{ y: -8 }}
-                                        className="group"
+                                        className="group cursor-pointer"
                                     >
-                                        <div className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
-                                            <div className="aspect-square relative overflow-hidden">
+                                        <div className="bg-white rounded-2xl md:rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100">
+                                            <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                                                 <SafeImage
-                                                    src={relatedProduct.images?.[0] || relatedProduct.image}
+                                                    src={relatedProduct.images?.[0]?.url || relatedProduct.image}
                                                     alt={relatedProduct.name}
                                                     fill
                                                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 />
+                                                {/* Quick View Overlay */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                                                    <span className="text-white text-sm font-medium">View Details</span>
+                                                </div>
                                             </div>
-                                            <div className="p-4">
-                                                <h3 className="text-sm font-light text-[#2C2C2C] mb-2 line-clamp-1 group-hover:text-[#D4AF76] transition-colors">
+                                            <div className="p-3 md:p-4">
+                                                <h3 className="text-sm md:text-base font-light text-[#2C2C2C] mb-1 md:mb-2 line-clamp-2 group-hover:text-[#D4AF76] transition-colors leading-tight">
                                                     {relatedProduct.name}
                                                 </h3>
-                                                <p className="text-lg font-light text-[#2C2C2C]">
-                                                    ₹{relatedProduct.sellingPrice?.toLocaleString('en-IN')}
-                                                </p>
+                                                <div className="flex items-center justify-between">
+                                                    <p className="text-base md:text-lg font-medium text-[#2C2C2C]">
+                                                        ₹{relatedProduct.sellingPrice?.toLocaleString('en-IN')}
+                                                    </p>
+                                                    {relatedProduct.mrp && relatedProduct.mrp > relatedProduct.sellingPrice && (
+                                                        <span className="text-xs text-gray-400 line-through">
+                                                            ₹{relatedProduct.mrp.toLocaleString('en-IN')}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </motion.div>
                                 </Link>
                             ))}
+                        </div>
+                        {/* Mobile View All Button */}
+                        <div className="md:hidden mt-6 text-center">
+                            <Link 
+                                href={`/products${
+                                    product?.subcategory?._id 
+                                        ? `?subcategory=${product.subcategory._id}` 
+                                        : product?.category 
+                                        ? `?category=${product.category}` 
+                                        : ''
+                                }`}
+                                className="inline-flex items-center gap-2 text-sm text-[#D4AF76] hover:text-[#8B6B4C] transition-colors font-medium"
+                            >
+                                View All Similar Products
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
                         </div>
                     </motion.div>
                 )}

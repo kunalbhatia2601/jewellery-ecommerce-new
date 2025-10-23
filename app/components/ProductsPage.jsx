@@ -9,29 +9,37 @@ export default function ProductsPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+    const [allSubcategories, setAllSubcategories] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedSubcategory, setSelectedSubcategory] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('featured');
     const [viewMode, setViewMode] = useState('grid');
     const [selectedTags, setSelectedTags] = useState([]);
     
-    // Set initial search term and category from URL
+    // Set initial search term, category, and subcategory from URL
     useEffect(() => {
         const searchFromUrl = searchParams.get('search');
         const categoryFromUrl = searchParams.get('category');
+        const subcategoryFromUrl = searchParams.get('subcategory');
         if (searchFromUrl) {
             setSearchTerm(searchFromUrl);
         }
         if (categoryFromUrl) {
             setSelectedCategory(categoryFromUrl);
         }
+        if (subcategoryFromUrl) {
+            setSelectedSubcategory(subcategoryFromUrl);
+        }
     }, [searchParams]);
 
-    // Fetch categories and products
+    // Fetch categories, subcategories, and products
     useEffect(() => {
         fetchCategories();
+        fetchSubcategories();
         fetchProducts();
     }, []);
 
@@ -46,10 +54,45 @@ export default function ProductsPage() {
         }
     };
 
+    const fetchSubcategories = async () => {
+        try {
+            const response = await fetch('/api/subcategories');
+            const data = await response.json();
+            if (data.success && Array.isArray(data.subcategories)) {
+                setAllSubcategories(data.subcategories);
+                // Initially show all subcategories
+                setSubcategories(data.subcategories);
+            } else {
+                setAllSubcategories([]);
+                setSubcategories([]);
+            }
+        } catch (error) {
+            console.error('Error fetching subcategories:', error);
+            setAllSubcategories([]);
+            setSubcategories([]);
+        }
+    };
+
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/products');
+            
+            // Build query parameters
+            const params = new URLSearchParams();
+            if (selectedCategory !== 'All') {
+                params.append('category', selectedCategory);
+            }
+            if (selectedSubcategory !== 'All') {
+                params.append('subcategory', selectedSubcategory);
+            }
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+            
+            const queryString = params.toString();
+            const url = `/api/products${queryString ? `?${queryString}` : ''}`;
+            
+            const response = await fetch(url);
             const data = await response.json();
             
             // API now returns paginated response with data nested
@@ -70,17 +113,17 @@ export default function ProductsPage() {
         }
     };
 
-    // Filter and sort products
+    // Re-fetch products when filters change
+    useEffect(() => {
+        fetchProducts();
+    }, [selectedCategory, selectedSubcategory, searchTerm]);
+
+    // Filter and sort products (client-side filtering for tags only, others handled by API)
     const filteredProducts = (Array.isArray(products) ? products : [])
         .filter(product => {
-            const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-            const matchesSearch = !searchTerm || 
-                product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()));
             const matchesTags = selectedTags.length === 0 || 
                 (product.tags && product.tags.some(tag => selectedTags.includes(tag)));
-            return matchesCategory && matchesSearch && matchesTags;
+            return matchesTags;
         })
         .sort((a, b) => {
             switch (sortBy) {
@@ -97,12 +140,40 @@ export default function ProductsPage() {
 
     const handleCategoryClick = (categoryName) => {
         setSelectedCategory(categoryName);
+        setSelectedSubcategory('All'); // Reset subcategory when category changes
+        
+        // Filter subcategories based on selected category
+        if (categoryName === 'All') {
+            setSubcategories(allSubcategories);
+        } else {
+            const filtered = allSubcategories.filter(sub => {
+                // Check if subcategory's category matches selected category
+                return sub.category?.name === categoryName || sub.category === categoryName;
+            });
+            setSubcategories(filtered);
+        }
+        
         // Update URL without navigation
         const params = new URLSearchParams(searchParams);
         if (categoryName === 'All') {
             params.delete('category');
+            params.delete('subcategory');
         } else {
             params.set('category', categoryName);
+            params.delete('subcategory');
+        }
+        router.replace(`/products?${params.toString()}`, { shallow: true });
+    };
+
+    const handleSubcategoryClick = (subcategoryId) => {
+        setSelectedSubcategory(subcategoryId);
+        
+        // Update URL without navigation
+        const params = new URLSearchParams(searchParams);
+        if (subcategoryId === 'All') {
+            params.delete('subcategory');
+        } else {
+            params.set('subcategory', subcategoryId);
         }
         router.replace(`/products?${params.toString()}`, { shallow: true });
     };
@@ -240,6 +311,161 @@ export default function ProductsPage() {
                         ))}
                     </div>
                 </motion.div>
+
+                {/* Subcategory Filters - Story Style Badges */}
+                {allSubcategories.length > 0 && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.25 }}
+                        className="mb-6 md:mb-8 lg:mb-10"
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-[#D4AF76]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                </svg>
+                                <h3 className="text-base md:text-lg font-medium text-[#2C2C2C]">
+                                    Explore Collections
+                                    {selectedCategory !== 'All' && (
+                                        <span className="ml-2 text-sm font-normal text-gray-500">in {selectedCategory}</span>
+                                    )}
+                                </h3>
+                            </div>
+                            {selectedSubcategory !== 'All' && (
+                                <button
+                                    onClick={() => handleSubcategoryClick('All')}
+                                    className="text-xs md:text-sm text-[#D4AF76] hover:text-[#8B6B4C] font-medium transition-colors flex items-center gap-1"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Clear
+                                </button>
+                            )}
+                        </div>
+                        
+                        {/* Story-style Scrollable Badges */}
+                        <div className="flex gap-3 md:gap-4 lg:gap-5 overflow-x-auto scrollbar-hide py-2 px-1">
+                            {/* All Collections Badge */}
+                            <motion.button
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.3 }}
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleSubcategoryClick('All')}
+                                className="flex flex-col items-center gap-1.5 md:gap-2 min-w-[70px] md:min-w-[80px] lg:min-w-[90px] group"
+                            >
+                                {/* Circular Image Container with Story Ring */}
+                                <div className={`
+                                    relative rounded-full p-[3px] transition-all duration-300
+                                    ${selectedSubcategory === 'All'
+                                        ? 'bg-gradient-to-tr from-[#D4AF76] via-[#C19A6B] to-[#8B6B4C]'
+                                        : 'bg-gradient-to-tr from-gray-200 to-gray-300 group-hover:from-[#D4AF76]/50 group-hover:to-[#8B6B4C]/50'
+                                    }
+                                `}>
+                                    <div className="bg-white rounded-full p-[3px]">
+                                        <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] flex items-center justify-center shadow-sm">
+                                            <svg className="w-7 h-7 md:w-8 md:h-8 text-[#D4AF76]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Active Indicator */}
+                                    {selectedSubcategory === 'All' && (
+                                        <motion.div
+                                            layoutId="activeSubcategory"
+                                            className="absolute -inset-[2px] rounded-full"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #D4AF76, #8B6B4C)',
+                                                filter: 'blur(4px)',
+                                                opacity: 0.4
+                                            }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                        />
+                                    )}
+                                </div>
+                                
+                                {/* Label */}
+                                <span className={`
+                                    text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center line-clamp-2 leading-tight
+                                    ${selectedSubcategory === 'All' 
+                                        ? 'text-[#D4AF76] font-medium' 
+                                        : 'text-[#2C2C2C] group-hover:text-[#D4AF76]'
+                                    }
+                                `}>
+                                    All Collections
+                                </span>
+                            </motion.button>
+
+                            {/* Subcategory Badges */}
+                            {subcategories.map((subcategory, index) => (
+                                <motion.button
+                                    key={subcategory._id}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.3, delay: (index + 1) * 0.05 }}
+                                    whileHover={{ scale: 1.05, y: -2 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleSubcategoryClick(subcategory._id)}
+                                    className="flex flex-col items-center gap-1.5 md:gap-2 min-w-[70px] md:min-w-[80px] lg:min-w-[90px] group"
+                                >
+                                    {/* Circular Image Container with Story Ring */}
+                                    <div className={`
+                                        relative rounded-full p-[3px] transition-all duration-300
+                                        ${selectedSubcategory === subcategory._id
+                                            ? 'bg-gradient-to-tr from-[#D4AF76] via-[#C19A6B] to-[#8B6B4C]'
+                                            : 'bg-gradient-to-tr from-gray-200 to-gray-300 group-hover:from-[#D4AF76]/50 group-hover:to-[#8B6B4C]/50'
+                                        }
+                                    `}>
+                                        <div className="bg-white rounded-full p-[3px]">
+                                            <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] flex items-center justify-center shadow-sm">
+                                                {subcategory.image ? (
+                                                    <img 
+                                                        src={subcategory.image} 
+                                                        alt={subcategory.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <svg className="w-7 h-7 md:w-8 md:h-8 text-[#D4AF76]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Active Indicator */}
+                                        {selectedSubcategory === subcategory._id && (
+                                            <motion.div
+                                                layoutId="activeSubcategory"
+                                                className="absolute -inset-[2px] rounded-full"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #D4AF76, #8B6B4C)',
+                                                    filter: 'blur(4px)',
+                                                    opacity: 0.4
+                                                }}
+                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                            />
+                                        )}
+                                    </div>
+                                    
+                                    {/* Subcategory Name */}
+                                    <span className={`
+                                        text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center line-clamp-2 leading-tight max-w-[70px] md:max-w-[80px] lg:max-w-[90px]
+                                        ${selectedSubcategory === subcategory._id 
+                                            ? 'text-[#D4AF76] font-medium' 
+                                            : 'text-[#2C2C2C] group-hover:text-[#D4AF76]'
+                                        }
+                                    `}>
+                                        {subcategory.name}
+                                    </span>
+                                </motion.button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
 
                 {/* Tag Filters */}
                 <motion.div 
@@ -443,10 +669,15 @@ function ProductCard({ product, index }) {
                             className="object-cover transform group-hover:scale-110 transition-transform duration-700"
                         />
                         {/* Mobile-optimized badge */}
-                        <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1">
                             <span className="bg-white/90 backdrop-blur-sm text-[#D4AF76] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium">
                                 {product.category}
                             </span>
+                            {product.subcategory?.name && (
+                                <span className="bg-[#D4AF76]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium">
+                                    {product.subcategory.name}
+                                </span>
+                            )}
                         </div>
                     </div>
                     <div className="p-3 md:p-4 lg:p-6">
@@ -484,9 +715,19 @@ function ProductListItem({ product, index }) {
                             />
                         </div>
                         <div className="flex-1 flex flex-col justify-center min-w-0">
-                            <p className="text-[10px] sm:text-xs text-[#D4AF76] font-medium tracking-wide uppercase mb-1 sm:mb-2">
-                                {product.category}
-                            </p>
+                            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                                <p className="text-[10px] sm:text-xs text-[#D4AF76] font-medium tracking-wide uppercase">
+                                    {product.category}
+                                </p>
+                                {product.subcategory?.name && (
+                                    <>
+                                        <span className="text-gray-300">•</span>
+                                        <p className="text-[10px] sm:text-xs text-[#8B6B4C] font-medium tracking-wide uppercase">
+                                            {product.subcategory.name}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
                             <h3 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#2C2C2C] font-light mb-1 sm:mb-2 md:mb-3 group-hover:text-[#D4AF76] transition-colors line-clamp-2">
                                 {product.name}
                             </h3>

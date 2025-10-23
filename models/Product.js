@@ -25,6 +25,11 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    subcategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subcategory',
+        default: null
+    },
     images: [{
         url: {
             type: String,
