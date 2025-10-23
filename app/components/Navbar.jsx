@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, Suspense, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavbar } from '../context/NavbarContext';
@@ -111,9 +112,18 @@ export default function Navbar() {
                             >
                                 <Link 
                                     href="/" 
-                                    className="text-2xl font-light tracking-[0.2em] text-gray-900 hover:text-[#D4AF76] transition-colors duration-300"
+                                    className="flex items-center"
                                 >
-                                    LUXE
+                                    {/* Fixed-height container to keep header size but visually enlarge logo by scaling image */}
+                                        <span className="relative h-12 w-[180px] overflow-hidden block">
+                                        <Image
+                                            src="/logo/desktop.png"
+                                            alt="Nandika Jewellers"
+                                            fill
+                                            className="absolute inset-0 object-cover transform scale-110"
+                                            priority
+                                        />
+                                    </span>
                                 </Link>
                             </motion.div>
 
@@ -287,8 +297,24 @@ export default function Navbar() {
                     duration: 0.4 
                 }}
             >
-                <div className="px-4 py-3">
-                    <SearchBar placeholder="Search jewelry, collections..." />
+                <div className="px-4 py-3 flex items-center gap-3">
+                    {/* Mobile Logo */}
+                    <Link href="/" className="flex-shrink-0">
+                        {/* keep container same height but scale image up */}
+                            <span className="relative h-10 w-10 overflow-hidden block rounded">
+                            <Image
+                                src="/logo/mobile.png"
+                                alt="Nandika Jewellers"
+                                fill
+                                className="absolute inset-0 object-cover transform scale-140"
+                                priority
+                            />
+                        </span>
+                    </Link>
+                    {/* Search Bar */}
+                    <div className="flex-1">
+                        <SearchBar placeholder="Search jewelry, collections..." />
+                    </div>
                 </div>
             </motion.div>
 
