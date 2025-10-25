@@ -14,24 +14,27 @@ export default function Hero() {
     const slides = [
         {
             image: "carousel1_l76hra.jpg",
-            title: "Timeless Elegance",
-            subtitle: "Curated Collection",
-            description: "Discover pieces that transcend trends and define luxury",
-            cta: "Shop Classics"
+            title: "Radiance That Never Fades",
+            subtitle: "",
+            description: "Each creation is a masterpiece — blending artistry, emotion, and timeless charm for those who believe in everlasting beauty.",
+            cta: "Shop Timeless Pieces",
+            cta2: "Explore Legacy Collection"
         },
         {
             image: "carousel2_gycam4.jpg",
-            title: "Artisan Craftsmanship",
-            subtitle: "Handcrafted with Precision",
-            description: "Every piece tells a story of skilled artisanship and dedication",
-            cta: "Explore Craftsmanship"
+            title: "Crafted by Hands, Perfected by Heart",
+            subtitle: "",
+            description: "Every detail reflects devotion — from the artisan's touch to the final shine, our jewellery celebrates the soul of true craftsmanship.",
+            cta: "Discover the Artistry",
+            cta2: "View Signature Designs"
         },
         {
             image: "carousel3_xpvlxx.jpg",
-            title: "New Arrivals",
-            subtitle: "Contemporary Luxury",
-            description: "Fresh designs that blend modern aesthetics with timeless appeal",
-            cta: "View Collection"
+            title: "Unveil the New Era of Jewellery",
+            subtitle: "",
+            description: "Step into a world of contemporary elegance — modern silhouettes inspired by heritage, designed to make every moment shine.",
+            cta: "Explore New Arrivals",
+            cta2: "Shop Fresh Styles"
         }
     ];
 
@@ -120,16 +123,18 @@ export default function Hero() {
                         className="space-y-8"
                     >
                         {/* Subtitle */}
-                        <motion.div 
-                            key={`subtitle-${currentSlide}`}
-                            initial={{ opacity: 0.7 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.3 }}
-                            className="text-sm md:text-base tracking-[0.3em] uppercase text-white/90 font-light relative"
-                        >
-                            <span className="relative z-10">{slides[currentSlide].subtitle}</span>
-                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-[1px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                        </motion.div>
+                        {slides[currentSlide].subtitle && (
+                            <motion.div 
+                                key={`subtitle-${currentSlide}`}
+                                initial={{ opacity: 0.7 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className="text-sm md:text-base tracking-[0.3em] uppercase text-white/90 font-light relative"
+                            >
+                                <span className="relative z-10">{slides[currentSlide].subtitle}</span>
+                                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-[1px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                            </motion.div>
+                        )}
 
                         {/* Main Title */}
                         <motion.h1 
@@ -137,10 +142,9 @@ export default function Hero() {
                             initial={{ opacity: 0.7, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
-                            className="text-5xl md:text-7xl lg:text-8xl font-light leading-tight tracking-tight"
+                            className="text-4xl md:text-6xl lg:text-7xl font-light leading-tight tracking-tight"
                         >
-                            <span className="block">{slides[currentSlide].title.split(' ')[0]}</span>
-                            <span className="block text-[#D4AF76] mt-2">{slides[currentSlide].title.split(' ')[1]}</span>
+                            <span className="block text-white">{slides[currentSlide].title}</span>
                         </motion.h1>
 
                         {/* Description */}
@@ -186,7 +190,7 @@ export default function Hero() {
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <span className="flex items-center gap-2">
-                                    Explore Collections
+                                    {slides[currentSlide].cta2}
                                     <svg className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                     </svg>
