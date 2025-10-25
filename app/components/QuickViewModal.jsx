@@ -5,25 +5,39 @@ import { useNavbar } from "../context/NavbarContext";
 import { useEffect } from "react";
 import ImageCarousel from "./ImageCarousel";
 import { isProductOutOfStock, getEffectiveStock, hasLowStock } from '@/lib/productUtils';
+import { useLenis } from "./SmoothScroll";
 
 export default function QuickViewModal({ isOpen, onClose, product }) {
     const { addToCart, setIsCartOpen } = useCart();
     const { hideNavbar, showNavbar } = useNavbar();
+    const lenis = useLenis();
 
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
             hideNavbar();
+            // Stop Lenis smooth scroll when modal is open
+            if (lenis) {
+                lenis.stop();
+            }
         } else {
             document.body.style.overflow = 'unset';
             showNavbar();
+            // Resume Lenis smooth scroll when modal is closed
+            if (lenis) {
+                lenis.start();
+            }
         }
 
         return () => {
             document.body.style.overflow = 'unset';
             showNavbar();
+            // Ensure Lenis is started when component unmounts
+            if (lenis) {
+                lenis.start();
+            }
         };
-    }, [isOpen, hideNavbar, showNavbar]);
+    }, [isOpen, hideNavbar, showNavbar, lenis]);
 
     const handleAddToCart = async () => {
         if (product) {
@@ -73,7 +87,7 @@ export default function QuickViewModal({ isOpen, onClose, product }) {
                             </button>
 
                             {/* Mobile Layout */}
-                            <div className="block lg:hidden max-h-[90vh] overflow-y-auto">
+                            <div className="block lg:hidden max-h-[90vh] overflow-y-auto" data-lenis-prevent>
                                 <div className="relative h-80 bg-gradient-to-br from-gray-50 to-gray-100">
                                     <ImageCarousel 
                                         images={product.images && product.images.length > 0 ? product.images : product.image}

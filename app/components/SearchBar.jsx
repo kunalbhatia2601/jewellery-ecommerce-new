@@ -400,7 +400,7 @@ export default function SearchBar({ className = "", placeholder = "Search for je
                             </div>
                         ) : (
                             <>
-                                <div className="max-h-80 overflow-y-auto">
+                                <div className="max-h-80 overflow-y-auto" data-lenis-prevent>
                                     {suggestions.map((suggestion, index) => (
                                 <motion.button
                                     key={suggestion.id}

@@ -400,7 +400,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
                                                                     
                                                                     {/* Variant Options */}
                                                                     <div className="mb-2">
-                                                                        {variant.optionCombination && Array.from(variant.optionCombination.entries()).map(([key, value]) => (
+                                                                        {variant.optionCombination && Object.entries(variant.optionCombination).map(([key, value]) => (
                                                                             <div key={key} className="text-xs text-gray-600">
                                                                                 <span className="font-medium">{key}:</span> {value}
                                                                             </div>

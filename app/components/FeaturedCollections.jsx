@@ -120,7 +120,7 @@ export default function FeaturedCollections() {
                         className="relative"
                     >
                         {/* Scroll container */}
-                        <div className="overflow-y-auto max-h-[600px] lg:max-h-[700px] space-y-6 pr-2 scrollbar-thin scrollbar-thumb-[#D4AF76] scrollbar-track-gray-100 hover:scrollbar-thumb-[#8B6B4C]">
+                        <div className="overflow-y-auto max-h-[600px] lg:max-h-[700px] space-y-6 pr-2 scrollbar-thin scrollbar-thumb-[#D4AF76] scrollbar-track-gray-100 hover:scrollbar-thumb-[#8B6B4C]" data-lenis-prevent>
                             {featuredCollections.map((collection, index) => (
                             <motion.button
                                 key={collection.id}

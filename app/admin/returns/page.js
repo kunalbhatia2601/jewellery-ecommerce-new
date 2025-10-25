@@ -4,6 +4,7 @@ import AdminLayout from '@/app/components/AdminLayout';
 import withAdminAuth from '@/app/components/withAdminAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StatusConfig, getNextActions } from '@/app/lib/returnStatusUtils';
+import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 
 
@@ -15,6 +16,9 @@ function AdminReturnsPage() {
     const [actionLoading, setActionLoading] = useState(false);
     const [showManualRefundModal, setShowManualRefundModal] = useState(false);
     const [showManualReturnModal, setShowManualReturnModal] = useState(false);
+    
+    // Control Lenis smooth scroll when any modal is open
+    useLenisControl(showManualRefundModal || showManualReturnModal || !!selectedReturn);
     const [manualRefundData, setManualRefundData] = useState({
         orderId: '',
         customerId: '',
@@ -735,7 +739,7 @@ function AdminReturnsPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-[9999]"
+                        className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center p-4 z-[9999]"
                         onClick={() => setSelectedReturn(null)}
                     >
                         <motion.div
@@ -752,14 +756,16 @@ function AdminReturnsPage() {
                                     </h2>
                                     <button
                                         onClick={() => setSelectedReturn(null)}
-                                        className="text-gray-400 hover:text-gray-600 text-2xl"
+                                        className="text-gray-400 hover:text-gray-600 transition-colors"
                                     >
-                                        ×
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="p-6 overflow-y-auto max-h-[70vh]">
+                            <div className="p-6 overflow-y-auto max-h-[70vh]" data-lenis-prevent>
                                 {/* Customer Information */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
@@ -937,14 +943,14 @@ function AdminReturnsPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-[9999]"
+                        className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center p-4 z-[9999]"
                         onClick={() => setShowManualRefundModal(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-white rounded-lg max-w-md w-full shadow-xl"
+                            className="bg-white rounded-lg max-w-md w-full shadow-xl max-h-[90vh] overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="p-6 border-b border-gray-200">
@@ -952,7 +958,7 @@ function AdminReturnsPage() {
                                 <p className="text-sm text-gray-600 mt-1">Process a refund without return request</p>
                             </div>
 
-                            <div className="p-6 space-y-4">
+                            <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]" data-lenis-prevent>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Order ID
@@ -1051,7 +1057,7 @@ function AdminReturnsPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-[9999]"
+                        className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center p-4 z-[9999]"
                         onClick={() => setShowManualReturnModal(false)}
                     >
                         <motion.div
@@ -1066,7 +1072,7 @@ function AdminReturnsPage() {
                                 <p className="text-sm text-gray-600 mt-1">Create a return request on behalf of a customer</p>
                             </div>
 
-                            <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
+                            <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]" data-lenis-prevent>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">

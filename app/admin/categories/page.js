@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { CldImage } from 'next-cloudinary';
 import withAdminAuth from '../../components/withAdminAuth';
+import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 function CategoriesAdmin() {
     const [categories, setCategories] = useState([]);
@@ -15,6 +16,9 @@ function CategoriesAdmin() {
     const [editingSubcategory, setEditingSubcategory] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [activeTab, setActiveTab] = useState('categories'); // 'categories' or 'subcategories'
+    
+    // Control Lenis smooth scroll when any modal is open
+    useLenisControl(showForm || showSubcategoryForm);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -416,8 +420,14 @@ function CategoriesAdmin() {
 
                 {/* Category Form Modal */}
                 {showForm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-screen overflow-y-auto">
+                    <div 
+                        className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center z-50"
+                        onClick={() => setShowForm(false)}
+                    >
+                        <div 
+                            className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-screen overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="p-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-xl font-bold">
@@ -425,7 +435,7 @@ function CategoriesAdmin() {
                                     </h2>
                                     <button
                                         onClick={() => setShowForm(false)}
-                                        className="text-gray-400 hover:text-gray-600"
+                                        className="text-gray-400 hover:text-gray-600 transition-colors"
                                     >
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -433,7 +443,7 @@ function CategoriesAdmin() {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
+                                <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)]" data-lenis-prevent>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Category Name *
@@ -576,8 +586,14 @@ function CategoriesAdmin() {
 
                 {/* Subcategory Form Modal */}
                 {showSubcategoryForm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-screen overflow-y-auto">
+                    <div 
+                        className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center z-50"
+                        onClick={() => setShowSubcategoryForm(false)}
+                    >
+                        <div 
+                            className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-screen overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="p-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-xl font-bold">
@@ -585,7 +601,7 @@ function CategoriesAdmin() {
                                     </h2>
                                     <button
                                         onClick={() => setShowSubcategoryForm(false)}
-                                        className="text-gray-400 hover:text-gray-600"
+                                        className="text-gray-400 hover:text-gray-600 transition-colors"
                                     >
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -593,7 +609,7 @@ function CategoriesAdmin() {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmitSubcategory} className="space-y-4">
+                                <form onSubmit={handleSubmitSubcategory} className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)]" data-lenis-prevent>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Parent Category *

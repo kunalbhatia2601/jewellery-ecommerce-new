@@ -4,6 +4,7 @@ import withAdminAuth from '@/app/components/withAdminAuth';
 import AdminLayout from '@/app/components/AdminLayout';
 import GoldPriceDashboard from '@/app/components/GoldPriceDashboard';
 import JewelryPriceCalculator from '@/app/components/JewelryPriceCalculator';
+import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 const MetalRatesManagement = () => {
   const [loading, setLoading] = useState({
@@ -13,6 +14,9 @@ const MetalRatesManagement = () => {
   });
   const [showModal, setShowModal] = useState(null);
   const [modalData, setModalData] = useState(null);
+
+  // Control Lenis smooth scroll when modal is open
+  useLenisControl(!!showModal);
 
   const handlePriceCalculated = (calculationData) => {
     console.log('Price calculated:', calculationData);
@@ -225,19 +229,27 @@ const MetalRatesManagement = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+          <div 
+            className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center p-4 z-50"
+            onClick={closeModal}
+          >
+            <div 
+              className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">{modalData?.title}</h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600 text-xl"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  ×
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
               
-              <div className="p-6 overflow-y-auto max-h-[60vh]">
+              <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]" data-lenis-prevent>
                 {showModal === 'result' && modalData?.content}
               </div>
             </div>

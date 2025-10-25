@@ -1,6 +1,7 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLenis } from './SmoothScroll';
 
 export default function Register({ isOpen, onClose, onLoginClick }) {
     // Add prop validation
@@ -9,6 +10,7 @@ export default function Register({ isOpen, onClose, onLoginClick }) {
         onLoginClick = () => {}; // Provide default empty function
     }
 
+    const lenis = useLenis();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -18,6 +20,21 @@ export default function Register({ isOpen, onClose, onLoginClick }) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+
+    // Stop/start Lenis when modal opens/closes
+    useEffect(() => {
+        if (isOpen && lenis) {
+            lenis.stop();
+        } else if (!isOpen && lenis) {
+            lenis.start();
+        }
+        
+        return () => {
+            if (lenis) {
+                lenis.start();
+            }
+        };
+    }, [isOpen, lenis]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -80,7 +97,7 @@ export default function Register({ isOpen, onClose, onLoginClick }) {
                         onClick={onClose}
                         className="fixed inset-0 bg-black/70 backdrop-blur-md z-[110]"
                     />
-                    <div className="fixed inset-0 z-[111] overflow-y-auto">
+                    <div className="fixed inset-0 z-[111] overflow-y-auto" data-lenis-prevent>
                         <div className="flex min-h-full items-center justify-center p-4">
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}

@@ -4,10 +4,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/lib/utils';
 import { ShoppingBag, X, Trash2, Plus, Minus, ShoppingCart, Sparkles } from 'lucide-react';
+import { useLenis } from './SmoothScroll';
+import { useEffect } from 'react';
 
 export default function Cart() {
     const router = useRouter();
     const { isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, loading } = useCart();
+    const lenis = useLenis();
+
+    // Stop/start Lenis when cart opens/closes
+    useEffect(() => {
+        if (isCartOpen && lenis) {
+            lenis.stop();
+        } else if (!isCartOpen && lenis) {
+            lenis.start();
+        }
+        
+        return () => {
+            if (lenis) {
+                lenis.start();
+            }
+        };
+    }, [isCartOpen, lenis]);
 
     const calculateTotal = () => {
         return (cartItems || []).reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -164,7 +182,7 @@ export default function Cart() {
                         ) : (
                             <>
                                 {/* Cart Items */}
-                                <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                                <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent" data-lenis-prevent>
                                     <AnimatePresence mode="popLayout">
                                         {cartItems.map((item, index) => (
                                             <motion.div

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '@/app/components/AdminLayout';
 import withAdminAuth from '@/app/components/withAdminAuth';
+import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 const CouponManagement = () => {
   const [coupons, setCoupons] = useState([]);
@@ -9,6 +10,9 @@ const CouponManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Control Lenis smooth scroll when modal is open
+  useLenisControl(showModal);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -323,21 +327,30 @@ const CouponManagement = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center p-4 z-50"
+            onClick={() => setShowModal(false)}
+          >
+            <div 
+              className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">
                   {editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}
                 </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600 text-xl"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  ×
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
               
-              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-80px)]" data-lenis-prevent>
+                <div className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -553,6 +566,7 @@ const CouponManagement = () => {
                   >
                     {editingCoupon ? 'Update' : 'Create'} Coupon
                   </button>
+                </div>
                 </div>
               </form>
             </div>
