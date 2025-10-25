@@ -36,37 +36,7 @@ export default function Testimonials() {
             image: "MR",
             purchase: "Custom Ring Design"
         },
-        {
-            id: 4,
-            name: "Priya Sharma",
-            role: "Interior Designer",
-            location: "Chennai",
-            text: "Absolutely love the contemporary designs! They perfectly blend traditional craftsmanship with modern aesthetics. My go-to place for special occasion jewelry.",
-            rating: 5,
-            image: "PS",
-            purchase: "Heritage Collection"
-        },
-        {
-            id: 5,
-            name: "David Wilson",
-            role: "CEO",
-            location: "Pune",
-            text: "Exceptional quality and service. Bought an anniversary gift and my wife was thrilled. The attention to detail and packaging was impressive. Will definitely return.",
-            rating: 5,
-            image: "DW",
-            purchase: "Anniversary Necklace"
-        },
-        {
-            id: 6,
-            name: "Anita Gupta",
-            role: "Doctor",
-            location: "Hyderabad",
-            text: "Beautiful, authentic pieces with excellent customer care. The team helped me choose the perfect earrings for my daughter's graduation. Couldn't be happier!",
-            rating: 5,
-            image: "AG",
-            purchase: "Diamond Earrings"
-        }
-    ];
+    ]
 
     const stats = [
         { number: "50K+", label: "Happy Customers" },
