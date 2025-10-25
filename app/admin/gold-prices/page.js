@@ -239,30 +239,6 @@ const MetalRatesManagement = () => {
               
               <div className="p-6 overflow-y-auto max-h-[60vh]">
                 {showModal === 'result' && modalData?.content}
-                
-                {showModal === 'settings' && modalData?.content && (
-                  <PricingSettingsForm 
-                    settings={modalData.content} 
-                    onSave={async (newSettings) => {
-                      try {
-                        const response = await fetch('/api/admin/gold-prices/settings', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(newSettings)
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                          closeModal();
-                          alert('Settings saved successfully!');
-                        } else {
-                          alert('Error saving settings: ' + result.error);
-                        }
-                      } catch (error) {
-                        alert('Error saving settings: ' + error.message);
-                      }
-                    }}
-                  />
-                )}
               </div>
             </div>
           </div>
