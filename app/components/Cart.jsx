@@ -112,22 +112,21 @@ export default function Cart() {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-white via-gray-50/50 to-white shadow-2xl z-[101] flex flex-col"
+                        className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[101] flex flex-col"
                     >
                         {/* Header */}
-                        <div className="relative bg-gradient-to-r from-[#2C2C2C] to-[#1A1A1A] text-white px-6 py-6">
-                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5 mix-blend-overlay"></div>
+                        <div className="relative bg-gradient-to-r from-[#8B6B4C] to-[#725939] text-white px-6 py-6">
                             <div className="relative flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <motion.div
                                         whileHover={{ rotate: [0, -10, 10, -10, 0] }}
                                         transition={{ duration: 0.5 }}
                                     >
-                                        <ShoppingBag className="w-7 h-7 text-[#D4AF76]" />
+                                        <ShoppingBag className="w-7 h-7" />
                                     </motion.div>
                                     <div>
                                         <h2 className="text-xl font-bold tracking-tight">Shopping Bag</h2>
-                                        <p className="text-xs text-gray-300 mt-0.5">
+                                        <p className="text-xs text-white/80 mt-0.5">
                                             {getTotalItems()} {getTotalItems() === 1 ? 'item' : 'items'}
                                         </p>
                                     </div>
@@ -159,13 +158,13 @@ export default function Cart() {
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ type: "spring", damping: 15 }}
-                                    className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6"
+                                    className="w-32 h-32 bg-gradient-to-br from-[#8B6B4C]/10 to-[#725939]/10 rounded-full flex items-center justify-center mb-6"
                                 >
-                                    <ShoppingCart className="w-16 h-16 text-gray-400" />
+                                    <ShoppingCart className="w-16 h-16 text-[#8B6B4C]" />
                                 </motion.div>
                                 <h3 className="text-xl font-semibold text-gray-800 mb-2">Your cart is empty</h3>
                                 <p className="text-gray-500 text-center mb-6">
-                                    Looks like you haven't added anything to your cart yet
+                                    Discover our exquisite collection of jewelry
                                 </p>
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
@@ -174,7 +173,7 @@ export default function Cart() {
                                         setIsCartOpen(false);
                                         router.push('/products');
                                     }}
-                                    className="px-8 py-3 bg-gradient-to-r from-[#2C2C2C] to-[#1A1A1A] text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-shadow"
+                                    className="px-8 py-3 bg-gradient-to-r from-[#8B6B4C] to-[#725939] text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-shadow"
                                 >
                                     Start Shopping
                                 </motion.button>
@@ -182,7 +181,7 @@ export default function Cart() {
                         ) : (
                             <>
                                 {/* Cart Items */}
-                                <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent" data-lenis-prevent>
+                                <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 bg-gray-50/50" data-lenis-prevent>
                                     <AnimatePresence mode="popLayout">
                                         {cartItems.map((item, index) => (
                                             <motion.div
@@ -193,7 +192,7 @@ export default function Cart() {
                                                 animate="visible"
                                                 exit="exit"
                                                 layout
-                                                className="group relative bg-white rounded-2xl p-4 mb-3 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+                                                className="group relative bg-white rounded-xl p-4 mb-3 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
                                             >
                                                 <div className="flex gap-4">
                                                     {/* Product Image */}
@@ -202,44 +201,43 @@ export default function Cart() {
                                                             whileHover={{ scale: 1.05 }}
                                                             src={item.images?.[0]?.url || item.image}
                                                             alt={item.name}
-                                                            className="w-24 h-24 object-cover rounded-xl shadow-md"
+                                                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shadow-sm"
                                                         />
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl" />
                                                     </div>
 
                                                     {/* Product Info */}
                                                     <div className="flex-1 min-w-0">
-                                                        <h3 className="text-sm font-semibold text-gray-800 mb-1 line-clamp-2 group-hover:text-[#8B6B4C] transition-colors">
+                                                        <h3 className="text-sm font-semibold text-gray-800 mb-1 line-clamp-2 group-hover:text-[#8B6B4C] transition-colors pr-16">
                                                             {item.name}
                                                         </h3>
-                                                        <div className="flex items-center gap-2 mb-3">
-                                                            <p className="text-lg font-bold text-[#2C2C2C]">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <p className="text-base sm:text-lg font-bold text-[#8B6B4C]">
                                                                 {formatPrice(item.price)}
                                                             </p>
                                                             <span className="text-xs text-gray-400">each</span>
                                                         </div>
 
                                                         {/* Quantity Controls */}
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="flex items-center bg-gray-100 rounded-lg overflow-hidden">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
                                                                 <motion.button
-                                                                    whileHover={{ backgroundColor: "#D4AF76" }}
+                                                                    whileHover={{ backgroundColor: "#8B6B4C" }}
                                                                     whileTap={{ scale: 0.9 }}
                                                                     onClick={() => updateQuantity(item.product, Math.max(1, item.quantity - 1))}
                                                                     className="p-2 hover:text-white transition-colors"
                                                                 >
-                                                                    <Minus className="w-3.5 h-3.5" />
+                                                                    <Minus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                                                 </motion.button>
-                                                                <span className="px-4 py-2 font-semibold text-sm min-w-[3rem] text-center">
+                                                                <span className="px-3 sm:px-4 py-1.5 sm:py-2 font-semibold text-sm min-w-[2.5rem] sm:min-w-[3rem] text-center">
                                                                     {item.quantity}
                                                                 </span>
                                                                 <motion.button
-                                                                    whileHover={{ backgroundColor: "#D4AF76" }}
+                                                                    whileHover={{ backgroundColor: "#8B6B4C" }}
                                                                     whileTap={{ scale: 0.9 }}
                                                                     onClick={() => updateQuantity(item.product, item.quantity + 1)}
                                                                     className="p-2 hover:text-white transition-colors"
                                                                 >
-                                                                    <Plus className="w-3.5 h-3.5" />
+                                                                    <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                                                 </motion.button>
                                                             </div>
                                                             
@@ -247,7 +245,7 @@ export default function Cart() {
                                                                 whileHover={{ scale: 1.1 }}
                                                                 whileTap={{ scale: 0.9 }}
                                                                 onClick={() => removeFromCart(item.product)}
-                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-auto"
+                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                                                 title="Remove item"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -258,7 +256,7 @@ export default function Cart() {
 
                                                 {/* Item Total */}
                                                 <div className="absolute top-4 right-4">
-                                                    <p className="text-sm font-bold text-[#2C2C2C]">
+                                                    <p className="text-sm font-bold text-[#8B6B4C]">
                                                         {formatPrice(item.price * item.quantity)}
                                                     </p>
                                                 </div>
@@ -268,17 +266,17 @@ export default function Cart() {
                                 </div>
 
                                 {/* Footer - Summary & Checkout */}
-                                <div className="border-t border-gray-200 bg-white px-6 py-5">
+                                <div className="border-t border-gray-200 bg-white px-4 sm:px-6 py-4 sm:py-5">
                                     {/* Savings Badge */}
                                     {calculateSavings() > 0 && (
                                         <motion.div 
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl px-4 py-2.5 mb-4"
+                                            className="flex items-center gap-2 bg-gradient-to-r from-[#8B6B4C]/10 to-[#725939]/10 border border-[#8B6B4C]/20 rounded-lg px-4 py-2.5 mb-4"
                                         >
-                                            <Sparkles className="w-4 h-4 text-green-600" />
-                                            <span className="text-sm font-medium text-green-700">
-                                                You're saving {formatPrice(calculateSavings())} on this order!
+                                            <Sparkles className="w-4 h-4 text-[#8B6B4C]" />
+                                            <span className="text-sm font-medium text-[#725939]">
+                                                You&apos;re saving {formatPrice(calculateSavings())} on this order!
                                             </span>
                                         </motion.div>
                                     )}
@@ -287,14 +285,14 @@ export default function Cart() {
                                     <div className="space-y-2 mb-4">
                                         <div className="flex justify-between text-sm text-gray-600">
                                             <span>Subtotal</span>
-                                            <span className="font-medium">{formatPrice(calculateSubtotal())}</span>
+                                            <span className="font-medium text-gray-900">{formatPrice(calculateSubtotal())}</span>
                                         </div>
                                         <div className="flex justify-between text-sm text-gray-600">
                                             <span>Shipping</span>
-                                            <span className="font-medium text-green-600">FREE</span>
+                                            <span className="font-medium text-[#8B6B4C]">FREE</span>
                                         </div>
                                         {calculateSavings() > 0 && (
-                                            <div className="flex justify-between text-sm text-green-600">
+                                            <div className="flex justify-between text-sm text-[#8B6B4C]">
                                                 <span>Savings</span>
                                                 <span className="font-medium">-{formatPrice(calculateSavings())}</span>
                                             </div>
@@ -308,7 +306,7 @@ export default function Cart() {
                                             key={calculateTotal()}
                                             initial={{ scale: 1.2 }}
                                             animate={{ scale: 1 }}
-                                            className="text-2xl font-bold bg-gradient-to-r from-[#2C2C2C] to-[#8B6B4C] bg-clip-text text-transparent"
+                                            className="text-2xl font-bold text-[#8B6B4C]"
                                         >
                                             {formatPrice(calculateTotal())}
                                         </motion.span>
@@ -319,12 +317,9 @@ export default function Cart() {
                                         onClick={handleCheckout}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="w-full bg-gradient-to-r from-[#2C2C2C] via-[#1A1A1A] to-[#2C2C2C] text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 bg-size-200 bg-pos-0 hover:bg-pos-100"
-                                        style={{
-                                            backgroundSize: '200% 100%',
-                                        }}
+                                        className="w-full bg-gradient-to-r from-[#8B6B4C] to-[#725939] text-white py-3.5 sm:py-4 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                                     >
-                                        <span className="flex items-center justify-center gap-2">
+                                        <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
                                             Proceed to Checkout
                                             <motion.span
                                                 animate={{ x: [0, 5, 0] }}

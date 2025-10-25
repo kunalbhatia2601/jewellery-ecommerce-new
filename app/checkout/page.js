@@ -167,10 +167,10 @@ export default function CheckoutPage() {
             }
 
             await clearCart();
-            router.push(`/checkout/confirmation?orderId=${orderId}&status=success`);
+            router.push(`/orders/${orderId}`);
         } catch (error) {
             console.error('Payment verification error:', error);
-            router.push(`/checkout/confirmation?orderId=${orderId}&status=failed`);
+            router.push(`/orders/${orderId}`);
         } finally {
             setLoading(false);
         }
