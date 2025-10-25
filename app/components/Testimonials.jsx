@@ -1,42 +1,160 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
 
 export default function Testimonials() {
-    const [activeTestimonial, setActiveTestimonial] = useState(0);
-
     const testimonials = [
         {
             id: 1,
-            name: "Sarah Johnson",
-            role: "Bride",
-            location: "Mumbai",
-            text: "The wedding collection exceeded my expectations. Every piece was absolutely stunning and made my special day even more magical. The craftsmanship is unparalleled.",
+            name: "Ritika Sharma",
+            role: "Verified Buyer",
+            location: "Delhi",
+            text: "Absolutely stunning craftsmanship! The necklace I received looks even more beautiful in person. Packaging was so elegant — felt like unboxing royalty.",
             rating: 5,
-            image: "SJ",
-            purchase: "Diamond Bridal Set"
+            image: "RS",
+            purchase: "Gold Necklace"
         },
         {
             id: 2,
-            name: "Emily Parker",
-            role: "Fashion Blogger",
-            location: "Delhi",
-            text: "The quality and craftsmanship of their jewelry is unmatched. Each piece tells a story and adds elegance to any outfit. Highly recommend to anyone looking for luxury.",
+            name: "Priyank Mehta",
+            role: "Verified Buyer",
+            location: "Ahmedabad",
+            text: "I ordered a custom gold bracelet for my wife's birthday. The detailing and polish are perfect. Delivered on time and safely. Highly recommended!",
             rating: 5,
-            image: "EP",
-            purchase: "Gold Chain Collection"
+            image: "PM",
+            purchase: "Custom Gold Bracelet"
         },
         {
             id: 3,
-            name: "Michael Roberts",
-            role: "Loyal Customer",
-            location: "Bangalore",
-            text: "Outstanding customer service and beautiful pieces that last forever. I've been buying from them for years and they never disappoint. True artistry in every piece.",
+            name: "Sanya Nair",
+            role: "Verified Buyer",
+            location: "Kochi",
+            text: "Loved the handcrafted earrings — lightweight, elegant, and classy. Customer support helped me with every detail patiently.",
             rating: 5,
-            image: "MR",
-            purchase: "Custom Ring Design"
+            image: "SN",
+            purchase: "Handcrafted Earrings"
         },
-    ]
+        {
+            id: 4,
+            name: "Rohit Kapoor",
+            role: "Verified Buyer",
+            location: "Mumbai",
+            text: "The design was exactly as shown on the website. Loved the authenticity certificate and the finishing quality. Totally worth it!",
+            rating: 5,
+            image: "RK",
+            purchase: "Gold Jewelry Set"
+        },
+        {
+            id: 5,
+            name: "Aditi Verma",
+            role: "Verified Buyer",
+            location: "Lucknow",
+            text: "Such a smooth experience! From online order to doorstep delivery — everything was perfect. Thank you, Nandika, for such premium service.",
+            rating: 5,
+            image: "AV",
+            purchase: "Diamond Ring"
+        },
+        {
+            id: 6,
+            name: "Deepak Reddy",
+            role: "Verified Buyer",
+            location: "Hyderabad",
+            text: "Ordered a men's gold chain. Excellent polish, proper weight, and safe packaging. Feels luxurious and genuine.",
+            rating: 5,
+            image: "DR",
+            purchase: "Men's Gold Chain"
+        },
+        {
+            id: 7,
+            name: "Neha Chauhan",
+            role: "Verified Buyer",
+            location: "Jaipur",
+            text: "Their diamond bangles are pure perfection. The sparkle, the design, everything screams class! Will shop again soon.",
+            rating: 5,
+            image: "NC",
+            purchase: "Diamond Bangles"
+        },
+        {
+            id: 8,
+            name: "Vivek Patel",
+            role: "Verified Buyer",
+            location: "Surat",
+            text: "Appreciate the transparency — got hallmark details, invoice, and lifetime service info clearly. Best online jewelry buying experience!",
+            rating: 5,
+            image: "VP",
+            purchase: "Gold Pendant"
+        },
+        {
+            id: 9,
+            name: "Meera Joshi",
+            role: "Verified Buyer",
+            location: "Pune",
+            text: "Nandika made my engagement ring dreams come true! Custom-designed exactly as I wanted. The finish is flawless.",
+            rating: 5,
+            image: "MJ",
+            purchase: "Custom Engagement Ring"
+        },
+        {
+            id: 10,
+            name: "Arjun Malhotra",
+            role: "Verified Buyer",
+            location: "Chandigarh",
+            text: "Was skeptical about ordering jewelry online, but Nandika proved me wrong. Authentic, elegant, and securely packed.",
+            rating: 5,
+            image: "AM",
+            purchase: "Gold Bracelet"
+        },
+        {
+            id: 11,
+            name: "Divya Iyer",
+            role: "Verified Buyer",
+            location: "Chennai",
+            text: "Their customer service is top-notch. They helped me track my parcel and even shared care instructions. Super professional!",
+            rating: 5,
+            image: "DI",
+            purchase: "Silver Anklets"
+        },
+        {
+            id: 12,
+            name: "Harshita Deshmukh",
+            role: "Verified Buyer",
+            location: "Nagpur",
+            text: "I've bought from many brands, but Nandika's craftsmanship stands out. Each piece feels premium and personal.",
+            rating: 5,
+            image: "HD",
+            purchase: "Gold Earrings"
+        },
+        {
+            id: 13,
+            name: "Ankita Das",
+            role: "Verified Buyer",
+            location: "Kolkata",
+            text: "Loved the fusion of traditional and modern design in my necklace. The shine and quality are unmatched!",
+            rating: 5,
+            image: "AD",
+            purchase: "Fusion Necklace"
+        },
+        {
+            id: 14,
+            name: "Rajesh Tiwari",
+            role: "Verified Buyer",
+            location: "Bhopal",
+            text: "Fast delivery and great communication. My wife loved her pendant — perfect finish and authenticity guaranteed.",
+            rating: 5,
+            image: "RT",
+            purchase: "Diamond Pendant"
+        },
+        {
+            id: 15,
+            name: "Shruti Pandey",
+            role: "Verified Buyer",
+            location: "Varanasi",
+            text: "The detailing is just incredible. You can feel the artistry in every curve and cut. Definitely recommending to my friends.",
+            rating: 5,
+            image: "SP",
+            purchase: "Artisan Collection"
+        }
+    ];
 
     const stats = [
         { number: "50K+", label: "Happy Customers" },
@@ -44,6 +162,16 @@ export default function Testimonials() {
         { number: "99%", label: "Satisfaction Rate" },
         { number: "24/7", label: "Customer Support" }
     ];
+
+    // Format testimonials for InfiniteMovingCards component
+    const formattedTestimonials = testimonials.map(testimonial => ({
+        quote: testimonial.text,
+        name: testimonial.name,
+        title: `${testimonial.role} • ${testimonial.location}`,
+        rating: testimonial.rating,
+        image: testimonial.image,
+        purchase: testimonial.purchase
+    }));
 
     return (
         <section className="py-20 lg:py-32 relative overflow-hidden">
@@ -106,113 +234,20 @@ export default function Testimonials() {
                     ))}
                 </motion.div>
 
-                {/* Main Testimonials Grid */}
-                <div className="grid lg:grid-cols-3 gap-8 mb-12">
-                    {testimonials.slice(0, 3).map((testimonial, index) => (
-                        <motion.div
-                            key={testimonial.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            viewport={{ once: true }}
-                            className="group relative"
-                        >
-                            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 group-hover:border-[#D4AF76]/30 h-full">
-                                {/* Quote Icon */}
-                                <div className="mb-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D4AF76] to-[#8B6B4C] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                {/* Review Text */}
-                                <p className="text-gray-700 mb-6 font-light leading-relaxed text-lg">
-                                    "{testimonial.text}"
-                                </p>
-
-                                {/* Rating */}
-                                <div className="flex items-center gap-1 mb-6">
-                                    {[...Array(testimonial.rating)].map((_, i) => (
-                                        <svg key={i} className="w-5 h-5 text-[#D4AF76]" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    ))}
-                                </div>
-
-                                {/* Customer Info */}
-                                <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#D4AF76] to-[#8B6B4C] flex items-center justify-center text-white font-light text-lg shadow-lg">
-                                        {testimonial.image}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-light text-[#2C2C2C] text-lg group-hover:text-[#D4AF76] transition-colors">
-                                            {testimonial.name}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 font-light mb-1">
-                                            {testimonial.role} • {testimonial.location}
-                                        </p>
-                                        <p className="text-xs text-[#D4AF76] font-light">
-                                            Purchased: {testimonial.purchase}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Background Pattern */}
-                                <div className="absolute top-0 right-0 w-20 h-20 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
-                                    <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
-                                        <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="1" className="text-[#D4AF76]"/>
-                                        <circle cx="50" cy="50" r="25" stroke="currentColor" strokeWidth="1" className="text-[#D4AF76]"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-
-                {/* Additional Testimonials Row */}
+                {/* Infinite Moving Cards - Testimonials */}
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
                     viewport={{ once: true }}
-                    className="grid md:grid-cols-3 gap-8"
+                    className="mb-12"
                 >
-                    {testimonials.slice(3, 6).map((testimonial, index) => (
-                        <motion.div
-                            key={testimonial.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            viewport={{ once: true }}
-                            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 hover:border-[#D4AF76]/30 hover:bg-white transition-all duration-300 group"
-                        >
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D4AF76] to-[#8B6B4C] flex items-center justify-center text-white text-sm font-light">
-                                    {testimonial.image}
-                                </div>
-                                <div>
-                                    <h4 className="font-light text-[#2C2C2C] group-hover:text-[#D4AF76] transition-colors">
-                                        {testimonial.name}
-                                    </h4>
-                                    <p className="text-xs text-gray-600 font-light">
-                                        {testimonial.role}
-                                    </p>
-                                </div>
-                                <div className="ml-auto flex gap-1">
-                                    {[...Array(testimonial.rating)].map((_, i) => (
-                                        <svg key={i} className="w-3 h-3 text-[#D4AF76]" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    ))}
-                                </div>
-                            </div>
-                            <p className="text-gray-600 font-light text-sm leading-relaxed">
-                                "{testimonial.text.slice(0, 100)}..."
-                            </p>
-                        </motion.div>
-                    ))}
+                    <InfiniteMovingCards
+                        items={formattedTestimonials}
+                        direction="left"
+                        speed="slow"
+                        pauseOnHover={true}
+                    />
                 </motion.div>
             </div>
         </section>

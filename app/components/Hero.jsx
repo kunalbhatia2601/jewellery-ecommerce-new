@@ -14,16 +14,16 @@ export default function Hero() {
     const slides = [
         {
             image: "carousel1_l76hra.jpg",
-            title: "Radiance That Never Fades",
-            subtitle: "",
-            description: "Each creation is a masterpiece — blending artistry, emotion, and timeless charm for those who believe in everlasting beauty.",
-            cta: "Shop Timeless Pieces",
-            cta2: "Explore Legacy Collection"
+            title: "Luxury, Redefined",
+            subtitle: "Exclusive Experience",
+            description: "Experience the pinnacle of artistry and craftsmanship with our signature collection. Every creation is a blend of timeless tradition, precision, and modern elegance.",
+            cta: "Shop Signature Collection",
+            cta2: "Explore Custom Designs"
         },
         {
             image: "carousel2_gycam4.jpg",
             title: "Crafted by Hands, Perfected by Heart",
-            subtitle: "",
+            subtitle: "The Nandika Signature Collection",
             description: "Every detail reflects devotion — from the artisan's touch to the final shine, our jewellery celebrates the soul of true craftsmanship.",
             cta: "Discover the Artistry",
             cta2: "View Signature Designs"
@@ -31,7 +31,7 @@ export default function Hero() {
         {
             image: "carousel3_xpvlxx.jpg",
             title: "Unveil the New Era of Jewellery",
-            subtitle: "",
+            subtitle: "Exclusively Crafted for the Discerning Few",
             description: "Step into a world of contemporary elegance — modern silhouettes inspired by heritage, designed to make every moment shine.",
             cta: "Explore New Arrivals",
             cta2: "Shop Fresh Styles"

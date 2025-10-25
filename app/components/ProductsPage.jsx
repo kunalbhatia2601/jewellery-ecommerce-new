@@ -25,6 +25,7 @@ export default function ProductsPage() {
         const searchFromUrl = searchParams.get('search');
         const categoryFromUrl = searchParams.get('category');
         const subcategoryFromUrl = searchParams.get('subcategory');
+        
         if (searchFromUrl) {
             setSearchTerm(searchFromUrl);
         }
@@ -35,12 +36,39 @@ export default function ProductsPage() {
             setSelectedSubcategory(subcategoryFromUrl);
         }
     }, [searchParams]);
+    
+    // Update subcategories when category changes from URL or when data is loaded
+    useEffect(() => {
+        if (allSubcategories.length === 0 || !categories.length) return;
+        
+        if (selectedCategory === 'All') {
+            setSubcategories(allSubcategories);
+        } else {
+            // Find the category object to get its ID
+            const categoryObj = categories.find(cat => cat.name === selectedCategory);
+            
+            const filtered = allSubcategories.filter(sub => {
+                // Check if subcategory's category matches selected category
+                return sub.category?.name === selectedCategory || 
+                       sub.category === selectedCategory ||
+                       (categoryObj && (sub.category?._id === categoryObj._id || sub.category === categoryObj._id));
+            });
+            setSubcategories(filtered);
+        }
+    }, [selectedCategory, allSubcategories, categories]);
 
     // Fetch categories, subcategories, and products
     useEffect(() => {
-        fetchCategories();
-        fetchSubcategories();
-        fetchProducts();
+        const fetchData = async () => {
+            await Promise.all([
+                fetchCategories(),
+                fetchSubcategories()
+            ]);
+            // Fetch products after categories and subcategories are loaded
+            await fetchProducts();
+        };
+        
+        fetchData();
     }, []);
 
     const fetchCategories = async () => {
@@ -79,10 +107,10 @@ export default function ProductsPage() {
             
             // Build query parameters
             const params = new URLSearchParams();
-            if (selectedCategory !== 'All') {
+            if (selectedCategory !== 'All' && selectedCategory) {
                 params.append('category', selectedCategory);
             }
-            if (selectedSubcategory !== 'All') {
+            if (selectedSubcategory !== 'All' && selectedSubcategory) {
                 params.append('subcategory', selectedSubcategory);
             }
             if (searchTerm) {
@@ -92,8 +120,13 @@ export default function ProductsPage() {
             const queryString = params.toString();
             const url = `/api/products${queryString ? `?${queryString}` : ''}`;
             
+            console.log('Fetching products with URL:', url);
+            console.log('Filters:', { selectedCategory, selectedSubcategory, searchTerm });
+            
             const response = await fetch(url);
             const data = await response.json();
+            
+            console.log('Products API response:', data);
             
             // API now returns paginated response with data nested
             if (data.success && Array.isArray(data.data)) {
@@ -115,8 +148,20 @@ export default function ProductsPage() {
 
     // Re-fetch products when filters change
     useEffect(() => {
+        // Only fetch if we have the necessary data loaded
+        if (categories.length === 0 || allSubcategories.length === 0) {
+            console.log('Waiting for categories and subcategories to load...');
+            return;
+        }
+        
+        console.log('Filters changed, fetching products...', {
+            selectedCategory,
+            selectedSubcategory,
+            searchTerm
+        });
+        
         fetchProducts();
-    }, [selectedCategory, selectedSubcategory, searchTerm]);
+    }, [selectedCategory, selectedSubcategory, searchTerm, categories.length, allSubcategories.length]);
 
     // Filter and sort products (client-side filtering for tags only, others handled by API)
     const filteredProducts = (Array.isArray(products) ? products : [])
@@ -139,6 +184,7 @@ export default function ProductsPage() {
         });
 
     const handleCategoryClick = (categoryName) => {
+        console.log('Category clicked:', categoryName);
         setSelectedCategory(categoryName);
         setSelectedSubcategory('All'); // Reset subcategory when category changes
         
@@ -146,10 +192,19 @@ export default function ProductsPage() {
         if (categoryName === 'All') {
             setSubcategories(allSubcategories);
         } else {
+            // Find the category object to get its ID
+            const categoryObj = categories.find(cat => cat.name === categoryName);
+            console.log('Category object:', categoryObj);
+            
             const filtered = allSubcategories.filter(sub => {
                 // Check if subcategory's category matches selected category
-                return sub.category?.name === categoryName || sub.category === categoryName;
+                const matches = sub.category?.name === categoryName || 
+                               sub.category === categoryName ||
+                               (categoryObj && (sub.category?._id === categoryObj._id || sub.category === categoryObj._id));
+                console.log('Subcategory:', sub.name, 'matches:', matches, 'category:', sub.category);
+                return matches;
             });
+            console.log('Filtered subcategories:', filtered);
             setSubcategories(filtered);
         }
         

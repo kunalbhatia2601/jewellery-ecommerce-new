@@ -463,3 +463,17 @@ textarea:focus-visible {
   background-size: 200% auto;
   animation: gradient-flow 3s ease infinite;
 }
+
+/* Infinite Scroll Animation for Testimonials */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 0.75rem));
+  }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 40s) linear infinite var(--animation-direction, forwards);
+}

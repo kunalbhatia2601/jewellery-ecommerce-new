@@ -310,6 +310,8 @@ export default function CategoryShowcase() {
   }, [subcategories]);
 
   const handleSubcategoryClick = useCallback((subcategory) => {
+    console.log('Subcategory clicked:', subcategory);
+    
     // Get the category info for the subcategory
     const categoryInfo = categories.find(cat => 
       cat._id === subcategory.category?._id || 
@@ -318,8 +320,18 @@ export default function CategoryShowcase() {
       cat.name === subcategory.category
     );
     
-    if (categoryInfo) {
-      router.push(`/products?category=${encodeURIComponent(categoryInfo.name)}&subcategory=${subcategory._id}`);
+    console.log('Category info found:', categoryInfo);
+    
+    if (categoryInfo && subcategory._id) {
+      const url = `/products?category=${encodeURIComponent(categoryInfo.name)}&subcategory=${encodeURIComponent(subcategory._id)}`;
+      console.log('Navigating to:', url);
+      router.push(url);
+    } else if (subcategory._id) {
+      // Fallback: navigate with just subcategory if category not found
+      console.log('Category not found, navigating with subcategory only');
+      router.push(`/products?subcategory=${encodeURIComponent(subcategory._id)}`);
+    } else {
+      console.error('Unable to navigate - missing subcategory ID');
     }
   }, [router, categories]);
 

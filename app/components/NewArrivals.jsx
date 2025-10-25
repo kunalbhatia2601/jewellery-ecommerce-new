@@ -83,10 +83,10 @@ export default function NewArrivals() {
                     </motion.div>
                     
                     <h2 className="text-3xl md:text-5xl lg:text-6xl font-light text-[#2C2C2C] tracking-tight mb-4">
-                        New Arrivals
+                        New Creations, Just For You
                     </h2>
                     <p className="text-sm md:text-base lg:text-lg text-gray-600 font-light max-w-2xl mx-auto">
-                        Discover our newest pieces, handpicked for their exceptional beauty and craftsmanship
+                        Explore exclusive designs that blend timeless artistry with a touch of modern elegance — curated to make every moment shine.
                     </p>
                 </motion.div>
 
@@ -221,7 +221,7 @@ export default function NewArrivals() {
                             ))}
                         </motion.div>
 
-                        {/* View All Button */}
+                        {/* View Latest Collection Button */}
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -235,7 +235,7 @@ export default function NewArrivals() {
                                 onClick={() => router.push('/products')}
                                 className="inline-flex items-center gap-3 bg-gradient-to-r from-[#2C2C2C] to-[#1A1A1A] text-white px-8 py-4 rounded-full font-medium shadow-xl hover:shadow-2xl transition-all duration-300 group"
                             >
-                                <span>View All Products</span>
+                                <span>View Latest Collection</span>
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </motion.button>
                         </motion.div>
