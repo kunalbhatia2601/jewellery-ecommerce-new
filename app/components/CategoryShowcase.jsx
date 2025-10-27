@@ -243,6 +243,8 @@ export default function CategoryShowcase() {
   const sectionRef = useRef(null);
   const router = useRouter();
 
+  const MAX_DISPLAYED = 20; // Maximum subcategories to display initially
+
   // Intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -364,6 +366,13 @@ export default function CategoryShowcase() {
     });
   }, [subcategories, selectedCategory, categories]);
 
+  // Get displayed subcategories (limited to MAX_DISPLAYED)
+  const displayedSubcategories = useMemo(() => {
+    return filteredSubcategories.slice(0, MAX_DISPLAYED);
+  }, [filteredSubcategories]);
+
+  const hasMore = filteredSubcategories.length > MAX_DISPLAYED;
+
   // Memoize loading skeleton
   const loadingSkeleton = useMemo(() => (
     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
@@ -381,7 +390,7 @@ export default function CategoryShowcase() {
 
   // Memoize rendered subcategories as cards
   const renderedSubcategories = useMemo(() => {
-    return filteredSubcategories.map((subcategory, index) => (
+    return displayedSubcategories.map((subcategory, index) => (
       <motion.div
         key={`${selectedCategory}-${subcategory._id}`}
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -413,7 +422,7 @@ export default function CategoryShowcase() {
         />
       </motion.div>
     ));
-  }, [filteredSubcategories, selectedCategory, handleSubcategoryClick]);
+  }, [displayedSubcategories, selectedCategory, handleSubcategoryClick]);
 
     return (
         <section ref={sectionRef} className="bg-background py-8 sm:py-12 lg:py-16">
@@ -546,7 +555,10 @@ export default function CategoryShowcase() {
                                     {selectedCategory === 'ALL' ? 'All Collections' : selectedCategory}
                                 </h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    Showing {filteredSubcategories.length} of {subcategories.length} collections
+                                    {filteredSubcategories.length <= MAX_DISPLAYED
+                                        ? `Showing all ${filteredSubcategories.length} collections`
+                                        : `Showing ${displayedSubcategories.length} of ${filteredSubcategories.length} collections`
+                                    }
                                 </p>
                             </div>
                             {selectedCategory !== 'ALL' && (
@@ -564,18 +576,50 @@ export default function CategoryShowcase() {
                         {loading ? (
                           loadingSkeleton
                         ) : filteredSubcategories.length > 0 ? (
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={selectedCategory}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              transition={{ duration: 0.5, ease: "easeOut" }}
-                              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
-                            >
-                              {renderedSubcategories}
-                            </motion.div>
-                          </AnimatePresence>
+                          <>
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key={selectedCategory}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
+                              >
+                                {renderedSubcategories}
+                              </motion.div>
+                            </AnimatePresence>
+                            
+                            {/* Show More / Explore All Button */}
+                            {hasMore && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.3 }}
+                                className="flex justify-center pt-8"
+                              >
+                                <button
+                                  onClick={() => {
+                                    // Redirect to products page with category filter if one is selected
+                                    if (selectedCategory !== 'ALL') {
+                                      router.push(`/products?category=${encodeURIComponent(selectedCategory)}`);
+                                    } else {
+                                      router.push('/products');
+                                    }
+                                  }}
+                                  className="group relative px-8 py-4 bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden"
+                                >
+                                  <span className="relative z-10 flex items-center gap-3">
+                                    Explore All {filteredSubcategories.length} Collections
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                  </span>
+                                  <div className="absolute inset-0 bg-gradient-to-r from-[#8B6B4C] to-[#D4AF76] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </button>
+                              </motion.div>
+                            )}
+                          </>
                         ) : (
               <div className="col-span-full text-center py-20">
                 <div className="text-gray-300 mb-4">
