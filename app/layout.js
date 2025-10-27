@@ -4,7 +4,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { NavbarProvider } from "./context/NavbarContext";
 import ConditionalNavbar from "./components/ConditionalNavbar";
-import SmoothScroll from "./components/SmoothScroll";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,18 +16,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SmoothScroll>
-          <AuthProvider>
-            <CartProvider>
-              <NavbarProvider>
-                <ConditionalNavbar />
-                <main>
-                  {children}
-                </main>
-              </NavbarProvider>
-            </CartProvider>
-          </AuthProvider>
-        </SmoothScroll>
+        <AuthProvider>
+          <CartProvider>
+            <NavbarProvider>
+              <ConditionalNavbar />
+              <main>
+                {children}
+              </main>
+            </NavbarProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

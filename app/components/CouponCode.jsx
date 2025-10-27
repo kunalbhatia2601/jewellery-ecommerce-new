@@ -189,7 +189,7 @@ const CouponCode = ({ cartItems, onCouponApplied, onCouponRemoved, appliedCoupon
               </button>
               
               {showAllCoupons && (
-                <div className="space-y-2 max-h-96 overflow-y-auto" data-lenis-prevent>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
                   {availableCoupons.map((coupon) => (
                     <div 
                       key={coupon._id}

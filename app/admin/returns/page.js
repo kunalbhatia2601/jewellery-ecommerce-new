@@ -4,7 +4,6 @@ import AdminLayout from '@/app/components/AdminLayout';
 import withAdminAuth from '@/app/components/withAdminAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StatusConfig, getNextActions } from '@/app/lib/returnStatusUtils';
-import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 
 
@@ -17,8 +16,6 @@ function AdminReturnsPage() {
     const [showManualRefundModal, setShowManualRefundModal] = useState(false);
     const [showManualReturnModal, setShowManualReturnModal] = useState(false);
     
-    // Control Lenis smooth scroll when any modal is open
-    useLenisControl(showManualRefundModal || showManualReturnModal || !!selectedReturn);
     const [manualRefundData, setManualRefundData] = useState({
         orderId: '',
         customerId: '',
@@ -765,7 +762,7 @@ function AdminReturnsPage() {
                                 </div>
                             </div>
 
-                            <div className="p-6 overflow-y-auto max-h-[70vh]" data-lenis-prevent>
+                            <div className="p-6 overflow-y-auto max-h-[70vh]">
                                 {/* Customer Information */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
@@ -958,7 +955,7 @@ function AdminReturnsPage() {
                                 <p className="text-sm text-gray-600 mt-1">Process a refund without return request</p>
                             </div>
 
-                            <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]" data-lenis-prevent>
+                            <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Order ID
@@ -1072,7 +1069,7 @@ function AdminReturnsPage() {
                                 <p className="text-sm text-gray-600 mt-1">Create a return request on behalf of a customer</p>
                             </div>
 
-                            <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]" data-lenis-prevent>
+                            <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">

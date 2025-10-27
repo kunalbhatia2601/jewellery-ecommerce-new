@@ -4,7 +4,6 @@ import withAdminAuth from '@/app/components/withAdminAuth';
 import AdminLayout from '@/app/components/AdminLayout';
 import GoldPriceDashboard from '@/app/components/GoldPriceDashboard';
 import JewelryPriceCalculator from '@/app/components/JewelryPriceCalculator';
-import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 const MetalRatesManagement = () => {
   const [loading, setLoading] = useState({
@@ -14,9 +13,6 @@ const MetalRatesManagement = () => {
   });
   const [showModal, setShowModal] = useState(null);
   const [modalData, setModalData] = useState(null);
-
-  // Control Lenis smooth scroll when modal is open
-  useLenisControl(!!showModal);
 
   const handlePriceCalculated = (calculationData) => {
     console.log('Price calculated:', calculationData);
@@ -256,7 +252,7 @@ const MetalRatesManagement = () => {
                 </button>
               </div>
               
-              <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]" data-lenis-prevent>
+              <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
                 {showModal === 'result' && modalData?.content}
               </div>
             </div>

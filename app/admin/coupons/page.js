@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '@/app/components/AdminLayout';
 import withAdminAuth from '@/app/components/withAdminAuth';
-import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 const CouponManagement = () => {
   const [coupons, setCoupons] = useState([]);
@@ -10,9 +9,6 @@ const CouponManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  
-  // Control Lenis smooth scroll when modal is open
-  useLenisControl(showModal);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -349,7 +345,7 @@ const CouponManagement = () => {
                 </button>
               </div>
               
-              <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-80px)]" data-lenis-prevent>
+              <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-80px)]">
                 <div className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>

@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { CldImage } from 'next-cloudinary';
 import withAdminAuth from '../../components/withAdminAuth';
-import { useLenisControl } from '@/app/hooks/useLenisControl';
 
 function CategoriesAdmin() {
     const [categories, setCategories] = useState([]);
@@ -17,8 +16,6 @@ function CategoriesAdmin() {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [activeTab, setActiveTab] = useState('categories'); // 'categories' or 'subcategories'
     
-    // Control Lenis smooth scroll when any modal is open
-    useLenisControl(showForm || showSubcategoryForm);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -443,7 +440,7 @@ function CategoriesAdmin() {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)]" data-lenis-prevent>
+                                <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)]">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Category Name *
@@ -609,7 +606,7 @@ function CategoriesAdmin() {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmitSubcategory} className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)]" data-lenis-prevent>
+                                <form onSubmit={handleSubmitSubcategory} className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)]">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Parent Category *

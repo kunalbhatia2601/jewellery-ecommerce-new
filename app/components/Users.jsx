@@ -3,29 +3,12 @@ import { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { useLenis } from './SmoothScroll';
 
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingUser, setEditingUser] = useState(null);
     const pathname = usePathname();
-    const lenis = useLenis();
-
-    // Stop/start Lenis when edit modal opens/closes
-    useEffect(() => {
-        if (editingUser && lenis) {
-            lenis.stop();
-        } else if (!editingUser && lenis) {
-            lenis.start();
-        }
-        
-        return () => {
-            if (lenis) {
-                lenis.start();
-            }
-        };
-    }, [editingUser, lenis]);
 
     useEffect(() => {
         fetchUsers();
