@@ -9,6 +9,10 @@ function AdminHeroVideosPage() {
     const [showForm, setShowForm] = useState(false);
     const [editingVideo, setEditingVideo] = useState(null);
     const [uploadingVideo, setUploadingVideo] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchingProducts, setSearchingProducts] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -16,12 +20,26 @@ function AdminHeroVideosPage() {
         thumbnailUrl: '',
         order: 0,
         isActive: true,
-        duration: 0
+        duration: 0,
+        linkedProductId: '',
+        linkedProductSlug: ''
     });
 
     useEffect(() => {
         fetchVideos();
     }, []);
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (searchQuery.trim()) {
+                searchProducts(searchQuery);
+            } else {
+                setSearchResults([]);
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchQuery]);
 
     const fetchVideos = async () => {
         try {
@@ -35,6 +53,41 @@ function AdminHeroVideosPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const searchProducts = async (query) => {
+        setSearchingProducts(true);
+        try {
+            const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&limit=10`);
+            if (res.ok) {
+                const data = await res.json();
+                setSearchResults(data);
+            }
+        } catch (error) {
+            console.error('Failed to search products:', error);
+        } finally {
+            setSearchingProducts(false);
+        }
+    };
+
+    const handleProductSelect = (product) => {
+        setSelectedProduct(product);
+        setFormData({
+            ...formData,
+            linkedProductId: product._id,
+            linkedProductSlug: product._id // Use product ID as the link
+        });
+        setSearchQuery('');
+        setSearchResults([]);
+    };
+
+    const handleProductRemove = () => {
+        setSelectedProduct(null);
+        setFormData({
+            ...formData,
+            linkedProductId: '',
+            linkedProductSlug: ''
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -81,8 +134,13 @@ function AdminHeroVideosPage() {
             thumbnailUrl: video.thumbnailUrl || '',
             order: video.order,
             isActive: video.isActive,
-            duration: video.duration || 0
+            duration: video.duration || 0,
+            linkedProductId: video.linkedProductId?._id || video.linkedProductId || '',
+            linkedProductSlug: video.linkedProductSlug || (video.linkedProductId?._id || video.linkedProductId || '')
         });
+        if (video.linkedProductId) {
+            setSelectedProduct(video.linkedProductId);
+        }
         setShowForm(true);
     };
 
@@ -114,10 +172,15 @@ function AdminHeroVideosPage() {
             thumbnailUrl: '',
             order: 0,
             isActive: true,
-            duration: 0
+            duration: 0,
+            linkedProductId: '',
+            linkedProductSlug: ''
         });
         setEditingVideo(null);
         setShowForm(false);
+        setSelectedProduct(null);
+        setSearchQuery('');
+        setSearchResults([]);
     };
 
     const openCloudinaryWidget = () => {
@@ -244,6 +307,7 @@ function AdminHeroVideosPage() {
                                 <li>• Keep videos short (10-30 seconds) for optimal engagement</li>
                                 <li>• Maximum file size: 50MB</li>
                                 <li>• Supported formats: MP4, WebM, MOV</li>
+                                <li>• <strong>Link products:</strong> Search and link a product to make videos clickable and redirect users to that product</li>
                             </ul>
                         </div>
                     </div>
@@ -310,6 +374,111 @@ function AdminHeroVideosPage() {
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
                                         placeholder="Brief description of the video content..."
                                     />
+                                </div>
+
+                                {/* Product Linking */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Link to Product (Optional)
+                                    </label>
+                                    <p className="text-sm text-gray-500 mb-3">
+                                        When users click on this video, they will be redirected to the linked product
+                                    </p>
+                                    
+                                    {selectedProduct ? (
+                                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                            <div className="flex items-start gap-4">
+                                                {selectedProduct.images && selectedProduct.images[0] && (
+                                                    <img
+                                                        src={selectedProduct.images[0]}
+                                                        alt={selectedProduct.name}
+                                                        className="w-20 h-20 object-cover rounded-lg"
+                                                    />
+                                                )}
+                                                <div className="flex-1">
+                                                    <h4 className="font-semibold text-gray-900">{selectedProduct.name}</h4>
+                                                    {selectedProduct.sku && (
+                                                        <p className="text-sm text-gray-600 mt-1">SKU: {selectedProduct.sku}</p>
+                                                    )}
+                                                    {selectedProduct.price && (
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            Price: ₹{selectedProduct.price.toLocaleString()}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleProductRemove}
+                                                    className="text-red-600 hover:text-red-700 p-2"
+                                                    title="Remove product link"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="relative">
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent pr-10"
+                                                    placeholder="Search for products by name or SKU..."
+                                                />
+                                                {searchingProducts && (
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#8B6B4C]"></div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Search Results Dropdown */}
+                                            {searchResults.length > 0 && (
+                                                <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+                                                    {searchResults.map((product) => (
+                                                        <button
+                                                            key={product._id}
+                                                            type="button"
+                                                            onClick={() => handleProductSelect(product)}
+                                                            className="w-full flex items-start gap-3 p-3 hover:bg-gray-50 transition text-left border-b border-gray-100 last:border-b-0"
+                                                        >
+                                                            {product.images && product.images[0] && (
+                                                                <img
+                                                                    src={product.images[0]}
+                                                                    alt={product.name}
+                                                                    className="w-16 h-16 object-cover rounded-lg"
+                                                                />
+                                                            )}
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="font-semibold text-gray-900 truncate">{product.name}</h4>
+                                                                {product.sku && (
+                                                                    <p className="text-sm text-gray-600 mt-1">SKU: {product.sku}</p>
+                                                                )}
+                                                                {product.price && (
+                                                                    <p className="text-sm text-gray-600 mt-1">
+                                                                        ₹{product.price.toLocaleString()}
+                                                                    </p>
+                                                                )}
+                                                                {product.category && (
+                                                                    <p className="text-xs text-gray-500 mt-1">
+                                                                        {product.category}
+                                                                        {product.subcategory && ` / ${product.subcategory}`}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            
+                                            {searchQuery && !searchingProducts && searchResults.length === 0 && (
+                                                <p className="text-sm text-gray-500 mt-2">No products found</p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -401,6 +570,21 @@ function AdminHeroVideosPage() {
                                 
                                 {video.description && (
                                     <p className="text-sm text-gray-600 mb-3 line-clamp-2">{video.description}</p>
+                                )}
+                                
+                                {/* Linked Product Info */}
+                                {video.linkedProductId && (
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                            </svg>
+                                            <span className="text-xs font-medium text-blue-900">Linked Product:</span>
+                                        </div>
+                                        <p className="text-sm text-blue-800 font-medium">
+                                            {video.linkedProductId.name || 'Product'}
+                                        </p>
+                                    </div>
                                 )}
                                 
                                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">

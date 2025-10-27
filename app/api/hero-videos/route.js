@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import HeroVideo from '@/models/HeroVideo';
+import Product from '@/models/Product';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
@@ -46,7 +47,7 @@ export async function GET(request) {
         const activeOnly = searchParams.get('activeOnly') === 'true';
 
         if (id) {
-            const video = await HeroVideo.findById(id);
+            const video = await HeroVideo.findById(id).populate('linkedProductId', 'name slug images price');
             if (!video) {
                 return NextResponse.json(
                     { error: 'Video not found' },
@@ -58,7 +59,9 @@ export async function GET(request) {
 
         // Fetch all videos
         const query = activeOnly ? { isActive: true } : {};
-        const videos = await HeroVideo.find(query).sort({ order: 1, createdAt: -1 });
+        const videos = await HeroVideo.find(query)
+            .populate('linkedProductId', 'name slug images price')
+            .sort({ order: 1, createdAt: -1 });
         
         return NextResponse.json(videos);
     } catch (error) {

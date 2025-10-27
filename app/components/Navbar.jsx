@@ -189,18 +189,6 @@ export default function Navbar() {
                                                             My Orders
                                                         </button>
                                                         
-                                                        <button
-                                                            onClick={() => {
-                                                                setIsProfileOpen(false);
-                                                                router.push('/returns/track');
-                                                            }}
-                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                                        >
-                                                            <svg className="mr-3 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                                            </svg>
-                                                            My Returns
-                                                        </button>
                                                         
                                                         {user.isAdmin && (
                                                             <button
@@ -442,18 +430,7 @@ export default function Navbar() {
                                                 </svg>
                                                 My Orders
                                             </button>
-                                            <button
-                                                onClick={() => {
-                                                    setIsMobileMenuOpen(false);
-                                                    router.push('/returns/track');
-                                                }}
-                                                className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50"
-                                            >
-                                                <svg className="mr-3 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                                </svg>
-                                                My Returns
-                                            </button>
+
                                             {user.isAdmin && (
                                                 <button
                                                     onClick={() => {

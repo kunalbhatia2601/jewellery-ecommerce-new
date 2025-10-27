@@ -28,6 +28,15 @@ const heroVideoSchema = new mongoose.Schema({
     duration: {
         type: Number, // Duration in seconds
         default: 0
+    },
+    linkedProductId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        default: null
+    },
+    linkedProductSlug: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true // Automatically adds createdAt and updatedAt

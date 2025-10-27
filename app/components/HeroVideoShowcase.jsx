@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function VideoShowcaseSection() {
     const [videos, setVideos] = useState([]);
@@ -9,6 +10,7 @@ export default function VideoShowcaseSection() {
     const [isMuted, setIsMuted] = useState(true);
     const videoRefs = useRef([]);
     const videoElementRefs = useRef([]);
+    const router = useRouter();
 
     useEffect(() => {
         fetchVideos();
@@ -51,6 +53,7 @@ export default function VideoShowcaseSection() {
             const res = await fetch('/api/hero-videos?activeOnly=true');
             if (res.ok) {
                 const data = await res.json();
+                console.log('Fetched videos:', data);
                 setVideos(data);
             }
         } catch (error) {
@@ -71,6 +74,18 @@ export default function VideoShowcaseSection() {
 
     const toggleMute = () => {
         setIsMuted(!isMuted);
+    };
+
+    const handleVideoClick = (video) => {
+        console.log('Video clicked:', video);
+        console.log('Linked product slug:', video.linkedProductSlug);
+        
+        if (video.linkedProductSlug) {
+            console.log('Navigating to:', `/products/${video.linkedProductSlug}`);
+            router.push(`/products/${video.linkedProductSlug}`);
+        } else {
+            console.log('No product linked to this video');
+        }
     };
 
     if (loading) {
@@ -122,11 +137,15 @@ export default function VideoShowcaseSection() {
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                                 className="flex-shrink-0 snap-center w-[280px] md:w-[320px] lg:w-[360px]"
                             >
-                                <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300 aspect-[9/16] group">
+                                <div 
+                                    className={`relative bg-black rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 aspect-[9/16] group ${
+                                        video.linkedProductSlug ? 'cursor-pointer hover:scale-[1.02]' : ''
+                                    }`}
+                                >
                                     {/* Video Player */}
                                     <video
                                         ref={(el) => (videoElementRefs.current[index] = el)}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover pointer-events-none"
                                         loop
                                         muted={isMuted}
                                         playsInline
@@ -144,11 +163,44 @@ export default function VideoShowcaseSection() {
                                         Your browser does not support the video tag.
                                     </video>
 
+                                    {/* Clickable Overlay - Only if product is linked */}
+                                    {video.linkedProductSlug && (
+                                        <div 
+                                            className="absolute inset-0 z-10"
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                console.log('Overlay clicked!');
+                                                handleVideoClick(video);
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    handleVideoClick(video);
+                                                }
+                                            }}
+                                            title={`Click to view ${video.linkedProductId?.name || 'product'}`}
+                                        />
+                                    )}
+
                                     {/* Gradient Overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
 
+                                    {/* Click Indicator - Show on hover if linked */}
+                                    {video.linkedProductSlug && (
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                                            <div className="bg-white/90 rounded-full p-4 backdrop-blur-sm">
+                                                <svg className="w-8 h-8 text-[#8B6B4C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Video Info */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white pointer-events-none z-20">
                                         <h3 className="text-xl font-semibold mb-2">
                                             {video.title}
                                         </h3>
@@ -156,6 +208,18 @@ export default function VideoShowcaseSection() {
                                             <p className="text-sm text-white/90 line-clamp-2">
                                                 {video.description}
                                             </p>
+                                        )}
+                                        {video.linkedProductSlug ? (
+                                            <div className="flex items-center gap-2 mt-3 text-xs text-white/80 bg-black/40 px-3 py-2 rounded-full w-fit">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                </svg>
+                                                <span className="font-medium">Tap to view product</span>
+                                            </div>
+                                        ) : (
+                                            <div className="mt-3 text-xs text-white/60">
+                                                No product linked
+                                            </div>
                                         )}
                                     </div>
 
@@ -197,33 +261,6 @@ export default function VideoShowcaseSection() {
                         </>
                     )}
                 </div>
-
-                {/* Sound Toggle */}
-                <div className="flex justify-center mt-8">
-                    <button
-                        onClick={toggleMute}
-                        className="flex items-center gap-2 px-6 py-3 bg-white rounded-full shadow-md hover:shadow-lg transition-all"
-                    >
-                        {isMuted ? (
-                            <>
-                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                                </svg>
-                                <span className="text-sm font-medium text-gray-700">Tap to Unmute</span>
-                            </>
-                        ) : (
-                            <>
-                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                </svg>
-                                <span className="text-sm font-medium text-gray-700">Sound On</span>
-                            </>
-                        )}
-                    </button>
-                </div>
-
-
                 {/* CTA */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
