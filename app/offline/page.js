@@ -1,3 +1,5 @@
+'use client';
+
 export default function OfflinePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -19,11 +21,11 @@ export default function OfflinePage() {
         </div>
         
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          You're Offline
+          You&apos;re Offline
         </h1>
         
         <p className="text-gray-600 mb-8">
-          It looks like you've lost your internet connection. Don't worry, you can still browse
+          It looks like you&apos;ve lost your internet connection. Don&apos;t worry, you can still browse
           previously viewed pages.
         </p>
         
@@ -35,7 +37,7 @@ export default function OfflinePage() {
         </button>
         
         <div className="mt-8 text-sm text-gray-500">
-          <p>Your connection will be restored automatically when you're back online.</p>
+          <p>Your connection will be restored automatically when you&apos;re back online.</p>
         </div>
       </div>
     </div>

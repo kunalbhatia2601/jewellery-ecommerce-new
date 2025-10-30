@@ -191,7 +191,7 @@ export default function PWATestPage() {
             </h3>
             <ul className="space-y-2 text-gray-700 text-sm">
               <li>✓ Open Chrome DevTools → Application tab for detailed inspection</li>
-              <li>✓ Test offline mode: Network tab → Set to "Offline"</li>
+              <li>✓ Test offline mode: Network tab → Set to &quot;Offline&quot;</li>
               <li>✓ Run Lighthouse audit for PWA score</li>
               <li>✓ Test on mobile device for install prompt</li>
               <li>✓ PWA requires HTTPS in production (localhost is exempt)</li>
