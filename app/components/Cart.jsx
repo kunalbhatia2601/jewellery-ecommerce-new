@@ -181,7 +181,7 @@ export default function Cart() {
                                                     <div className="relative flex-shrink-0">
                                                         <motion.img
                                                             whileHover={{ scale: 1.05 }}
-                                                            src={item.images?.[0]?.url || item.image}
+                                                            src={item.images?.[0]?.url || item.image || '/placeholder-product.png'}
                                                             alt={item.name}
                                                             className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shadow-sm"
                                                         />

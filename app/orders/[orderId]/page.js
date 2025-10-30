@@ -73,8 +73,8 @@ export default function OrderDetailsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="min-h-screen pt-8 md:pt-9 lg:pt-10 bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="animate-pulse space-y-6">
                         {[1, 2, 3].map((i) => (
                             <div key={i} className="bg-white p-8 rounded-xl shadow-md">
@@ -90,8 +90,8 @@ export default function OrderDetailsPage() {
 
     if (error || !order) {
         return (
-            <div className="min-h-screen pt-24 bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="min-h-screen pt-8 md:pt-9 lg:pt-10 bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -121,8 +121,8 @@ export default function OrderDetailsPage() {
     const withinReturnWindow = daysSinceOrder <= 7;
 
     return (
-        <div className="min-h-screen pt-24 bg-gradient-to-br from-gray-50 to-gray-100">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-h-screen pt-8 md:pt-9 lg:pt-10 pb-6 md:pb-8 bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Back Button & Refresh Indicator */}
                 <div className="flex justify-between items-center mb-6">
                     <Link
@@ -382,7 +382,7 @@ export default function OrderDetailsPage() {
                                     <div key={idx} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                         <div className="relative w-20 h-20 flex-shrink-0">
                                             <Image
-                                                src={item.image}
+                                                src={item.image || '/placeholder-product.png'}
                                                 alt={item.name}
                                                 fill
                                                 className="object-cover rounded-lg"

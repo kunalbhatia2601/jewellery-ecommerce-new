@@ -179,7 +179,7 @@ export default function CheckoutPage() {
     // Don't render checkout if user is not authenticated
     if (!user) {
         return (
-            <div className="min-h-screen bg-gray-50 pt-4 md:pt-6 lg:pt-8 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 pt-8 md:pt-9 lg:pt-10 flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
                     <p className="text-gray-600 mb-6">Please log in to continue with checkout</p>
@@ -190,11 +190,11 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 pt-4 md:pt-6 lg:pt-8 pb-12">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 pt-8 md:pt-9 lg:pt-10 pb-12">
             <RazorpayScript />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-8 text-center lg:text-left">
+                <div className="mb-8 text-left">
                     <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
                         Checkout
                     </h1>

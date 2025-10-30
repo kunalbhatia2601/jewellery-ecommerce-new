@@ -226,7 +226,7 @@ export default function OrdersPage() {
     // Show loading while auth is being checked or orders are being fetched
     if (authLoading || loading || !authChecked) {
         return (
-            <div className="min-h-screen pt-24 bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="min-h-screen pt-8 md:pt-9 lg:pt-10 bg-gradient-to-br from-gray-50 to-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="animate-pulse space-y-6">
                         {[1, 2, 3].map((i) => (
@@ -244,8 +244,8 @@ export default function OrdersPage() {
     const displayOrders = getOrdersByTab();
 
     return (
-        <div className="min-h-screen pt-24 bg-gradient-to-br from-gray-50 to-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-h-screen pt-8 md:pt-9 lg:pt-10 pb-6 md:pb-8 bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">My Orders</h1>
@@ -393,7 +393,7 @@ export default function OrdersPage() {
                                                 <div key={idx} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
                                                     <div className="relative w-20 h-20 flex-shrink-0">
                                                         <Image
-                                                            src={item.image}
+                                                            src={item.image || '/placeholder-product.png'}
                                                             alt={item.name}
                                                             fill
                                                             className="object-cover rounded-lg"
