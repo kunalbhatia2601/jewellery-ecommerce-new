@@ -5,6 +5,8 @@ import cache from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
 export async function GET(req) {
     let connection;
@@ -13,7 +15,7 @@ export async function GET(req) {
         connection = await Promise.race([
             connectDB(),
             new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Database connection timeout')), 10000)
+                setTimeout(() => reject(new Error('Database connection timeout')), 15000)
             )
         ]);
         
@@ -99,8 +101,9 @@ export async function GET(req) {
                 .sort(sort)
                 .skip(skip)
                 .limit(limit)
-                .lean(), // Use lean() for better performance
-            Product.countDocuments(query)
+                .lean()
+                .maxTimeMS(15000), // Add MongoDB query timeout
+            Product.countDocuments(query).maxTimeMS(10000)
         ]);
         
         // Convert to plain objects and ensure totalStock is calculated
@@ -158,7 +161,9 @@ export async function GET(req) {
         return NextResponse.json(response, {
             headers: {
                 'X-Cache': 'MISS',
-                'Cache-Control': 'public, max-age=60, s-maxage=120, stale-while-revalidate=300'
+                'Cache-Control': 'public, max-age=60, s-maxage=120, stale-while-revalidate=300',
+                'CDN-Cache-Control': 'public, max-age=60',
+                'Vercel-CDN-Cache-Control': 'public, max-age=60',
             }
         });
     } catch (error) {

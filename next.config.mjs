@@ -54,6 +54,23 @@ const nextConfig = {
         optimizeCss: true,
         optimizePackageImports: ['framer-motion', 'lucide-react'],
     },
+    // Disable static optimization for dynamic routes
+    async headers() {
+        return [
+            {
+                source: '/api/:path*',
+                headers: [
+                    { key: 'Cache-Control', value: 'no-store, must-revalidate' },
+                ],
+            },
+            {
+                source: '/products/:path*',
+                headers: [
+                    { key: 'Cache-Control', value: 'no-store, must-revalidate' },
+                ],
+            },
+        ];
+    },
 };
 
 export default nextConfig;
