@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
             );
         }
 
-        const { id } = params;
+        const { id } = await params;
         await connectDB();
         
         const product = await Product.findById(id).populate('subcategory', 'name slug');
@@ -298,7 +298,7 @@ export async function DELETE(req, { params }) {
             );
         }
 
-        const { id } = params;
+        const { id } = await params;
         await connectDB();
 
         const product = await Product.findByIdAndDelete(id);

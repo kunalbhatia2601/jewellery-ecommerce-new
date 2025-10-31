@@ -249,45 +249,42 @@ export default function AdminLayout({ children }) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
                         onClick={() => setIsMobileSidebarOpen(false)}
                     />
                 )}
             </AnimatePresence>
 
-            <div className="flex pt-16 lg:pt-20"> {/* Add top padding for fixed header */}
+            <div className="flex pt-[40px]">
                 {/* Desktop Sidebar */}
-                <aside className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 fixed left-0 top-16 lg:top-20 bottom-0 overflow-y-auto">
-                    <nav className="p-4">
-                        <ul className="space-y-1">
-                            {navItems.map((item) => {
-                                const isActive = pathname === item.path;
-                                return (
-                                    <li key={item.path}>
-                                        <Link
-                                            href={item.path}
-                                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                                isActive
-                                                    ? 'bg-[#8B6B4C] text-white shadow-sm'
-                                                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                                            }`}
-                                        >
-                                            <span className={`${isActive ? 'text-white' : 'text-gray-400'}`}>
-                                                {item.icon}
-                                            </span>
-                                            <span className="font-medium">{item.label}</span>
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                <aside className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 fixed left-0 top-[73px] bottom-0 overflow-y-auto">
+                    <nav className="p-4 space-y-2">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.path;
+                            return (
+                                <Link
+                                    key={item.path}
+                                    href={item.path}
+                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                                        isActive
+                                            ? 'bg-gradient-to-r from-[#8B6B4C] to-[#7A5D42] text-white shadow-md'
+                                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                    }`}
+                                >
+                                    <span className={`transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-400'}`}>
+                                        {item.icon}
+                                    </span>
+                                    <span className="font-medium text-sm">{item.label}</span>
+                                </Link>
+                            );
+                        })}
                     </nav>
 
                     {/* Sidebar Footer */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gradient-to-b from-gray-50 to-gray-100">
                         <div className="text-center">
-                            <p className="text-xs text-gray-500">Jewelry Store Admin</p>
-                            <p className="text-xs text-gray-400">v1.0.0</p>
+                            <p className="text-xs font-medium text-gray-600">Jewelry Store Admin</p>
+                            <p className="text-xs text-gray-400 mt-0.5">v1.0.0</p>
                         </div>
                     </div>
                 </aside>
@@ -300,39 +297,101 @@ export default function AdminLayout({ children }) {
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="lg:hidden w-64 bg-white shadow-xl fixed left-0 top-16 bottom-0 z-50 overflow-y-auto"
+                            className="lg:hidden w-72 bg-white shadow-2xl fixed left-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col"
                         >
-                            <nav className="p-4">
-                                <ul className="space-y-1">
-                                    {navItems.map((item) => {
-                                        const isActive = pathname === item.path;
-                                        return (
-                                            <li key={item.path}>
-                                                <Link
-                                                    href={item.path}
-                                                    onClick={() => setIsMobileSidebarOpen(false)}
-                                                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                                        isActive
-                                                            ? 'bg-[#8B6B4C] text-white shadow-sm'
-                                                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                                                    }`}
-                                                >
-                                                    <span className={`${isActive ? 'text-white' : 'text-gray-400'}`}>
-                                                        {item.icon}
-                                                    </span>
-                                                    <span className="font-medium">{item.label}</span>
-                                                </Link>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                            {/* Mobile Sidebar Header */}
+                            <div className="bg-gradient-to-r from-[#8B6B4C] to-[#7A5D42] px-6 py-5 flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                        <span className="text-white font-bold text-lg">A</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-white font-bold text-lg">Admin Panel</h2>
+                                        <p className="text-white/80 text-xs">Jewelry Store</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setIsMobileSidebarOpen(false)}
+                                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                                >
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* User Info Card */}
+                            <div className="px-4 py-4 border-b border-gray-100">
+                                <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-[#8B6B4C] to-[#7A5D42] rounded-full flex items-center justify-center shadow-md">
+                                        <span className="text-white text-lg font-bold">
+                                            {user?.name?.charAt(0)?.toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
+                                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Navigation */}
+                            <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+                                {navItems.map((item) => {
+                                    const isActive = pathname === item.path;
+                                    return (
+                                        <Link
+                                            key={item.path}
+                                            href={item.path}
+                                            onClick={() => setIsMobileSidebarOpen(false)}
+                                            className={`flex items-center space-x-3 px-4 py-3.5 rounded-xl transition-all duration-200 group ${
+                                                isActive
+                                                    ? 'bg-gradient-to-r from-[#8B6B4C] to-[#7A5D42] text-white shadow-lg scale-[1.02]'
+                                                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:scale-95'
+                                            }`}
+                                        >
+                                            <span className={`transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-400'}`}>
+                                                {item.icon}
+                                            </span>
+                                            <span className="font-medium text-sm">{item.label}</span>
+                                            {isActive && (
+                                                <span className="ml-auto">
+                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            )}
+                                        </Link>
+                                    );
+                                })}
                             </nav>
 
                             {/* Mobile Sidebar Footer */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
-                                <div className="text-center">
-                                    <p className="text-xs text-gray-500">Jewelry Store Admin</p>
-                                    <p className="text-xs text-gray-400">v1.0.0</p>
+                            <div className="border-t border-gray-200 bg-gradient-to-b from-gray-50 to-gray-100">
+                                <div className="px-4 py-3 space-y-2">
+                                    <Link
+                                        href="/"
+                                        onClick={() => setIsMobileSidebarOpen(false)}
+                                        className="flex items-center justify-center space-x-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                        <span>View Store</span>
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center justify-center space-x-2 w-full px-4 py-2.5 bg-red-50 border border-red-200 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        <span>Sign Out</span>
+                                    </button>
+                                </div>
+                                <div className="px-4 py-3 text-center border-t border-gray-200">
+                                    <p className="text-xs font-medium text-gray-600">Jewelry Store Admin</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">v1.0.0</p>
                                 </div>
                             </div>
                         </motion.aside>
@@ -340,8 +399,8 @@ export default function AdminLayout({ children }) {
                 </AnimatePresence>
 
                 {/* Main Content */}
-                <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50">
-                    <div className="max-w-7xl mx-auto">
+                <main className="flex-1 lg:ml-64 min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         {children}
                     </div>
                 </main>

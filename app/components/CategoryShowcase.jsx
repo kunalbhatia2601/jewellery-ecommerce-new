@@ -243,7 +243,7 @@ export default function CategoryShowcase() {
   const sectionRef = useRef(null);
   const router = useRouter();
 
-  const MAX_DISPLAYED = 20; // Maximum subcategories to display initially
+  const MAX_DISPLAYED = 16; // Maximum subcategories to display initially
 
   // Intersection observer for scroll animations
   useEffect(() => {
