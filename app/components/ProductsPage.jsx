@@ -130,6 +130,7 @@ export default function ProductsPage() {
             // Build query parameters
             const params = new URLSearchParams();
             params.append('limit', '100'); // Fetch more at once
+            params.append('_', Date.now()); // Cache busting
             
             if (selectedCategory !== 'All' && selectedCategory) {
                 params.append('category', selectedCategory);
@@ -146,8 +147,10 @@ export default function ProductsPage() {
             
             const response = await fetch(url, {
                 signal: abortControllerRef.current.signal,
+                cache: 'no-store',
                 headers: {
                     'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
                 }
             });
             
