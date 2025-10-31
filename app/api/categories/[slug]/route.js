@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import Category from '@/models/Category';
 import Product from '@/models/Product';
+import Subcategory from '@/models/Subcategory';
 import connectDB from '@/lib/mongodb';
+import cache from '@/lib/cache';
 
 // GET single category
 export async function GET(request, context) {
@@ -77,7 +79,7 @@ export async function DELETE(request, context) {
         
         const { slug } = await params;
         
-        // Check if category has products
+        // Find the category
         const category = await Category.findOne({ slug });
         if (!category) {
             return NextResponse.json(
@@ -86,17 +88,38 @@ export async function DELETE(request, context) {
             );
         }
         
-        const productCount = await Product.countDocuments({ category: category.name });
-        if (productCount > 0) {
-            return NextResponse.json(
-                { error: 'Cannot delete category with existing products' },
-                { status: 400 }
-            );
-        }
+        // Get all subcategories associated with this category
+        const subcategories = await Subcategory.find({ category: category._id });
+        const subcategoryIds = subcategories.map(sub => sub._id);
         
+        // Count products to be deleted (for logging)
+        const productsByCategory = await Product.countDocuments({ category: category.name });
+        const productsBySubcategory = await Product.countDocuments({ subcategory: { $in: subcategoryIds } });
+        
+        // Delete all products associated with this category (by category name)
+        await Product.deleteMany({ category: category.name });
+        
+        // Delete all products associated with subcategories of this category
+        // (in case there are products linked by subcategory but different category name)
+        await Product.deleteMany({ subcategory: { $in: subcategoryIds } });
+        
+        // Delete all subcategories associated with this category
+        await Subcategory.deleteMany({ category: category._id });
+        
+        // Delete the category itself
         await Category.findOneAndDelete({ slug });
         
-        return NextResponse.json({ message: 'Category deleted successfully' });
+        // Clear all related caches
+        cache.clear(); // Clear all category, subcategory and product caches
+        
+        return NextResponse.json({ 
+            message: 'Category and related data deleted successfully',
+            deleted: {
+                category: category.name,
+                subcategories: subcategories.length,
+                products: Math.max(productsByCategory, productsBySubcategory) // Avoid double counting
+            }
+        });
     } catch (error) {
         console.error('Error deleting category:', error);
         return NextResponse.json(

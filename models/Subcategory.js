@@ -49,4 +49,24 @@ subcategorySchema.pre('save', async function(next) {
     next();
 });
 
+// Cascade delete: Remove associated products when subcategory is deleted
+subcategorySchema.pre('findOneAndDelete', async function(next) {
+    try {
+        const subcategory = await this.model.findOne(this.getFilter());
+        if (subcategory) {
+            // Import Product model here to avoid circular dependencies
+            const Product = mongoose.models.Product || mongoose.model('Product');
+            
+            // Delete all products associated with this subcategory
+            const result = await Product.deleteMany({ subcategory: subcategory._id });
+            
+            console.log(`Cascade delete: Removed ${result.deletedCount} products for subcategory "${subcategory.name}"`);
+        }
+        next();
+    } catch (error) {
+        console.error('Error in subcategory cascade delete:', error);
+        next(error);
+    }
+});
+
 export default mongoose.models.Subcategory || mongoose.model('Subcategory', subcategorySchema);

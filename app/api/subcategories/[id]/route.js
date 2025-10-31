@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Subcategory from '@/models/Subcategory';
 import Product from '@/models/Product';
 import { adminAuth } from '@/middleware/adminAuth';
+import cache from '@/lib/cache';
 
 // GET: Fetch a single subcategory by ID
 export async function GET(request, context) {
@@ -103,21 +104,8 @@ export async function DELETE(request, context) {
         const params = await context.params;
         const { id } = params;
         
-        // Check if any products are using this subcategory
-        const productsCount = await Product.countDocuments({ subcategory: id });
-        
-        if (productsCount > 0) {
-            return NextResponse.json(
-                { 
-                    error: `Cannot delete subcategory. ${productsCount} product(s) are using this subcategory.`,
-                    productsCount 
-                },
-                { status: 400 }
-            );
-        }
-        
-        const subcategory = await Subcategory.findByIdAndDelete(id);
-        
+        // Check if subcategory exists
+        const subcategory = await Subcategory.findById(id);
         if (!subcategory) {
             return NextResponse.json(
                 { error: 'Subcategory not found' },
@@ -125,9 +113,25 @@ export async function DELETE(request, context) {
             );
         }
         
+        // Count products to be deleted (for logging)
+        const productsCount = await Product.countDocuments({ subcategory: id });
+        
+        // Delete all products associated with this subcategory
+        await Product.deleteMany({ subcategory: id });
+        
+        // Delete the subcategory itself
+        await Subcategory.findByIdAndDelete(id);
+        
+        // Clear all related caches
+        cache.clear(); // Clear all subcategory and product caches
+        
         return NextResponse.json({
             success: true,
-            message: 'Subcategory deleted successfully'
+            message: 'Subcategory and related products deleted successfully',
+            deleted: {
+                subcategory: subcategory.name,
+                products: productsCount
+            }
         });
     } catch (error) {
         console.error('Error deleting subcategory:', error);
