@@ -12,18 +12,26 @@ import {
     CreditCard,
     User,
     Calendar,
-    AlertCircle
+    AlertCircle,
+    Search,
+    Filter,
+    Mail,
+    Phone,
+    MapPin,
+    ChevronDown,
+    ChevronUp,
+    DollarSign
 } from 'lucide-react';
 import AdminLayout from '@/app/components/AdminLayout';
 
 const statusConfig = {
-    requested: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'Return Requested' },
-    pickup_scheduled: { icon: Package, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Pickup Scheduled' },
-    in_transit: { icon: Truck, color: 'text-indigo-600', bg: 'bg-indigo-50', label: 'Picked Up' },
-    returned_to_seller: { icon: RotateCcw, color: 'text-orange-600', bg: 'bg-orange-50', label: 'Received in Warehouse' },
-    received: { icon: CheckCircle2, color: 'text-purple-600', bg: 'bg-purple-50', label: 'Received in Warehouse' },
-    completed: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: 'Return Complete' },
-    cancelled: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Cancelled' }
+    requested: { color: 'bg-blue-100 text-blue-800', icon: Package, label: 'Requested' },
+    pickup_scheduled: { color: 'bg-purple-100 text-purple-800', icon: Package, label: 'Pickup Scheduled' },
+    in_transit: { color: 'bg-yellow-100 text-yellow-800', icon: Package, label: 'In Transit' },
+    returned_to_seller: { color: 'bg-orange-100 text-orange-800', icon: Package, label: 'Received at Warehouse' },
+    received: { color: 'bg-[#D4AF76] text-[#8B6B4C]', icon: CheckCircle2, label: 'Received & Verified' },
+    completed: { color: 'bg-green-100 text-green-800', icon: CheckCircle2, label: 'Completed' },
+    cancelled: { color: 'bg-red-100 text-red-800', icon: AlertCircle, label: 'Cancelled' },
 };
 
 export default function AdminReturnsPage() {
@@ -32,31 +40,48 @@ export default function AdminReturnsPage() {
     const [processingRefund, setProcessingRefund] = useState(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [expandedReturn, setExpandedReturn] = useState(null);
     const ITEMS_PER_PAGE = 20;
 
     useEffect(() => {
         fetchReturns();
-    }, [page]);
+    }, [page, statusFilter]);
 
     const fetchReturns = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/returns');
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: ITEMS_PER_PAGE.toString(),
+            });
+
+            if (statusFilter !== 'all') {
+                params.append('status', statusFilter);
+            }
+
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+
+            const res = await fetch(`/api/admin/returns?${params}`);
             const data = await res.json();
             if (res.ok) {
-                const allReturns = data.returns || [];
-                const total = Math.ceil(allReturns.length / ITEMS_PER_PAGE);
-                setTotalPages(total);
-                
-                const start = (page - 1) * ITEMS_PER_PAGE;
-                const end = start + ITEMS_PER_PAGE;
-                setReturns(allReturns.slice(start, end));
+                setReturns(data.returns || []);
+                setTotalPages(data.totalPages || 1);
             }
         } catch (err) {
             console.error('Error fetching returns:', err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setPage(1);
+        fetchReturns();
     };
 
     const handleMarkRefundComplete = async (returnId) => {
@@ -100,7 +125,7 @@ export default function AdminReturnsPage() {
         return (
             <AdminLayout>
                 <div className="min-h-screen flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
+                    <Loader2 className="w-8 h-8 animate-spin text-[#D4AF76]" />
                 </div>
             </AdminLayout>
         );
@@ -108,14 +133,58 @@ export default function AdminReturnsPage() {
 
     return (
         <AdminLayout>
-            <div className="p-8">
+            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                        <RotateCcw className="w-8 h-8 text-amber-600" />
-                        Returns Management
-                    </h1>
-                    <p className="text-gray-600 mt-2">Manage product returns and refunds</p>
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Returns Management</h1>
+                    <p className="text-gray-600 mt-1">Manage and process customer return requests</p>
+                </div>
+
+                {/* Filters */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {/* Search */}
+                        <form onSubmit={handleSearch} className="flex gap-2">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Search by return number, name, or phone..."
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="px-6 py-2 bg-[#D4AF76] text-white rounded-lg hover:bg-[#8B6B4C] transition"
+                            >
+                                Search
+                            </button>
+                        </form>
+
+                        {/* Status Filter */}
+                        <div className="flex items-center gap-2">
+                            <Filter className="w-5 h-5 text-gray-400" />
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => {
+                                    setStatusFilter(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
+                            >
+                                <option value="all">All Status</option>
+                                <option value="requested">Requested</option>
+                                <option value="pickup_scheduled">Pickup Scheduled</option>
+                                <option value="in_transit">In Transit</option>
+                                <option value="returned_to_seller">Received at Warehouse</option>
+                                <option value="received">Received & Verified</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Returns List */}
@@ -128,52 +197,79 @@ export default function AdminReturnsPage() {
                 ) : (
                     <div className="space-y-4">
                         {returns.map((returnItem) => {
+                            const isExpanded = expandedReturn === returnItem._id;
                             const StatusIcon = statusConfig[returnItem.status]?.icon || Clock;
-                            const statusInfo = statusConfig[returnItem.status] || statusConfig.requested;
 
                             return (
                                 <motion.div
                                     key={returnItem._id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white rounded-xl shadow-lg overflow-hidden"
+                                    className="bg-white rounded-xl shadow-sm overflow-hidden"
                                 >
-                                    <div className="p-6">
-                                        {/* Header */}
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <h3 className="text-xl font-bold text-gray-900">
-                                                        Return Request
+                                    {/* Return Header - Clickable Card */}
+                                    <div 
+                                        className="p-6 cursor-pointer hover:bg-gray-50 transition"
+                                        onClick={() => setExpandedReturn(isExpanded ? null : returnItem._id)}
+                                    >
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1 grid md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <h3 className="font-bold text-gray-900 mb-1">
+                                                        {returnItem.returnNumber || 'Return Request'}
                                                     </h3>
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.bg} ${statusInfo.color}`}>
-                                                        <StatusIcon className="w-4 h-4 inline mr-1" />
-                                                        {statusInfo.label}
-                                                    </span>
-                                                    {returnItem.refundSucceeded && (
-                                                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                                                            <CheckCircle2 className="w-4 h-4 inline mr-1" />
-                                                            Refund Completed
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-4 text-sm text-gray-600">
-                                                    <span className="flex items-center gap-1">
+                                                    <p className="text-sm text-gray-600 flex items-center gap-1">
                                                         <Calendar className="w-4 h-4" />
                                                         {formatDate(returnItem.createdAt)}
-                                                    </span>
-                                                    {returnItem.orderId?.orderNumber && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>Order: {returnItem.orderId.orderNumber}</span>
-                                                        </>
-                                                    )}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-600 flex items-center gap-1">
+                                                        <User className="w-4 h-4" />
+                                                        {returnItem.userId?.name || 'N/A'}
+                                                    </p>
+                                                    <p className="text-sm text-gray-600 flex items-center gap-1">
+                                                        <Mail className="w-4 h-4" />
+                                                        {returnItem.userId?.email || 'N/A'}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-lg font-bold text-[#D4AF76]">
+                                                        ₹{returnItem.refundAmount?.toLocaleString() || '0'}
+                                                    </p>
+                                                    <p className="text-sm text-gray-600">
+                                                        {returnItem.items?.length || 0} item(s)
+                                                    </p>
                                                 </div>
                                             </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig[returnItem.status]?.color}`}>
+                                                    {statusConfig[returnItem.status]?.label || returnItem.status}
+                                                </span>
+                                                {returnItem.refundSucceeded && (
+                                                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        Refunded
+                                                    </span>
+                                                )}
+                                                {isExpanded ? (
+                                                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                                                ) : (
+                                                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                                                )}
+                                            </div>
                                         </div>
+                                    </div>
 
-                                        <div className="grid md:grid-cols-2 gap-6">
-                                            {/* Customer Info */}
+                                    {/* Expanded Details */}
+                                    {isExpanded && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            className="border-t border-gray-200"
+                                        >
+                                            <div className="p-6 space-y-6">
+                                                <div className="grid md:grid-cols-2 gap-6">
+                                                    {/* Customer Info */}
                                             <div className="space-y-4">
                                                 <div className="p-4 bg-gray-50 rounded-lg">
                                                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -208,9 +304,9 @@ export default function AdminReturnsPage() {
                                             {/* Return Info */}
                                             <div className="space-y-4">
                                                 {/* Items */}
-                                                <div className="p-4 bg-amber-50 rounded-lg">
+                                                <div className="p-4 bg-[#F5E6D3] rounded-lg">
                                                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                                        <Package className="w-4 h-4 text-amber-600" />
+                                                        <Package className="w-4 h-4 text-[#D4AF76]" />
                                                         Return Items
                                                     </h4>
                                                     <div className="space-y-2">
@@ -256,27 +352,30 @@ export default function AdminReturnsPage() {
                                         </div>
 
                                         {/* Action Buttons */}
-                                        {returnItem.status === 'returned_to_seller' && !returnItem.refundSucceeded && (
+                                        {(returnItem.status === 'returned_to_seller' || returnItem.status === 'received') && !returnItem.refundSucceeded && (
                                             <div className="mt-6 pt-6 border-t border-gray-200">
                                                 <div className="flex items-start gap-3 mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                                                     <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                                                     <div className="text-sm text-yellow-800">
-                                                        <p className="font-medium">Action Required</p>
+                                                        <p className="font-medium">Action Required - Product Received at Warehouse</p>
                                                         <p>The return has been received. Please verify the items and process the refund manually to the customer&apos;s bank account.</p>
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={() => handleMarkRefundComplete(returnItem._id)}
                                                     disabled={processingRefund === returnItem._id}
-                                                    className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full sm:w-auto px-6 py-3 bg-[#D4AF76] text-white rounded-lg hover:bg-[#8B6B4C] transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                                 >
                                                     {processingRefund === returnItem._id ? (
                                                         <>
-                                                            <Loader2 className="w-5 h-5 inline mr-2 animate-spin" />
+                                                            <Loader2 className="w-5 h-5 animate-spin" />
                                                             Processing...
                                                         </>
                                                     ) : (
-                                                        'Mark Return Complete & Refund Processed'
+                                                        <>
+                                                            <CheckCircle2 className="w-5 h-5" />
+                                                            Mark Return Complete & Refund Processed
+                                                        </>
                                                     )}
                                                 </button>
                                             </div>
@@ -295,7 +394,9 @@ export default function AdminReturnsPage() {
                                                 </div>
                                             </div>
                                         )}
-                                    </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
                                 </motion.div>
                             );
                         })}
@@ -312,7 +413,7 @@ export default function AdminReturnsPage() {
                         >
                             Previous
                         </button>
-                        <span className="px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg font-medium">
+                        <span className="px-4 py-2 bg-[#F5E6D3] border border-[#D4AF76] rounded-lg font-medium text-[#8B6B4C]">
                             Page {page} of {totalPages}
                         </span>
                         <button

@@ -83,7 +83,7 @@ export default function ReturnDetailPage({ params }) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] flex items-center justify-center">
                 <div className="text-center">
-                    <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-3" />
+                    <Loader2 className="w-10 h-10 animate-spin text-[#D4AF76] mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Loading return details...</p>
                 </div>
             </div>
@@ -97,7 +97,7 @@ export default function ReturnDetailPage({ params }) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] pb-20 sm:pb-0">
             {/* Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white sticky top-0 z-40 shadow-lg">
+            <div className="bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white sticky top-0 z-40 shadow-lg">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                     <div className="flex items-center gap-3 sm:gap-4">
                         <Link
@@ -110,7 +110,7 @@ export default function ReturnDetailPage({ params }) {
                             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                 Return Details
                             </h1>
-                            <p className="text-xs sm:text-sm text-orange-100 mt-1">{returnData.returnNumber}</p>
+                            <p className="text-xs sm:text-sm text-[#F5E6D3] mt-1">{returnData.returnNumber}</p>
                         </div>
                         <span className={`
                             inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold

@@ -63,7 +63,7 @@ export default function ReturnsPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] flex items-center justify-center">
                 <div className="text-center">
-                    <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-3" />
+                    <Loader2 className="w-10 h-10 animate-spin text-[#D4AF76] mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Loading returns...</p>
                 </div>
             </div>
@@ -73,7 +73,7 @@ export default function ReturnsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] pb-20 sm:pb-0">
             {/* Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white sticky top-0 z-40 shadow-lg">
+            <div className="bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white sticky top-0 z-40 shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 sm:gap-4">
@@ -84,7 +84,7 @@ export default function ReturnsPage() {
                                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
                                     My Returns
                                 </h1>
-                                <p className="text-xs sm:text-sm text-orange-100 mt-0.5 sm:mt-1 hidden sm:block">
+                                <p className="text-xs sm:text-sm text-[#F5E6D3] mt-0.5 sm:mt-1 hidden sm:block">
                                     Track your return requests
                                 </p>
                             </div>
@@ -107,8 +107,8 @@ export default function ReturnsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 p-8 sm:p-12 text-center"
                     >
-                        <div className="p-4 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl w-fit mx-auto mb-4">
-                            <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 text-orange-600" />
+                        <div className="p-4 bg-gradient-to-br from-[#F5E6D3] to-[#FFF8F0] rounded-2xl w-fit mx-auto mb-4">
+                            <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 text-[#D4AF76]" />
                         </div>
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">No Returns Yet</h2>
                         <p className="text-gray-600 text-sm sm:text-base mb-6">
@@ -137,7 +137,7 @@ export default function ReturnsPage() {
                                 >
                                     <Link
                                         href={`/returns/${returnItem._id}`}
-                                        className="block bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl hover:border-orange-400/30 transition-all duration-300"
+                                        className="block bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl hover:border-[#D4AF76]/50 transition-all duration-300"
                                     >
                                         <div className="p-4 sm:p-6">
                                             <div className="flex items-start justify-between gap-4">
@@ -161,7 +161,7 @@ export default function ReturnsPage() {
                                                             <p className="text-sm text-gray-700 font-medium line-clamp-2">
                                                                 {returnItem.items[0]?.name}
                                                                 {returnItem.items.length > 1 && (
-                                                                    <span className="ml-2 px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold">
+                                                                    <span className="ml-2 px-2 py-0.5 bg-[#F5E6D3] text-[#8B6B4C] rounded-full text-xs font-semibold">
                                                                         +{returnItem.items.length - 1} more
                                                                     </span>
                                                                 )}
@@ -171,7 +171,7 @@ export default function ReturnsPage() {
 
                                                     <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
                                                         <span className="flex items-center gap-1.5">
-                                                            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" />
+                                                            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D4AF76]" />
                                                             {formatDate(returnItem.createdAt)}
                                                         </span>
                                                         <span className="text-gray-300">•</span>
@@ -209,7 +209,7 @@ export default function ReturnsPage() {
                                 <button
                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                     disabled={currentPage === 1}
-                                    className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-[#D4AF76] hover:text-[#D4AF76] transition disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Previous
                                 </button>
@@ -220,8 +220,8 @@ export default function ReturnsPage() {
                                             onClick={() => setCurrentPage(page)}
                                             className={`px-4 py-2 rounded-xl font-medium text-sm transition ${
                                                 currentPage === page
-                                                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                                                    : 'bg-white border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500'
+                                                    ? 'bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white shadow-lg'
+                                                    : 'bg-white border-2 border-gray-200 hover:border-[#D4AF76] hover:text-[#D4AF76]'
                                             }`}
                                         >
                                             {page}
@@ -231,7 +231,7 @@ export default function ReturnsPage() {
                                 <button
                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-[#D4AF76] hover:text-[#D4AF76] transition disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Next
                                 </button>
