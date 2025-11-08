@@ -91,26 +91,27 @@ function OrdersContent() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] pb-20 sm:pb-0">
-            <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
+        <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] pb-20 sm:pb-0">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white sticky top-0 z-40 shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 sm:gap-4">
-                            <div className="p-2 sm:p-3 bg-gradient-to-br from-[#D4AF76] to-[#8B6B4C] rounded-xl sm:rounded-2xl shadow-lg">
-                                <Package className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                            <div className="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl">
+                                <Package className="w-5 h-5 sm:w-7 sm:h-7" />
                             </div>
                             <div>
-                                <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
                                     My Orders
                                 </h1>
-                                <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1 hidden sm:block">
+                                <p className="text-xs sm:text-sm text-[#F5E6D3] mt-0.5 sm:mt-1 hidden sm:block">
                                     Track and manage your orders
                                 </p>
                             </div>
                         </div>
                         <Link
                             href="/products"
-                            className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
+                            className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-xl transition-all duration-300 font-medium"
                         >
                             <PackageCheck className="w-4 h-4" />
                             Continue Shopping
@@ -208,6 +209,18 @@ function OrdersContent() {
 }
 
 function OrdersList({ orders, formatDate, emptyMessage, emptyDescription }) {
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
+    
+    const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedOrders = orders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    // Reset to page 1 when orders change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [orders.length]);
+    
     if (orders.length === 0) {
         return (
             <motion.div
@@ -237,9 +250,11 @@ function OrdersList({ orders, formatDate, emptyMessage, emptyDescription }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="space-y-4"
+            className="space-y-6"
         >
-            {orders.map((order, index) => {
+            {/* Orders List */}
+            <div className="space-y-4">
+                {paginatedOrders.map((order, index) => {
                 const StatusIcon = statusConfig[order.status].icon;
 
                 return (
@@ -268,6 +283,19 @@ function OrdersList({ orders, formatDate, emptyMessage, emptyDescription }) {
                                                 {statusConfig[order.status].label}
                                             </span>
                                         </div>
+                                        
+                                        {/* Product Names */}
+                                        <div className="mb-3">
+                                            <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                                                {order.items[0]?.name}
+                                                {order.items.length > 1 && (
+                                                    <span className="ml-2 px-2 py-0.5 bg-[#F5E6D3] text-[#8B6B4C] rounded-full text-xs font-semibold">
+                                                        +{order.items.length - 1} more
+                                                    </span>
+                                                )}
+                                            </p>
+                                        </div>
+
                                         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
                                             <span className="flex items-center gap-1.5">
                                                 <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D4AF76]" />
@@ -277,44 +305,64 @@ function OrdersList({ orders, formatDate, emptyMessage, emptyDescription }) {
                                             <span>{order.items.length} item(s)</span>
                                             {order.awbCode && (
                                                 <>
-                                                    <span className="text-gray-300">•</span>
-                                                    <span className="text-blue-600 font-mono text-xs">
+                                                    <span className="text-gray-300 hidden sm:inline">•</span>
+                                                    <span className="text-blue-600 font-mono text-xs hidden sm:inline">
                                                         AWB: {order.awbCode}
                                                     </span>
                                                 </>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="text-right flex items-center gap-3">
-                                        <div>
-                                            <p className="text-lg sm:text-2xl font-bold text-[#D4AF76]">
+                                    <div className="flex items-start gap-2 sm:gap-3 flex-shrink-0">
+                                        <div className="text-right">
+                                            <p className="text-base sm:text-xl lg:text-2xl font-bold text-[#D4AF76]">
                                                 ₹{order.totalAmount.toLocaleString()}
                                             </p>
                                         </div>
-                                        <ArrowRight className="w-5 h-5 text-gray-400" />
+                                        <ArrowRight className="w-5 h-5 text-gray-400 mt-1" />
                                     </div>
-                                </div>
-
-                                <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
-                                    {order.items.slice(0, 4).map((item, idx) => (
-                                        <img
-                                            key={idx}
-                                            src={item.image || '/placeholder.png'}
-                                            alt={item.name}
-                                            className="w-16 h-16 object-cover rounded-lg border-2 border-gray-100"
-                                        />
-                                    ))}
-                                    {order.items.length > 4 && (
-                                        <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg border-2 border-gray-200 text-sm font-semibold text-gray-600">
-                                            +{order.items.length - 4}
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </Link>
                     </motion.div>
                 );
             })}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                    <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-[#D4AF76] hover:text-[#D4AF76] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Previous
+                    </button>
+                    <div className="flex items-center gap-2">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-4 py-2 rounded-xl font-medium text-sm transition ${
+                                    currentPage === page
+                                        ? 'bg-gradient-to-r from-[#D4AF76] to-[#8B6B4C] text-white shadow-lg'
+                                        : 'bg-white border-2 border-gray-200 hover:border-[#D4AF76] hover:text-[#D4AF76]'
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+                    <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-[#D4AF76] hover:text-[#D4AF76] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </motion.div>
     );
 }

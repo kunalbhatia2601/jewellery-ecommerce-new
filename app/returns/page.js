@@ -26,6 +26,8 @@ const statusConfig = {
 export default function ReturnsPage() {
     const [returns, setReturns] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
 
     useEffect(() => {
         fetchReturns();
@@ -53,11 +55,15 @@ export default function ReturnsPage() {
         });
     };
 
+    const totalPages = Math.ceil(returns.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedReturns = returns.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] flex items-center justify-center">
                 <div className="text-center">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#D4AF76] mx-auto mb-3" />
+                    <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Loading returns...</p>
                 </div>
             </div>
@@ -65,27 +71,27 @@ export default function ReturnsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] pb-20 sm:pb-0">
+        <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] pb-20 sm:pb-0">
             {/* Header */}
-            <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white sticky top-0 z-40 shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 sm:gap-4">
-                            <div className="p-2 sm:p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl sm:rounded-2xl shadow-lg">
-                                <RotateCcw className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                            <div className="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl">
+                                <RotateCcw className="w-5 h-5 sm:w-7 sm:h-7" />
                             </div>
                             <div>
-                                <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
                                     My Returns
                                 </h1>
-                                <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1 hidden sm:block">
+                                <p className="text-xs sm:text-sm text-orange-100 mt-0.5 sm:mt-1 hidden sm:block">
                                     Track your return requests
                                 </p>
                             </div>
                         </div>
                         <Link
                             href="/orders"
-                            className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-300 font-medium"
+                            className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-xl transition-all duration-300 font-medium"
                         >
                             View Orders
                         </Link>
@@ -117,8 +123,9 @@ export default function ReturnsPage() {
                         </Link>
                     </motion.div>
                 ) : (
-                    <div className="space-y-4">
-                        {returns.map((returnItem, index) => {
+                    <>
+                        <div className="space-y-4">
+                            {paginatedReturns.map((returnItem, index) => {
                             const StatusIcon = statusConfig[returnItem.status]?.icon || Clock;
 
                             return (
@@ -147,6 +154,21 @@ export default function ReturnsPage() {
                                                             {statusConfig[returnItem.status]?.label || returnItem.status}
                                                         </span>
                                                     </div>
+                                                    
+                                                    {/* Product Names */}
+                                                    {returnItem.items && returnItem.items.length > 0 && (
+                                                        <div className="mb-3">
+                                                            <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                                                                {returnItem.items[0]?.name}
+                                                                {returnItem.items.length > 1 && (
+                                                                    <span className="ml-2 px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold">
+                                                                        +{returnItem.items.length - 1} more
+                                                                    </span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    )}
+
                                                     <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
                                                         <span className="flex items-center gap-1.5">
                                                             <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" />
@@ -156,8 +178,8 @@ export default function ReturnsPage() {
                                                         <span>{returnItem.items?.length || 0} item(s)</span>
                                                         {returnItem.shiprocketReturnAwb && (
                                                             <>
-                                                                <span className="text-gray-300">•</span>
-                                                                <span className="text-blue-600 font-mono text-xs">
+                                                                <span className="text-gray-300 hidden sm:inline">•</span>
+                                                                <span className="text-blue-600 font-mono text-xs hidden sm:inline">
                                                                     AWB: {returnItem.shiprocketReturnAwb}
                                                                 </span>
                                                             </>
@@ -179,7 +201,43 @@ export default function ReturnsPage() {
                                 </motion.div>
                             );
                         })}
-                    </div>
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-2 mt-8">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Previous
+                                </button>
+                                <div className="flex items-center gap-2">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                        <button
+                                            key={page}
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`px-4 py-2 rounded-xl font-medium text-sm transition ${
+                                                currentPage === page
+                                                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                                                    : 'bg-white border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500'
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="px-4 py-2 rounded-xl font-medium text-sm bg-white border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

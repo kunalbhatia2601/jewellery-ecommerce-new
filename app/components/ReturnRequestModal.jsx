@@ -82,25 +82,29 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
 
     return (
         <AnimatePresence>
-            {/* Backdrop */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={handleClose}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-            />
+            {isOpen && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        key="backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={handleClose}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                    />
 
-            {/* Modal Container - Responsive positioning */}
-            <div className="fixed inset-0 z-[101] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none">
-                <motion.div
-                    initial={{ opacity: 0, y: "100%", scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: "100%", scale: 0.95 }}
-                    transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="bg-white rounded-t-[2rem] sm:rounded-3xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden pointer-events-auto"
-                >
+                    {/* Modal Container - Responsive positioning */}
+                    <div key="modal-container" className="fixed inset-0 z-[101] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none">
+                        <motion.div
+                            key="modal-content"
+                            initial={{ opacity: 0, y: "100%", scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: "100%", scale: 0.95 }}
+                            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-t-[2rem] sm:rounded-3xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden pointer-events-auto"
+                        >
                     {/* Header - Sticky with brand colors */}
                     <div className="sticky top-0 bg-gradient-to-r from-[#F5E6D3] to-[#FFF8F0] border-b border-[#D4AF76]/30 px-4 sm:px-6 py-4 flex items-center justify-between z-10 backdrop-blur-sm">
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -290,6 +294,8 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
                     </div>
                 </motion.div>
             </div>
+                </>
+            )}
         </AnimatePresence>
     );
 }

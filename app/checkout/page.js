@@ -270,12 +270,12 @@ export default function CheckoutPage() {
                     }
                 },
                 prefill: {
-                    name: address.fullName,
-                    contact: address.phone,
-                },
-                theme: {
-                    color: '#D97706',
-                },
+                name: address.fullName,
+                contact: address.phone,
+            },
+            theme: {
+                color: '#D4AF76',
+            },
                 modal: {
                     ondismiss: function() {
                         setError('Payment cancelled');
@@ -334,14 +334,14 @@ export default function CheckoutPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
+            <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-[#D4AF76]" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] py-12 px-4 sm:px-6 lg:px-8 pb-24 sm:pb-12">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <motion.div
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Checkout</h1>
+                    <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[#8B6B4C] to-[#D4AF76] bg-clip-text text-transparent mb-2">Checkout</h1>
                     <p className="text-gray-600">Complete your order</p>
                 </motion.div>
 
@@ -364,12 +364,12 @@ export default function CheckoutPage() {
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                    <MapPin className="w-6 h-6 text-amber-600" />
+                                    <MapPin className="w-6 h-6 text-[#D4AF76]" />
                                     Delivery Address
                                 </h2>
                                 <button
                                     onClick={() => setShowAddressForm(!showAddressForm)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#D4AF76] text-white rounded-lg hover:bg-[#8B6B4C] transition"
                                 >
                                     <Plus className="w-4 h-4" />
                                     Add New
@@ -384,7 +384,7 @@ export default function CheckoutPage() {
                                         animate={{ opacity: 1, height: 'auto' }}
                                         exit={{ opacity: 0, height: 0 }}
                                         onSubmit={handleAddAddress}
-                                        className="mb-6 space-y-4 p-4 bg-amber-50 rounded-lg"
+                                        className="mb-6 space-y-4 p-4 bg-[#F5E6D3] rounded-lg"
                                     >
                                         <div className="grid sm:grid-cols-2 gap-4">
                                             <input
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
                                                 value={formData.fullName}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                             />
                                             <input
                                                 type="tel"
@@ -403,7 +403,7 @@ export default function CheckoutPage() {
                                                 value={formData.phone}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                             />
                                         </div>
                                         <input
@@ -413,7 +413,7 @@ export default function CheckoutPage() {
                                             value={formData.addressLine1}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                         />
                                         <input
                                             type="text"
@@ -421,7 +421,7 @@ export default function CheckoutPage() {
                                             placeholder="Address Line 2 (Optional)"
                                             value={formData.addressLine2}
                                             onChange={handleInputChange}
-                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                         />
                                         <div className="grid sm:grid-cols-3 gap-4">
                                             <input
@@ -431,7 +431,7 @@ export default function CheckoutPage() {
                                                 value={formData.city}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                             />
                                             <input
                                                 type="text"
@@ -440,7 +440,7 @@ export default function CheckoutPage() {
                                                 value={formData.state}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                             />
                                             <input
                                                 type="text"
@@ -450,7 +450,7 @@ export default function CheckoutPage() {
                                                 onChange={handleInputChange}
                                                 required
                                                 pattern="[0-9]{6}"
-                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent"
                                             />
                                         </div>
                                         <label className="flex items-center gap-2 cursor-pointer">
@@ -459,14 +459,14 @@ export default function CheckoutPage() {
                                                 name="isDefault"
                                                 checked={formData.isDefault}
                                                 onChange={handleInputChange}
-                                                className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500"
+                                                className="w-4 h-4 text-[#D4AF76] rounded focus:ring-[#D4AF76]"
                                             />
                                             <span className="text-sm text-gray-700">Set as default address</span>
                                         </label>
                                         <div className="flex gap-3">
                                             <button
                                                 type="submit"
-                                                className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+                                                className="px-6 py-2 bg-[#D4AF76] text-white rounded-lg hover:bg-[#8B6B4C] transition"
                                             >
                                                 Save Address
                                             </button>
@@ -497,15 +497,15 @@ export default function CheckoutPage() {
                                             onClick={() => setSelectedAddress(address._id)}
                                             className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                                                 selectedAddress === address._id
-                                                    ? 'border-amber-600 bg-amber-50'
-                                                    : 'border-gray-200 hover:border-amber-300'
+                                                    ? 'border-[#D4AF76] bg-[#F5E6D3]'
+                                                    : 'border-gray-200 hover:border-[#E5C89F]'
                                             }`}
                                         >
                                             <div className="flex items-start justify-between">
                                                 <div className="flex items-start gap-3 flex-1">
                                                     <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                                                         selectedAddress === address._id
-                                                            ? 'border-amber-600 bg-amber-600'
+                                                            ? 'border-[#D4AF76] bg-[#D4AF76]'
                                                             : 'border-gray-300'
                                                     }`}>
                                                         {selectedAddress === address._id && (
@@ -555,7 +555,7 @@ export default function CheckoutPage() {
                             className="bg-white rounded-2xl shadow-lg p-6"
                         >
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-amber-600" />
+                                <CreditCard className="w-5 h-5 text-[#D4AF76]" />
                                 Payment Method
                             </h2>
                             <div className="space-y-3">
@@ -565,14 +565,14 @@ export default function CheckoutPage() {
                                     onClick={() => setPaymentMethod('cod')}
                                     className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                                         paymentMethod === 'cod'
-                                            ? 'border-amber-600 bg-amber-50'
-                                            : 'border-gray-200 hover:border-amber-300'
+                                            ? 'border-[#D4AF76] bg-[#F5E6D3]'
+                                            : 'border-gray-200 hover:border-[#E5C89F]'
                                     }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                                             paymentMethod === 'cod'
-                                                ? 'border-amber-600 bg-amber-600'
+                                                ? 'border-[#D4AF76] bg-[#D4AF76]'
                                                 : 'border-gray-300'
                                         }`}>
                                             {paymentMethod === 'cod' && (
@@ -592,14 +592,14 @@ export default function CheckoutPage() {
                                     onClick={() => setPaymentMethod('online')}
                                     className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                                         paymentMethod === 'online'
-                                            ? 'border-amber-600 bg-amber-50'
-                                            : 'border-gray-200 hover:border-amber-300'
+                                            ? 'border-[#D4AF76] bg-[#F5E6D3]'
+                                            : 'border-gray-200 hover:border-[#E5C89F]'
                                     }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                                             paymentMethod === 'online'
-                                                ? 'border-amber-600 bg-amber-600'
+                                                ? 'border-[#D4AF76] bg-[#D4AF76]'
                                                 : 'border-gray-300'
                                         }`}>
                                             {paymentMethod === 'online' && (
@@ -633,7 +633,7 @@ export default function CheckoutPage() {
                                 onChange={(e) => setNotes(e.target.value)}
                                 placeholder="Any special instructions for your order?"
                                 rows={4}
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#D4AF76] focus:border-transparent resize-none"
                             />
                         </motion.div>
                     </div>
@@ -647,7 +647,7 @@ export default function CheckoutPage() {
                             className="bg-white rounded-2xl shadow-lg p-6 sticky top-6"
                         >
                             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <ShoppingBag className="w-6 h-6 text-amber-600" />
+                                <ShoppingBag className="w-6 h-6 text-[#D4AF76]" />
                                 Order Summary
                             </h2>
 
@@ -689,7 +689,7 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                                     <span>Total</span>
-                                    <span className="text-amber-600">₹{calculateTotal().toLocaleString()}</span>
+                                    <span className="text-[#D4AF76]">₹{calculateTotal().toLocaleString()}</span>
                                 </div>
                             </div>
 
@@ -709,7 +709,7 @@ export default function CheckoutPage() {
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={submitting || !selectedAddress || !cartItems || cartItems.length === 0}
-                                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white py-4 rounded-xl font-semibold hover:from-amber-700 hover:to-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+                                className="w-full bg-gradient-to-r from-[#D4AF76] to-[#C4A067] text-white py-4 rounded-xl font-semibold hover:from-[#8B6B4C] hover:to-[#B39158] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                             >
                                 {submitting ? (
                                     <>

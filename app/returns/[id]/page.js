@@ -81,9 +81,9 @@ export default function ReturnDetailPage({ params }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] flex items-center justify-center">
                 <div className="text-center">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#D4AF76] mx-auto mb-3" />
+                    <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Loading return details...</p>
                 </div>
             </div>
@@ -95,36 +95,36 @@ export default function ReturnDetailPage({ params }) {
     const StatusIcon = statusConfig[returnData.status]?.icon || Clock;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] pb-20 sm:pb-0">
+        <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] pb-20 sm:pb-0">
             {/* Header */}
-            <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-                    <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white sticky top-0 z-40 shadow-lg">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         <Link
                             href="/returns"
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-gray-600" />
+                            <ArrowLeft className="w-5 h-5" />
                         </Link>
-                        <div className="flex-1">
-                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                 Return Details
                             </h1>
-                            <p className="text-sm text-gray-600 mt-1">{returnData.returnNumber}</p>
+                            <p className="text-xs sm:text-sm text-orange-100 mt-1">{returnData.returnNumber}</p>
                         </div>
                         <span className={`
-                            inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
+                            inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold
                             ${statusConfig[returnData.status]?.bg} ${statusConfig[returnData.status]?.color}
                         `}>
-                            <StatusIcon className="w-4 h-4" />
-                            {statusConfig[returnData.status]?.label || returnData.status}
+                            <StatusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">{statusConfig[returnData.status]?.label || returnData.status}</span>
                         </span>
                     </div>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div className="space-y-6">
                     {/* Return Tracker - Only if not cancelled */}
                     {returnData.status !== 'cancelled' && (

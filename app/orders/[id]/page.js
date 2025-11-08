@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { 
     Package, 
@@ -16,18 +16,84 @@ import {
     RotateCcw,
     ChevronRight,
     ArrowLeft,
-    CreditCard
+    CreditCard,
+    Phone,
+    User,
+    Mail,
+    Home,
+    ExternalLink,
+    Sparkles
 } from 'lucide-react';
 import ReturnRequestModal from '@/app/components/ReturnRequestModal';
 
 const statusConfig = {
-    pending: { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: Clock, label: 'Pending' },
-    confirmed: { color: 'text-blue-600', bg: 'bg-blue-50', icon: CheckCircle, label: 'Confirmed' },
-    processing: { color: 'text-purple-600', bg: 'bg-purple-50', icon: Package, label: 'Processing' },
-    shipped: { color: 'text-indigo-600', bg: 'bg-indigo-50', icon: Truck, label: 'Shipped' },
-    delivered: { color: 'text-green-600', bg: 'bg-green-50', icon: CheckCircle, label: 'Delivered' },
-    cancelled: { color: 'text-red-600', bg: 'bg-red-50', icon: XCircle, label: 'Cancelled' },
-    returned: { color: 'text-gray-600', bg: 'bg-gray-50', icon: RotateCcw, label: 'Returned' }
+    pending: { color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200', icon: Clock, label: 'Pending' },
+    confirmed: { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', icon: CheckCircle, label: 'Confirmed' },
+    processing: { color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', icon: Package, label: 'Processing' },
+    shipped: { color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-200', icon: Truck, label: 'Shipped' },
+    delivered: { color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200', icon: CheckCircle, label: 'Delivered' },
+    cancelled: { color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', icon: XCircle, label: 'Cancelled' },
+    returned: { color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200', icon: RotateCcw, label: 'Returned' }
+};
+
+const OrderProgressTracker = ({ status }) => {
+    const steps = [
+        { id: 'pending', label: 'Order Placed', icon: CheckCircle },
+        { id: 'confirmed', label: 'Confirmed', icon: CheckCircle },
+        { id: 'processing', label: 'Processing', icon: Package },
+        { id: 'shipped', label: 'Shipped', icon: Truck },
+        { id: 'delivered', label: 'Delivered', icon: Box }
+    ];
+
+    const statusIndex = steps.findIndex(s => s.id === status);
+    const isCancelled = status === 'cancelled';
+    const isReturned = status === 'returned';
+
+    if (isCancelled || isReturned) return null;
+
+    return (
+        <div className="relative">
+            <div className="flex justify-between items-center mb-8">
+                {steps.map((step, index) => {
+                    const StepIcon = step.icon;
+                    const isCompleted = index <= statusIndex;
+                    const isCurrent = index === statusIndex;
+
+                    return (
+                        <div key={step.id} className="flex flex-col items-center flex-1 relative">
+                            {/* Line to next step */}
+                            {index < steps.length - 1 && (
+                                <div className="absolute top-5 left-1/2 w-full h-0.5 -z-10">
+                                    <div className={`h-full ${isCompleted ? 'bg-[#D4AF76]' : 'bg-gray-200'}`} />
+                                </div>
+                            )}
+
+                            {/* Step icon */}
+                            <motion.div
+                                initial={false}
+                                animate={{
+                                    scale: isCurrent ? 1.1 : 1,
+                                    backgroundColor: isCompleted ? '#D4AF76' : '#E5E7EB'
+                                }}
+                                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center z-10 border-4 ${
+                                    isCompleted ? 'border-[#F5E6D3]' : 'border-white'
+                                } shadow-lg`}
+                            >
+                                <StepIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${isCompleted ? 'text-white' : 'text-gray-400'}`} />
+                            </motion.div>
+
+                            {/* Step label */}
+                            <span className={`text-xs sm:text-sm font-medium mt-2 text-center hidden sm:block ${
+                                isCompleted ? 'text-[#8B6B4C]' : 'text-gray-400'
+                            }`}>
+                                {step.label}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
 };
 
 export default function OrderDetailPage({ params }) {
@@ -94,7 +160,7 @@ export default function OrderDetailPage({ params }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-10 h-10 animate-spin text-[#D4AF76] mx-auto mb-3" />
                     <p className="text-gray-600 text-sm">Loading order details...</p>
@@ -108,271 +174,311 @@ export default function OrderDetailPage({ params }) {
     const StatusIcon = statusConfig[order.status].icon;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#F5F0E8] pb-20 sm:pb-0">
+        <div className="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-white to-[#FFF8F0] pb-20 sm:pb-0">
             {/* Header */}
-            <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-                    <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-r from-[#D4AF76] to-[#C4A067] text-white sticky top-0 z-40 shadow-lg">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         <Link
                             href="/orders"
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-gray-600" />
+                            <ArrowLeft className="w-5 h-5" />
                         </Link>
-                        <div className="flex-1">
-                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                 Order Details
                             </h1>
-                            <p className="text-sm text-gray-600 mt-1">{order.orderNumber}</p>
+                            <p className="text-xs sm:text-sm text-[#F5E6D3] mt-1">{order.orderNumber}</p>
                         </div>
                         <span className={`
-                            inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
-                            ${statusConfig[order.status].bg} ${statusConfig[order.status].color}
+                            inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold
+                            ${statusConfig[order.status].bg} ${statusConfig[order.status].color} border ${statusConfig[order.status].border}
                         `}>
-                            <StatusIcon className="w-4 h-4" />
-                            {statusConfig[order.status].label}
+                            <StatusIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">{statusConfig[order.status].label}</span>
                         </span>
                     </div>
 
                     {/* Success Message */}
-                    {showSuccess && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-2xl flex items-center gap-3"
-                        >
-                            <div className="p-2 bg-green-100 rounded-xl">
-                                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="font-semibold text-green-900 text-sm sm:text-base">
-                                    Order Placed Successfully!
-                                </h3>
-                                <p className="text-xs sm:text-sm text-green-700">
-                                    Your order has been confirmed and will be processed soon.
-                                </p>
-                            </div>
-                        </motion.div>
-                    )}
+                    <AnimatePresence>
+                        {showSuccess && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="p-3 sm:p-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl flex items-center gap-3">
+                                    <div className="p-2 bg-white/30 rounded-xl">
+                                        <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-sm sm:text-base">
+                                            Order Placed Successfully!
+                                        </h3>
+                                        <p className="text-xs sm:text-sm text-[#F5E6D3]">
+                                            Your order is confirmed and will be processed soon.
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                <div className="space-y-6">
-                    {/* Order Summary Card */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+                {/* Order Progress Tracker */}
+                {!['cancelled', 'returned'].includes(order.status) && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6"
+                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6"
                     >
-                        <div className="grid sm:grid-cols-2 gap-4">
+                        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <Truck className="w-5 h-5 text-[#D4AF76]" />
+                            Order Tracking
+                        </h3>
+                        <OrderProgressTracker status={order.status} />
+                    </motion.div>
+                )}
+
+                {/* Order Summary Grid */}
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                    {/* Date & Amount Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-gradient-to-br from-white to-[#F5F0E8] rounded-2xl shadow-lg border border-[#D4AF76]/20 p-4 sm:p-6"
+                    >
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-[#D4AF76]/10 rounded-xl">
+                                <Calendar className="w-5 h-5 text-[#D4AF76]" />
+                            </div>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900">Order Information</h3>
+                        </div>
+                        <div className="space-y-3">
                             <div>
-                                <p className="text-sm text-gray-600 mb-1">Order Date</p>
-                                <p className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-[#D4AF76]" />
+                                <p className="text-xs text-gray-500 mb-1">Order Date</p>
+                                <p className="text-sm sm:text-base font-semibold text-gray-900">
                                     {formatDate(order.createdAt)}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                                <p className="text-2xl font-bold text-[#D4AF76]">
+                                <p className="text-xs text-gray-500 mb-1">Total Amount</p>
+                                <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#8B6B4C] to-[#D4AF76] bg-clip-text text-transparent">
                                     ₹{order.totalAmount.toLocaleString()}
                                 </p>
                             </div>
                         </div>
                     </motion.div>
 
-                    {/* Payment & Tracking Info */}
-                    <div className="grid sm:grid-cols-2 gap-4">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="p-5 bg-gradient-to-br from-[#F5E6D3] to-[#FFF8F0] rounded-2xl border border-[#D4AF76]/30 shadow-sm"
-                        >
-                            <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[#D4AF76]" />
-                                Payment Details
-                            </h4>
-                            <p className="text-sm text-gray-700 mb-2">
-                                Method: <span className="font-semibold">
-                                    {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
-                                </span>
-                            </p>
-                            <p className="text-sm text-gray-700">
-                                Status: <span className={`font-semibold ${
-                                    order.paymentStatus === 'paid' ? 'text-green-600' :
-                                    order.paymentStatus === 'failed' ? 'text-red-600' :
-                                    'text-yellow-600'
-                                }`}>
-                                    {order.paymentStatus?.charAt(0).toUpperCase() + order.paymentStatus?.slice(1)}
-                                </span>
-                            </p>
-                            {order.razorpayPaymentId && (
-                                <p className="text-xs text-gray-600 mt-3 font-mono bg-white/50 p-2 rounded">
-                                    ID: {order.razorpayPaymentId}
-                                </p>
-                            )}
-                        </motion.div>
-
-                        {order.awbCode && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50 shadow-sm"
-                            >
-                                <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <Truck className="w-5 h-5 text-blue-600" />
-                                    Tracking Info
-                                </h4>
-                                <p className="text-sm text-gray-700 mb-2">
-                                    AWB: <span className="font-semibold font-mono">{order.awbCode}</span>
-                                </p>
-                                <p className="text-sm text-gray-700 mb-3">
-                                    Courier: <span className="font-semibold">{order.courierName}</span>
-                                </p>
-                                {order.trackingUrl && (
-                                    <a 
-                                        href={order.trackingUrl} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-semibold hover:underline"
-                                    >
-                                        Track Shipment
-                                        <ChevronRight className="w-4 h-4" />
-                                    </a>
-                                )}
-                            </motion.div>
-                        )}
-                    </div>
-
-                    {/* Order Items */}
+                    {/* Payment Details Card */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6"
+                        transition={{ delay: 0.15 }}
+                        className="bg-gradient-to-br from-white to-[#FFF8F0] rounded-2xl shadow-lg border border-[#D4AF76]/20 p-4 sm:p-6"
                     >
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Box className="w-5 h-5 text-[#D4AF76]" />
-                            Order Items ({order.items.length})
-                        </h3>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-[#D4AF76]/10 rounded-xl">
+                                <CreditCard className="w-5 h-5 text-[#D4AF76]" />
+                            </div>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900">Payment Details</h3>
+                        </div>
                         <div className="space-y-3">
-                            {order.items.map((item, idx) => (
-                                <div key={idx} className="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                                    <div className="relative flex-shrink-0">
-                                        <img
-                                            src={item.image || '/placeholder.png'}
-                                            alt={item.name}
-                                            className="w-20 h-20 object-cover rounded-lg ring-2 ring-gray-200"
-                                        />
-                                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#8B6B4C] text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
-                                            {item.quantity}
-                                        </div>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h5 className="font-semibold text-gray-900 mb-1">
-                                            {item.name}
-                                        </h5>
-                                        {item.selectedVariant && (
-                                            <p className="text-sm text-gray-600 mb-1">
-                                                <span className="font-medium">{item.selectedVariant.name}:</span> {item.selectedVariant.value}
-                                            </p>
-                                        )}
-                                        <p className="text-sm text-gray-500">
-                                            ₹{item.price.toLocaleString()} × {item.quantity}
-                                        </p>
-                                    </div>
-                                    <div className="text-right self-center">
-                                        <p className="font-bold text-gray-900">
-                                            ₹{(item.price * item.quantity).toLocaleString()}
-                                        </p>
-                                    </div>
+                            <div>
+                                <p className="text-xs text-gray-500 mb-1">Payment Method</p>
+                                <p className="text-sm sm:text-base font-semibold text-gray-900 capitalize">
+                                    {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500 mb-1">Payment Status</p>
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold ${
+                                    order.paymentStatus === 'paid' 
+                                        ? 'bg-green-100 text-green-700' 
+                                        : 'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                    {order.paymentStatus === 'paid' ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                                    {order.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                                </span>
+                            </div>
+                            {order.razorpayPaymentId && (
+                                <div>
+                                    <p className="text-xs text-gray-500 mb-1">Payment ID</p>
+                                    <p className="text-xs font-mono text-gray-700 break-all">
+                                        {order.razorpayPaymentId}
+                                    </p>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </motion.div>
+                </div>
 
-                    {/* Shipping Address */}
+                {/* Tracking Info */}
+                {order.shiprocketOrderId && order.status === 'shipped' && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6"
+                        transition={{ delay: 0.2 }}
+                        className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg border-2 border-blue-200 p-4 sm:p-6"
                     >
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <MapPin className="w-5 h-5 text-[#D4AF76]" />
-                            Shipping Address
-                        </h3>
-                        <div className="p-4 bg-gradient-to-br from-[#F5E6D3] to-[#FFF8F0] rounded-xl">
-                            <p className="font-bold text-gray-900 mb-1">{order.shippingAddress.fullName}</p>
-                            <p className="text-sm text-gray-600 mb-2">{order.shippingAddress.phone}</p>
-                            <div className="text-sm text-gray-700 space-y-0.5">
-                                <p>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-blue-100 rounded-xl flex-shrink-0">
+                                    <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                                </div>
+                                <div>
+                                    <h4 className="text-base sm:text-lg font-bold text-blue-900 mb-1">Package Shipped!</h4>
+                                    <p className="text-xs sm:text-sm text-blue-700 mb-2">
+                                        Your order is on its way
+                                    </p>
+                                    {order.shiprocketAwb && (
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                                            <span className="text-xs text-blue-600 font-medium">Tracking Number:</span>
+                                            <span className="text-xs sm:text-sm font-mono font-bold text-blue-900 bg-white px-3 py-1 rounded-lg">
+                                                {order.shiprocketAwb}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            {order.trackingUrl && (
+                                <a
+                                    href={order.trackingUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition text-sm whitespace-nowrap self-start sm:self-auto"
+                                >
+                                    Track Package
+                                    <ExternalLink className="w-4 h-4" />
+                                </a>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Order Items */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6"
+                >
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Package className="w-5 h-5 text-[#D4AF76]" />
+                        Order Items ({order.items?.length || 0})
+                    </h3>
+                    <div className="space-y-4">
+                        {order.items && order.items.map((item, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.3 + index * 0.05 }}
+                                className="flex gap-4 pb-4 border-b border-gray-100 last:border-0"
+                            >
+                                <img
+                                    src={item.image || '/placeholder.png'}
+                                    alt={item.name}
+                                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-gray-200 flex-shrink-0"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base mb-1 line-clamp-2">
+                                        {item.name}
+                                    </h4>
+                                    {item.sku && (
+                                        <p className="text-xs text-gray-500">SKU: {item.sku}</p>
+                                    )}
+                                    <div className="flex items-center justify-between mt-2">
+                                        <span className="text-xs sm:text-sm text-gray-600">
+                                            Qty: <span className="font-semibold text-gray-900">{item.quantity}</span>
+                                        </span>
+                                        <span className="text-sm sm:text-base font-bold text-[#D4AF76]">
+                                            ₹{item.price.toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {/* Total Summary */}
+                    <div className="mt-4 pt-4 border-t-2 border-gray-200">
+                        <div className="flex justify-between items-center">
+                            <span className="text-base sm:text-lg font-semibold text-gray-700">Total</span>
+                            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#8B6B4C] to-[#D4AF76] bg-clip-text text-transparent">
+                                ₹{order.totalAmount.toLocaleString()}
+                            </span>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Shipping Address */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6"
+                >
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-[#D4AF76]" />
+                        Shipping Address
+                    </h3>
+                    {order.shippingAddress && (
+                        <div className="bg-gradient-to-br from-[#F5F0E8] to-white p-4 rounded-xl space-y-3">
+                            <div className="flex items-center gap-2">
+                                <User className="w-4 h-4 text-[#D4AF76]" />
+                                <p className="font-semibold text-gray-900 text-sm sm:text-base">
+                                    {order.shippingAddress.fullName}
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <Home className="w-4 h-4 text-[#D4AF76] mt-0.5 flex-shrink-0" />
+                                <p className="text-sm text-gray-700 leading-relaxed">
                                     {order.shippingAddress.addressLine1}
                                     {order.shippingAddress.addressLine2 && `, ${order.shippingAddress.addressLine2}`}
-                                </p>
-                                <p className="font-medium">
+                                    <br />
                                     {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}
                                 </p>
                             </div>
+                            <div className="flex items-center gap-2">
+                                <Phone className="w-4 h-4 text-[#D4AF76]" />
+                                <p className="text-sm text-gray-700">{order.shippingAddress.phone}</p>
+                            </div>
                         </div>
+                    )}
+                </motion.div>
+
+                {/* Return Button */}
+                {order.status === 'delivered' && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.35 }}
+                    >
+                        <button
+                            onClick={() => setReturnModalOpen(true)}
+                            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition flex items-center justify-center gap-2 shadow-lg"
+                        >
+                            <RotateCcw className="w-5 h-5" />
+                            Request Return
+                        </button>
                     </motion.div>
-
-                    {/* Notes */}
-                    {order.notes && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6"
-                        >
-                            <h3 className="text-lg font-bold text-gray-900 mb-3">Order Notes</h3>
-                            <p className="text-sm text-gray-700 p-4 bg-gray-50 rounded-xl">
-                                {order.notes}
-                            </p>
-                        </motion.div>
-                    )}
-
-                    {/* Return Button */}
-                    {order.status === 'delivered' && order.status !== 'returned' && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            className="bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl border border-red-200 p-6"
-                        >
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Need to return this order?</h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                                You can request a return for this delivered order. Our team will process it within 24-48 hours.
-                            </p>
-                            <button
-                                onClick={() => setReturnModalOpen(true)}
-                                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-semibold flex items-center justify-center gap-2 group"
-                            >
-                                <RotateCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-                                Request Return
-                            </button>
-                        </motion.div>
-                    )}
-                </div>
+                )}
             </div>
 
-            {/* Return Request Modal */}
-            {order && (
-                <ReturnRequestModal
-                    isOpen={returnModalOpen}
-                    onClose={() => setReturnModalOpen(false)}
-                    order={order}
-                    onSuccess={() => {
-                        setReturnModalOpen(false);
-                        router.push('/returns');
-                    }}
-                />
-            )}
+            {/* Return Modal */}
+            <ReturnRequestModal
+                isOpen={returnModalOpen}
+                onClose={() => setReturnModalOpen(false)}
+                order={order}
+                onSuccess={fetchOrder}
+            />
         </div>
     );
 }
