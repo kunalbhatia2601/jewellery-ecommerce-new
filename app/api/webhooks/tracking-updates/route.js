@@ -311,11 +311,20 @@ async function handleReturnUpdate(webhookData) {
 
     // If not found by tracking info, try to find by order
     if (!returnDoc && (order_id || sr_order_id)) {
+        // For returns, Shiprocket sends order_id like "RETURN-ORD17626375923710012"
+        // Extract the actual order number by removing "RETURN-" prefix
+        let actualOrderId = order_id;
+        if (order_id && order_id.startsWith('RETURN-')) {
+            actualOrderId = order_id.replace('RETURN-', '');
+            console.log('📋 Extracted order number from return:', actualOrderId);
+        }
+        
         const order = await Order.findOne({
             $or: [
                 { shiprocketOrderId: String(sr_order_id) },
-                { orderNumber: String(order_id) },
-                { shiprocketOrderId: String(order_id) }
+                { orderNumber: String(actualOrderId) },
+                { shiprocketOrderId: String(actualOrderId) },
+                { orderNumber: String(order_id) }
             ]
         });
 
