@@ -7,23 +7,11 @@ import { NextResponse } from 'next/server';
  * Shiprocket Webhook Handler
  * Receives updates from Shiprocket about shipment status
  */
-
-// Add CORS headers for webhook
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
-export async function OPTIONS(request) {
-    return NextResponse.json({}, { headers: corsHeaders });
-}
-
 export async function POST(request) {
     try {
         const body = await request.json();
         
-        console.log('Shiprocket webhook received:', JSON.stringify(body, null, 2));
+        console.log('Shiprocket webhook received:', body);
 
         // Verify webhook authenticity (optional but recommended)
         // You can add HMAC verification here if Shiprocket provides it
@@ -38,10 +26,7 @@ export async function POST(request) {
         } = body;
 
         if (!order_id) {
-            return NextResponse.json({ error: 'Order ID required' }, { 
-                status: 400,
-                headers: corsHeaders 
-            });
+            return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
         }
 
         await connectDB();
@@ -184,25 +169,20 @@ export async function POST(request) {
             message: 'Webhook processed successfully',
             orderNumber: order.orderNumber,
             status: order.status
-        }, { headers: corsHeaders });
+        });
     } catch (error) {
         console.error('Shiprocket webhook error:', error);
         return NextResponse.json({ 
             error: 'Webhook processing failed',
             details: error.message 
-        }, { 
-            status: 500,
-            headers: corsHeaders 
-        });
+        }, { status: 500 });
     }
 }
 
-// Handle GET request (for webhook verification/testing)
+// Handle GET request (for webhook verification)
 export async function GET(request) {
     return NextResponse.json({ 
-        message: 'Webhook endpoint is active',
-        status: 'ready',
-        endpoint: '/api/webhooks/tracking-updates',
-        timestamp: new Date().toISOString()
-    }, { headers: corsHeaders });
+        message: 'Shiprocket webhook endpoint',
+        status: 'active'
+    });
 }
