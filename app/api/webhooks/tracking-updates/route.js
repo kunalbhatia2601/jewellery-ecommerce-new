@@ -359,10 +359,21 @@ async function handleReturnUpdate(webhookData) {
     const receivedStatus = (shipment_status || current_status || '').toUpperCase().trim();
     console.log('📊 Received return status:', receivedStatus);
 
-    if (receivedStatus && returnStatusMapping[receivedStatus]) {
-        const newStatus = returnStatusMapping[receivedStatus];
+    let newStatus = null;
+    if (receivedStatus) {
+        if (returnStatusMapping[receivedStatus]) {
+            newStatus = returnStatusMapping[receivedStatus];
+        } else if (receivedStatus.includes('CANCEL')) {
+            // Catch variations like 'CANCELLED', 'CANCELED', 'Return cancelled', etc.
+            newStatus = 'cancelled';
+        } else if (receivedStatus.includes('RTO')) {
+            newStatus = 'cancelled';
+        }
+    }
+
+    if (newStatus) {
         
-        if (returnDoc.status !== newStatus) {
+    if (returnDoc.status !== newStatus) {
             const oldStatus = returnDoc.status;
             returnDoc.status = newStatus;
             updated = true;
@@ -382,12 +393,27 @@ async function handleReturnUpdate(webhookData) {
         await returnDoc.save();
         console.log('💾 Return saved to database');
         
-        // Revalidate return pages to show updates immediately
+        // Revalidate return and related pages to show updates immediately
         try {
+            // Admin list and public returns list
             revalidatePath('/admin/returns');
-            revalidatePath(`/orders/${returnDoc.returnNumber}`);
+            revalidatePath('/returns');
+
+            // If this return is linked to an order, revalidate the order page too
+            if (returnDoc.orderId) {
+                try {
+                    const order = await (await import('@/models/Order')).default.findById(returnDoc.orderId).select('orderNumber');
+                    if (order && order.orderNumber) {
+                        revalidatePath(`/orders/${order.orderNumber}`);
+                    }
+                } catch (ordErr) {
+                    console.log('⚠️  Failed to revalidate linked order page:', ordErr.message);
+                }
+            }
+
+            // Generic orders list
             revalidatePath('/orders');
-            console.log('🔄 Cache revalidated for return pages');
+            console.log('🔄 Cache revalidated for return and related pages');
         } catch (revalError) {
             console.log('⚠️  Cache revalidation failed:', revalError.message);
         }
