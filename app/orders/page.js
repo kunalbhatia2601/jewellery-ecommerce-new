@@ -1,7 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { 
     Package, 
     Loader2, 
@@ -29,7 +30,7 @@ const statusConfig = {
     cancelled: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Cancelled' }
 };
 
-export default function OrdersPage() {
+function OrdersContent() {
     const searchParams = useSearchParams();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -129,12 +130,12 @@ export default function OrdersPage() {
                         <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">No Orders Yet</h2>
                         <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
-                        <a
+                        <Link
                             href="/products"
                             className="inline-block px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
                         >
-                            Browse Products
-                        </a>
+                            Start Shopping
+                        </Link>
                     </motion.div>
                 ) : (
                     <div className="space-y-4">
@@ -342,5 +343,19 @@ export default function OrdersPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function OrdersPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
+                </div>
+            </div>
+        }>
+            <OrdersContent />
+        </Suspense>
     );
 }

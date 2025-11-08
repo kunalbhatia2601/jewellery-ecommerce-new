@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyTokenEdge } from './lib/auth';
+import { verifyTokenEdge } from './lib/auth-edge';
 
 export async function middleware(request) {
     const { pathname } = request.nextUrl;

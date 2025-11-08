@@ -71,7 +71,7 @@ export default function MyReturnsPage() {
                     >
                         <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">No Returns Yet</h2>
-                        <p className="text-gray-600 mb-6">You haven't requested any returns</p>
+                        <p className="text-gray-600 mb-6">You haven&apos;t requested any returns</p>
                         <a
                             href="/orders"
                             className="inline-block px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"

@@ -252,7 +252,7 @@ export default function AdminReturnsPage() {
                                                     <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                                                     <div className="text-sm text-yellow-800">
                                                         <p className="font-medium">Action Required</p>
-                                                        <p>The return has been received. Please verify the items and process the refund manually to the customer's bank account.</p>
+                                                        <p>The return has been received. Please verify the items and process the refund manually to the customer&apos;s bank account.</p>
                                                     </div>
                                                 </div>
                                                 <button
