@@ -41,26 +41,12 @@ export async function POST(request) {
     console.log('='.repeat(80));
     
     try {
-        // Log raw headers for debugging
-        const headersList = {};
-        request.headers.forEach((value, key) => {
-            headersList[key] = value;
-        });
-        console.log('📋 Headers:', JSON.stringify(headersList, null, 2));
-        
         // Parse webhook body
         const body = await request.json();
         
         console.log('📥 Webhook Payload:');
         console.log(JSON.stringify(body, null, 2));
         console.log('-'.repeat(80));
-
-        // Log to file for debugging (async, don't wait)
-        fetch(`${request.nextUrl.origin}/api/debug/webhook-logs`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        }).catch(err => console.log('Failed to log webhook:', err.message));
 
         // Extract data from webhook
         const {
@@ -286,13 +272,6 @@ async function handleReturnUpdate(webhookData) {
     // Find return by AWB or shipment ID
     let returnDoc = null;
 
-    console.log('🔍 Searching for return with:', {
-        awb,
-        shipment_id,
-        order_id,
-        sr_order_id
-    });
-
     // Try to find by shipment_id FIRST (most reliable for returns)
     if (shipment_id) {
         returnDoc = await ReturnModel.findOne({ shiprocketReturnShipmentId: String(shipment_id) });
@@ -338,15 +317,6 @@ async function handleReturnUpdate(webhookData) {
 
     if (!returnDoc) {
         console.log('⚠️  Return not found for:', { order_id, sr_order_id, awb, shipment_id });
-        
-        // Debug: Check what returns exist in DB
-        try {
-            const allReturns = await ReturnModel.find({}).select('returnNumber orderId shiprocketReturnAwb shiprocketReturnShipmentId status').limit(5);
-            console.log('📋 Available returns in DB:', JSON.stringify(allReturns, null, 2));
-        } catch (err) {
-            console.log('⚠️  Could not query returns:', err.message);
-        }
-        
         return;
     }
 

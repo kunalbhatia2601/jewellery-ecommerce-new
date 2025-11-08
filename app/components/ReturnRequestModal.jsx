@@ -6,6 +6,7 @@ import { X, Package, CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react'
 export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [existingReturnNumber, setExistingReturnNumber] = useState('');
     const [success, setSuccess] = useState(false);
     const [formData, setFormData] = useState({
         reason: '',
@@ -16,10 +17,18 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
         notes: ''
     });
 
+    const handleClose = () => {
+        setError('');
+        setExistingReturnNumber('');
+        setSuccess(false);
+        onClose();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setExistingReturnNumber('');
 
         try {
             const res = await fetch('/api/returns', {
@@ -50,12 +59,19 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
                 setSuccess(true);
                 setTimeout(() => {
                     onSuccess && onSuccess();
-                    onClose();
+                    handleClose();
                 }, 2000);
             } else {
-                setError(data.error || 'Failed to submit return request');
+                // Handle duplicate return case
+                if (data.returnNumber) {
+                    setExistingReturnNumber(data.returnNumber);
+                    setError(data.error || 'A return request already exists for this order');
+                } else {
+                    setError(data.error || 'Failed to submit return request');
+                }
             }
         } catch (err) {
+            console.error('Return request error:', err);
             setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
@@ -66,12 +82,14 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                    initial={{ opacity: 0, y: 100, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 100, scale: 0.95 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto mb-0 sm:mb-0"
+                    style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
                 >
                     {/* Header */}
                     <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -80,7 +98,7 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
                             <h2 className="text-2xl font-bold text-gray-900">Return Request</h2>
                         </div>
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="p-2 hover:bg-gray-100 rounded-full transition"
                         >
                             <X className="w-6 h-6 text-gray-500" />
@@ -105,9 +123,27 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
 
                             {/* Error Message */}
                             {error && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                                    <p className="text-sm text-red-700">{error}</p>
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <div className="flex items-start gap-3">
+                                        <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                        <div className="flex-1">
+                                            <p className="text-sm text-red-700 font-medium">{error}</p>
+                                            {existingReturnNumber && (
+                                                <div className="mt-3">
+                                                    <a 
+                                                        href="/returns" 
+                                                        className="inline-flex items-center gap-2 text-sm text-amber-700 hover:text-amber-800 font-medium underline"
+                                                        onClick={handleClose}
+                                                    >
+                                                        View existing return ({existingReturnNumber})
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
@@ -217,7 +253,7 @@ export default function ReturnRequestModal({ isOpen, onClose, order, onSuccess }
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
-                                    onClick={onClose}
+                                    onClick={handleClose}
                                     className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
                                 >
                                     Cancel

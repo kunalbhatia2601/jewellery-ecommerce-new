@@ -25,6 +25,19 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Only delivered orders can be returned' }, { status: 400 });
         }
 
+        // Check if return already exists for this order
+        const existingReturn = await ReturnModel.findOne({ 
+            orderId: order._id,
+            status: { $nin: ['cancelled', 'completed'] } // Allow new return if previous was cancelled/completed
+        });
+
+        if (existingReturn) {
+            return NextResponse.json({ 
+                error: 'A return request already exists for this order',
+                returnNumber: existingReturn.returnNumber
+            }, { status: 400 });
+        }
+
         // Create return record
         const returnDoc = new ReturnModel({
             orderId: order._id,
