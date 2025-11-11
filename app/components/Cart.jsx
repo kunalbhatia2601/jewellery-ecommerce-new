@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/lib/utils';
-import { ShoppingBag, X, Trash2, Plus, Minus, ShoppingCart, Sparkles } from 'lucide-react';
+import { ShoppingBag, X, Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function Cart() {
@@ -38,11 +38,6 @@ export default function Cart() {
 
     const calculateSubtotal = () => {
         return (cartItems || []).reduce((total, item) => total + (item.price * item.quantity), 0);
-    };
-
-    const calculateSavings = () => {
-        // Mock savings calculation - you can make this dynamic
-        return calculateSubtotal() * 0.05; // 5% savings
     };
 
     const getTotalItems = () => {
@@ -269,20 +264,6 @@ export default function Cart() {
 
                                 {/* Footer - Summary & Checkout */}
                                 <div className="border-t border-gray-200 bg-white px-4 sm:px-6 py-4 sm:py-5">
-                                    {/* Savings Badge */}
-                                    {calculateSavings() > 0 && (
-                                        <motion.div 
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className="flex items-center gap-2 bg-gradient-to-r from-[#8B6B4C]/10 to-[#725939]/10 border border-[#8B6B4C]/20 rounded-lg px-4 py-2.5 mb-4"
-                                        >
-                                            <Sparkles className="w-4 h-4 text-[#8B6B4C]" />
-                                            <span className="text-sm font-medium text-[#725939]">
-                                                You&apos;re saving {formatPrice(calculateSavings())} on this order!
-                                            </span>
-                                        </motion.div>
-                                    )}
-
                                     {/* Price Breakdown */}
                                     <div className="space-y-2 mb-4">
                                         <div className="flex justify-between text-sm text-gray-600">
@@ -293,12 +274,6 @@ export default function Cart() {
                                             <span>Shipping</span>
                                             <span className="font-medium text-[#8B6B4C]">FREE</span>
                                         </div>
-                                        {calculateSavings() > 0 && (
-                                            <div className="flex justify-between text-sm text-[#8B6B4C]">
-                                                <span>Savings</span>
-                                                <span className="font-medium">-{formatPrice(calculateSavings())}</span>
-                                            </div>
-                                        )}
                                     </div>
 
                                     {/* Total */}
