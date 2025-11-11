@@ -21,7 +21,7 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
         pricingMethod: 'fixed',
         metalType: 'gold',
         goldWeight: '',
-        goldPurity: '24',
+        goldPurity: '22',
         silverWeight: '',
         silverPurity: '999',
         makingChargePercent: '',
