@@ -113,9 +113,15 @@ export async function GET(req) {
             
             // Optimize images - only send primary image and first 3 images
             if (product.images && product.images.length > 0) {
-                const primaryImage = product.images.find(img => img.isPrimary);
-                const otherImages = product.images.filter(img => !img.isPrimary).slice(0, 2);
-                product.images = primaryImage ? [primaryImage, ...otherImages] : otherImages.slice(0, 3);
+                // Filter out null/undefined images first
+                const validImages = product.images.filter(img => img && typeof img === 'object');
+                if (validImages.length > 0) {
+                    const primaryImage = validImages.find(img => img.isPrimary);
+                    const otherImages = validImages.filter(img => !img.isPrimary).slice(0, 2);
+                    product.images = primaryImage ? [primaryImage, ...otherImages] : otherImages.slice(0, 3);
+                } else {
+                    product.images = [];
+                }
             }
             
             return product;

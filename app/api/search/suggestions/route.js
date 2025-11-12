@@ -67,7 +67,9 @@ export async function GET(request) {
             
             // For product images array
             if (type === 'product' && Array.isArray(imageData) && imageData.length > 0) {
-                const primaryImage = imageData.find(img => img.isPrimary) || imageData[0];
+                // Filter out null/undefined images first
+                const validImages = imageData.filter(img => img && typeof img === 'object');
+                const primaryImage = validImages.find(img => img.isPrimary) || validImages[0];
                 imageUrl = primaryImage?.url || null;
             }
             

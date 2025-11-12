@@ -20,11 +20,14 @@ export default function ImageCarousel({
     // Handle case where images is a single string (backward compatibility)
     const imageArray = (() => {
         if (Array.isArray(images)) {
-            return images.map((img, index) => ({
-                url: typeof img === 'string' ? img : img.url,
-                alt: typeof img === 'string' ? `${productName} - Image ${index + 1}` : (img.alt || `${productName} - Image ${index + 1}`),
-                isPrimary: typeof img === 'object' ? img.isPrimary : index === 0
-            }));
+            // Filter out null/undefined images and map them
+            return images
+                .filter(img => img !== null && img !== undefined)
+                .map((img, index) => ({
+                    url: typeof img === 'string' ? img : img.url,
+                    alt: typeof img === 'string' ? `${productName} - Image ${index + 1}` : (img.alt || `${productName} - Image ${index + 1}`),
+                    isPrimary: typeof img === 'object' && img !== null ? img.isPrimary : index === 0
+                }));
         } else if (images) {
             return [{ url: images, alt: productName, isPrimary: true }];
         } else {
