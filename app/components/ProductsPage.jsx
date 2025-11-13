@@ -226,38 +226,15 @@ export default function ProductsPage() {
     const handleCategoryClick = useCallback((categoryName) => {
         setSelectedCategory(categoryName);
         setSelectedSubcategory('All'); // Reset subcategory when category changes
-        
-        // Update URL without navigation
-        const params = new URLSearchParams(searchParams);
-        if (categoryName === 'All') {
-            params.delete('category');
-            params.delete('subcategory');
-        } else {
-            params.set('category', categoryName);
-            params.delete('subcategory');
-        }
-        router.replace(`/products?${params.toString()}`, { shallow: true });
-    }, [searchParams, router]);
+    }, []);
 
     const handleSubcategoryClick = useCallback((subcategoryId) => {
         setSelectedSubcategory(subcategoryId);
-        
-        // Update URL without navigation
-        const params = new URLSearchParams(searchParams);
-        if (subcategoryId === 'All') {
-            params.delete('subcategory');
-        } else {
-            params.set('subcategory', subcategoryId);
-        }
-        router.replace(`/products?${params.toString()}`, { shallow: true });
-    }, [searchParams, router]);
+    }, []);
 
     const clearSearch = useCallback(() => {
         setSearchTerm('');
-        const params = new URLSearchParams(searchParams);
-        params.delete('search');
-        router.replace(`/products?${params.toString()}`, { shallow: true });
-    }, [searchParams, router]);
+    }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white via-[#FAFAFA] to-white pt-4 md:pt-6 lg:pt-8 pb-6 md:pb-8 lg:pb-12">
