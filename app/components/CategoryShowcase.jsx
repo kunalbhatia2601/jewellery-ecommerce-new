@@ -245,6 +245,51 @@ export default function CategoryShowcase() {
 
   const MAX_DISPLAYED = 16; // Maximum subcategories to display initially
 
+  // Function to scroll to the top of the section smoothly
+  const scrollToSection = useCallback(() => {
+    if (sectionRef.current) {
+      const sectionTop = sectionRef.current.offsetTop;
+      
+      // Use Lenis for smooth scrolling if available
+      if (window.lenis) {
+        window.lenis.scrollTo(sectionTop, {
+          offset: -20, // Small offset from the top
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        });
+      } else {
+        // Fallback to native smooth scroll
+        window.scrollTo({
+          top: sectionTop - -80,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, []);
+
+  // Handle category change with scroll
+  const handleCategoryChange = useCallback((category) => {
+    setSelectedCategory(category);
+    scrollToSection();
+  }, [scrollToSection]);
+
+  // Check if element is already in viewport on mount (for direct mobile navigation)
+  useEffect(() => {
+    const checkInitialVisibility = () => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        const isInViewport = rect.top < window.innerHeight && rect.bottom >= 0;
+        if (isInViewport) {
+          setIsVisible(true);
+        }
+      }
+    };
+    
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(checkInitialVisibility, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -253,7 +298,7 @@ export default function CategoryShowcase() {
           setIsVisible(true);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 } // Reduced threshold for better mobile detection
     );
 
     if (sectionRef.current) {
@@ -442,8 +487,8 @@ export default function CategoryShowcase() {
             <div className="flex flex-col lg:flex-row">
                 {/* Sidebar - Filter Section */}
                 <div className="w-full lg:w-1/5 p-4 sm:p-6 lg:p-8 xl:p-12 flex flex-col justify-start">
-                    {/* Removed lg:sticky lg:top-8 to allow natural scrolling */}
-                    <div>
+                    {/* Added sticky positioning back with proper offset */}
+                    <div className="lg:sticky lg:top-24">
                         <div
                             className={`transform transition-all duration-1500 ease-out ${
                                 isVisible ? "translate-y-0 opacity-100" : "translate-y-[50vh] opacity-0"
@@ -487,7 +532,7 @@ export default function CategoryShowcase() {
                                         return (
                                             <button
                                                 key={filter}
-                                                onClick={() => setSelectedCategory(filter)}
+                                                onClick={() => handleCategoryChange(filter)}
                                                 className={`text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-[1.02] flex items-center justify-between group ${
                                                     selectedCategory === filter
                                                         ? 'bg-gradient-to-r from-[#D4AF76] to-[#B8935F] text-white shadow-lg shadow-[#D4AF76]/20'
@@ -528,7 +573,7 @@ export default function CategoryShowcase() {
                                             return (
                                                 <button
                                                     key={filter}
-                                                    onClick={() => setSelectedCategory(filter)}
+                                                    onClick={() => handleCategoryChange(filter)}
                                                     className={`whitespace-nowrap px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 group ${
                                                         selectedCategory === filter
                                                             ? 'bg-gradient-to-r from-[#D4AF76] to-[#B8935F] text-white shadow-lg shadow-[#D4AF76]/20'
