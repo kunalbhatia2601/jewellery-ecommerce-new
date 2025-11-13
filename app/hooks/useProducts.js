@@ -33,7 +33,7 @@ export function useProducts(options = {}) {
         
         try {
             const timestamp = Date.now();
-            const res = await fetch(`/api/products?limit=100&_=${timestamp}`, {
+            const res = await fetch(`/api/products?limit=1000&_=${timestamp}`, {
                 signal: abortControllerRef.current.signal,
                 cache: 'no-store',
                 headers: {

@@ -17,7 +17,7 @@ export async function GET(req) {
         // Get query parameters
         const { searchParams } = new URL(req.url);
         const page = parseInt(searchParams.get('page')) || 1;
-        const limit = parseInt(searchParams.get('limit')) || 50; // Increased default limit
+        const limit = parseInt(searchParams.get('limit')) || 100; // Default limit
         const category = searchParams.get('category');
         const subcategory = searchParams.get('subcategory');
         const search = searchParams.get('search');
@@ -27,9 +27,9 @@ export async function GET(req) {
         const maxPrice = parseFloat(searchParams.get('maxPrice')) || Infinity;
         
         // Validate pagination parameters
-        if (page < 1 || limit < 1 || limit > 200) {
+        if (page < 1 || limit < 1 || limit > 2000) {
             return NextResponse.json(
-                { error: 'Invalid pagination parameters. Page must be >= 1, limit must be 1-200.' },
+                { error: 'Invalid pagination parameters. Page must be >= 1, limit must be 1-2000.' },
                 { status: 400 }
             );
         }
