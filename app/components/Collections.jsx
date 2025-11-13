@@ -73,7 +73,7 @@ export default function Collections() {
         try {
             setLoading(true);
             const timestamp = Date.now();
-            const response = await fetch(`/api/products?_=${timestamp}`, {
+            const response = await fetch(`/api/products?limit=1000&_=${timestamp}`, {
                 cache: 'no-store',
                 headers: {
                     'Cache-Control': 'no-cache'

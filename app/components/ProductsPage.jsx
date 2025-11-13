@@ -129,7 +129,8 @@ export default function ProductsPage() {
             
             // Build query parameters
             const params = new URLSearchParams();
-            params.append('limit', '100'); // Fetch more at once
+            params.append('limit', '2000'); // Fetch all products
+            params.append('page', '1'); // Explicitly set page 1
             params.append('_', Date.now()); // Cache busting
             
             if (selectedCategory !== 'All' && selectedCategory) {
