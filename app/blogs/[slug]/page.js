@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
 import { Calendar, Clock, Eye, User, ArrowLeft, Tag } from 'lucide-react';
@@ -13,11 +13,7 @@ export default function BlogPostPage({ params }) {
     const [relatedBlogs, setRelatedBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchBlog();
-    }, [slug]);
-
-    const fetchBlog = async () => {
+    const fetchBlog = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch(`/api/blogs/${slug}`);
@@ -32,7 +28,11 @@ export default function BlogPostPage({ params }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [slug]);
+
+    useEffect(() => {
+        fetchBlog();
+    }, [slug, fetchBlog]);
 
     if (loading) {
         return (
@@ -52,7 +52,7 @@ export default function BlogPostPage({ params }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <h1 className="text-4xl font-light text-gray-800 mb-4">Article Not Found</h1>
-                <p className="text-gray-500 mb-8 font-light">The article you're looking for doesn't exist</p>
+                <p className="text-gray-500 mb-8 font-light">The article you&apos;re looking for doesn&apos;t exist</p>
                 <Link href="/blogs">
                     <Button className="bg-[#D4AF76] hover:bg-[#B8956A] text-[#2C2C2C] rounded-full px-8 py-3 font-light">
                         Back to Journal
