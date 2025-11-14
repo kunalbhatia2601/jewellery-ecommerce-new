@@ -74,7 +74,7 @@ export default function Navbar() {
 
     return (
         <>
-            {/* Desktop Navbar - Fixed Minimal Design */}
+            {/* Desktop Navbar - Enhanced Apple Liquid Glass Effect */}
             <motion.nav
                 ref={ref}
                 className="fixed inset-x-0 top-0 z-[100] hidden lg:block"
@@ -91,17 +91,24 @@ export default function Navbar() {
                 <motion.div
                     animate={{
                         backgroundColor: visible 
-                            ? "rgba(255, 255, 255, 0.98)" 
-                            : "rgba(255, 255, 255, 0.90)",
+                            ? "rgba(255, 255, 255, 0.75)" 
+                            : "rgba(255, 255, 255, 0.65)",
                         borderBottomColor: visible 
-                            ? "rgba(0, 0, 0, 0.06)" 
-                            : "rgba(0, 0, 0, 0.04)",
+                            ? "rgba(0, 0, 0, 0.12)" 
+                            : "rgba(0, 0, 0, 0.08)",
+                        boxShadow: visible
+                            ? "0 4px 30px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
+                            : "0 2px 20px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
                     }}
                     transition={{
-                        duration: 0.3,
-                        ease: "easeInOut"
+                        duration: 0.5,
+                        ease: [0.25, 0.1, 0.25, 1]
                     }}
-                    className="backdrop-blur-2xl border-b"
+                    className="backdrop-blur-[24px] backdrop-saturate-[200%] border-b"
+                    style={{
+                        WebkitBackdropFilter: "blur(24px) saturate(200%)",
+                        backdropFilter: "blur(24px) saturate(200%)"
+                    }}
                 >
                     <div className="max-w-7xl mx-auto px-6 py-4">
                         <div className="flex items-center justify-between">
@@ -143,7 +150,7 @@ export default function Navbar() {
                                 >
                                     <Link 
                                         href="/products"
-                                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200"
+                                        className="px-4 py-2 text-sm font-medium text-gray-800 hover:text-black hover:bg-black/[0.06] rounded-xl transition-all duration-300"
                                     >
                                         Shop
                                     </Link>
@@ -156,7 +163,7 @@ export default function Navbar() {
                                 >
                                     <Link 
                                         href="/blogs"
-                                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200"
+                                        className="px-4 py-2 text-sm font-medium text-gray-800 hover:text-black hover:bg-black/[0.06] rounded-xl transition-all duration-300"
                                     >
                                         Blog
                                     </Link>
@@ -167,8 +174,8 @@ export default function Navbar() {
                                     <div className="relative profile-menu">
                                         <motion.button 
                                             onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                            className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white flex items-center justify-center text-sm font-semibold shadow-sm hover:shadow-md transition-all"
-                                            whileHover={{ scale: 1.05 }}
+                                            className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white flex items-center justify-center text-sm font-semibold shadow-lg hover:shadow-xl transition-all ring-2 ring-white/30 hover:ring-white/50"
+                                            whileHover={{ scale: 1.08, y: -1 }}
                                             whileTap={{ scale: 0.95 }}
                                         >
                                             {getInitials()}
@@ -177,15 +184,20 @@ export default function Navbar() {
                                         <AnimatePresence>
                                             {isProfileOpen && (
                                                 <motion.div
-                                                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                    initial={{ opacity: 0, scale: 0.92, y: -10 }}
                                                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                    transition={{ duration: 0.15 }}
-                                                    className="absolute right-0 mt-2 w-60 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 py-1 overflow-hidden"
+                                                    exit={{ opacity: 0, scale: 0.92, y: -10 }}
+                                                    transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                                                    className="absolute right-0 top-full mt-7 w-64 bg-white/98 backdrop-blur-[40px] backdrop-saturate-[200%] rounded-2xl shadow-2xl border border-black/10 py-2 overflow-hidden"
+                                                    style={{
+                                                        WebkitBackdropFilter: "blur(40px) saturate(200%)",
+                                                        backdropFilter: "blur(40px) saturate(200%)",
+                                                        boxShadow: "0 20px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
+                                                    }}
                                                 >
-                                                    <div className="px-4 py-3 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                                                    <div className="px-4 py-3 bg-gradient-to-br from-black/[0.04] to-black/[0.02] border-b border-black/[0.06]">
                                                         <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
-                                                        <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+                                                        <p className="text-xs text-gray-600 truncate mt-0.5">{user.email}</p>
                                                     </div>
                                                     
                                                     <div className="py-1">
@@ -194,9 +206,9 @@ export default function Navbar() {
                                                                 setIsProfileOpen(false);
                                                                 router.push('/orders');
                                                             }}
-                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-gray-800 hover:bg-black/[0.06] active:bg-black/[0.08] transition-all duration-200"
                                                         >
-                                                            <svg className="mr-3 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <svg className="mr-3 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                                             </svg>
                                                             My Orders
@@ -207,9 +219,9 @@ export default function Navbar() {
                                                                 setIsProfileOpen(false);
                                                                 router.push('/returns');
                                                             }}
-                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-gray-800 hover:bg-black/[0.06] active:bg-black/[0.08] transition-all duration-200"
                                                         >
-                                                            <svg className="mr-3 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <svg className="mr-3 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                                                             </svg>
                                                             My Returns
@@ -221,9 +233,9 @@ export default function Navbar() {
                                                                     setIsProfileOpen(false);
                                                                     router.push('/admin');
                                                                 }}
-                                                                className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                                className="flex items-center w-full px-4 py-2.5 text-sm text-gray-800 hover:bg-black/[0.06] active:bg-black/[0.08] transition-all duration-200"
                                                             >
-                                                                <svg className="mr-3 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <svg className="mr-3 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                                 </svg>
@@ -232,11 +244,11 @@ export default function Navbar() {
                                                         )}
                                                     </div>
 
-                                                    <div className="border-t border-gray-100">
+                                                    <div className="border-t border-black/[0.06] mt-1">
                                                         <button
                                                             onClick={handleLogout}
                                                             disabled={isLoggingOut}
-                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                                                            className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/90 active:bg-red-50 transition-all duration-200 disabled:opacity-50"
                                                         >
                                                             <svg className="mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -251,8 +263,8 @@ export default function Navbar() {
                                 ) : (
                                     <motion.button
                                         onClick={() => triggerLoginModal()}
-                                        className="px-5 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                                        whileHover={{ scale: 1.02 }}
+                                        className="px-5 py-2 text-sm font-medium text-gray-800 hover:text-black bg-black/[0.06] hover:bg-black/[0.10] rounded-xl transition-all duration-300 hover:shadow-sm"
+                                        whileHover={{ scale: 1.03, y: -1 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
                                         Sign In
@@ -268,17 +280,17 @@ export default function Navbar() {
                                             triggerLoginModal();
                                         }
                                     }}
-                                    className="relative p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all duration-200"
-                                    whileHover={{ scale: 1.05 }}
+                                    className="relative p-2.5 rounded-xl bg-black/[0.06] hover:bg-black/[0.10] transition-all duration-300 hover:shadow-sm"
+                                    whileHover={{ scale: 1.08, y: -1 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    <svg className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                     </svg>
                                     <AnimatePresence>
                                         {cartItems.length > 0 && (
                                             <motion.span 
-                                                className="absolute -top-1.5 -right-1.5 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold shadow-md"
+                                                className="absolute -top-1.5 -right-1.5 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold shadow-lg ring-2 ring-white/40"
                                                 initial={{ scale: 0, opacity: 0 }}
                                                 animate={{ scale: 1, opacity: 1 }}
                                                 exit={{ scale: 0, opacity: 0 }}
@@ -295,9 +307,15 @@ export default function Navbar() {
                 </motion.div>
             </motion.nav>
 
-            {/* Mobile Top Search Bar */}
+            {/* Mobile Top Search Bar - Enhanced Apple Liquid Glass Effect */}
             <motion.div 
-                className="lg:hidden fixed top-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-xl border-b border-gray-200/50"
+                className="lg:hidden fixed top-0 left-0 right-0 z-[100] backdrop-blur-[24px] backdrop-saturate-[200%] border-b border-black/10"
+                style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.75)",
+                    WebkitBackdropFilter: "blur(24px) saturate(200%)",
+                    backdropFilter: "blur(24px) saturate(200%)",
+                    boxShadow: "0 2px 20px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
+                }}
                 initial={{ y: -100 }}
                 animate={{ 
                     y: isNavbarHidden ? -100 : 0,
@@ -331,9 +349,15 @@ export default function Navbar() {
                 </div>
             </motion.div>
 
-            {/* Mobile Bottom Navigation */}
+            {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
             <motion.div 
-                className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-xl border-t border-gray-200/50"
+                className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] backdrop-blur-[24px] backdrop-saturate-[200%] border-t border-black/10"
+                style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.75)",
+                    WebkitBackdropFilter: "blur(24px) saturate(200%)",
+                    backdropFilter: "blur(24px) saturate(200%)",
+                    boxShadow: "0 -2px 20px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
+                }}
                 initial={{ y: 100 }}
                 animate={{ 
                     y: isNavbarHidden ? 100 : 0,
@@ -346,57 +370,57 @@ export default function Navbar() {
                     duration: 0.4 
                 }}
             >
-                <div className="flex items-center justify-around py-2">
+                <div className="flex items-center justify-around py-2.5">
                     {/* Home */}
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Link href="/" className="flex flex-col items-center p-2 space-y-1">
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
+                        <Link href="/" className="flex flex-col items-center p-2 space-y-1.5">
                             <motion.div
-                                className="p-2 rounded-xl bg-gray-50"
-                                whileHover={{ backgroundColor: "#D4AF76", scale: 1.1 }}
-                                transition={{ duration: 0.2 }}
+                                className="p-2.5 rounded-2xl bg-black/[0.06]"
+                                whileHover={{ backgroundColor: "rgba(212, 175, 118, 0.15)", scale: 1.08 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </motion.div>
-                            <span className="text-xs text-gray-600 font-medium">Home</span>
+                            <span className="text-xs text-gray-700 font-medium">Home</span>
                         </Link>
                     </motion.div>
 
                     {/* Browse */}
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Link href="/products" className="flex flex-col items-center p-2 space-y-1">
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
+                        <Link href="/products" className="flex flex-col items-center p-2 space-y-1.5">
                             <motion.div
-                                className="p-2 rounded-xl bg-gray-50"
-                                whileHover={{ backgroundColor: "#D4AF76", scale: 1.1 }}
-                                transition={{ duration: 0.2 }}
+                                className="p-2.5 rounded-2xl bg-black/[0.06]"
+                                whileHover={{ backgroundColor: "rgba(212, 175, 118, 0.15)", scale: 1.08 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
                             </motion.div>
-                            <span className="text-xs text-gray-600 font-medium">Browse</span>
+                            <span className="text-xs text-gray-700 font-medium">Browse</span>
                         </Link>
                     </motion.div>
 
                     {/* Blog */}
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Link href="/blogs" className="flex flex-col items-center p-2 space-y-1">
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
+                        <Link href="/blogs" className="flex flex-col items-center p-2 space-y-1.5">
                             <motion.div
-                                className="p-2 rounded-xl bg-gray-50"
-                                whileHover={{ backgroundColor: "#D4AF76", scale: 1.1 }}
-                                transition={{ duration: 0.2 }}
+                                className="p-2.5 rounded-2xl bg-black/[0.06]"
+                                whileHover={{ backgroundColor: "rgba(212, 175, 118, 0.15)", scale: 1.08 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </motion.div>
-                            <span className="text-xs text-gray-600 font-medium">Blog</span>
+                            <span className="text-xs text-gray-700 font-medium">Blog</span>
                         </Link>
                     </motion.div>
 
                     {/* Cart */}
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
                         <button 
                             onClick={() => {
                                 if (user) {
@@ -405,20 +429,20 @@ export default function Navbar() {
                                     triggerLoginModal();
                                 }
                             }}
-                            className="flex flex-col items-center p-2 space-y-1 relative"
+                            className="flex flex-col items-center p-2 space-y-1.5 relative"
                         >
                             <motion.div
-                                className="p-2 rounded-xl bg-gray-50 relative"
-                                whileHover={{ backgroundColor: "#D4AF76", scale: 1.1 }}
-                                transition={{ duration: 0.2 }}
+                                className="p-2.5 rounded-2xl bg-black/[0.06] relative"
+                                whileHover={{ backgroundColor: "rgba(212, 175, 118, 0.15)", scale: 1.08 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
                                 <AnimatePresence>
                                     {cartItems.length > 0 && (
                                         <motion.span 
-                                            className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium shadow-lg"
+                                            className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold shadow-lg ring-2 ring-white/50"
                                             initial={{ scale: 0, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             exit={{ scale: 0, opacity: 0 }}
@@ -429,35 +453,41 @@ export default function Navbar() {
                                     )}
                                 </AnimatePresence>
                             </motion.div>
-                            <span className="text-xs text-gray-600 font-medium">Cart</span>
+                            <span className="text-xs text-gray-700 font-medium">Cart</span>
                         </button>
                     </motion.div>
 
                     {/* Profile/Account */}
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="relative mobile-profile-menu">
+                    <motion.div whileHover={{ scale: 1.05 }} className="relative mobile-profile-menu">
                         {user ? (
                             <>
                                 <button 
                                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                    className="flex flex-col items-center p-2 space-y-1"
+                                    className="flex flex-col items-center p-2 space-y-1.5"
                                 >
                                     <motion.div
-                                        className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#2C2C2C] to-[#D4AF76] text-white flex items-center justify-center text-xs font-medium shadow-md"
-                                        whileHover={{ scale: 1.1, rotate: 5 }}
-                                        transition={{ duration: 0.2 }}
+                                        className="w-9 h-9 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white flex items-center justify-center text-xs font-semibold shadow-lg ring-2 ring-white/30"
+                                        whileHover={{ scale: 1.08, rotate: 3 }}
+                                        transition={{ duration: 0.3 }}
                                     >
                                         {getInitials()}
                                     </motion.div>
-                                    <span className="text-xs text-gray-600 font-medium">Profile</span>
+                                    <span className="text-xs text-gray-700 font-medium">Profile</span>
                                 </button>
                                 
                                 <AnimatePresence>
                                     {isMobileMenuOpen && (
                                         <motion.div
-                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                            initial={{ opacity: 0, scale: 0.92, y: 10 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                            className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-[110]"
+                                            exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                                            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                                            className="absolute bottom-full right-0 mb-4 w-52 bg-white/98 backdrop-blur-[40px] backdrop-saturate-[200%] rounded-2xl shadow-2xl border border-black/10 py-2 z-[110]"
+                                            style={{
+                                                WebkitBackdropFilter: "blur(40px) saturate(200%)",
+                                                backdropFilter: "blur(40px) saturate(200%)",
+                                                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
+                                            }}
                                         >
                                             <button
                                                 onClick={(e) => {

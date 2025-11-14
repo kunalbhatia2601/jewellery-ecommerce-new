@@ -379,11 +379,16 @@ export default function SearchBar({ className = "", placeholder = "Search for je
                 {isOpen && (suggestions.length > 0 || isLoading) && searchQuery.trim().length >= 2 && (
                     <motion.div
                         ref={suggestionsRef}
-                        initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                        initial={{ opacity: 0, y: -5, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-50"
+                        exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+                        className="absolute top-full left-0 right-0 mt-5 bg-white/98 backdrop-blur-[40px] backdrop-saturate-[200%] rounded-2xl shadow-2xl border border-black/10 overflow-hidden z-50"
+                        style={{
+                            WebkitBackdropFilter: "blur(40px) saturate(200%)",
+                            backdropFilter: "blur(40px) saturate(200%)",
+                            boxShadow: "0 20px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.5)"
+                        }}
                     >
                         {isLoading ? (
                             <div className="py-2">
