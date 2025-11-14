@@ -42,25 +42,57 @@ export default function Hero() {
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentSlide}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 1 }}
+                        initial={{ 
+                            opacity: 0,
+                            scale: 1.1,
+                        }}
+                        animate={{ 
+                            opacity: 1,
+                            scale: 1,
+                        }}
+                        exit={{ 
+                            opacity: 0,
+                            scale: 0.95,
+                        }}
+                        transition={{ 
+                            duration: 1.2,
+                            ease: [0.43, 0.13, 0.23, 0.96], // Custom easing for smooth, luxurious feel
+                        }}
                         className="absolute inset-0"
                     >
                         {/* Desktop & Tablet Image - Hidden only on small mobile if mobile version exists */}
-                        <Image
-                            src={`/${slides[currentSlide].image}`}
-                            alt="Nandika Jewellers"
-                            fill
-                            className={`object-cover object-center ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                            priority
-                            quality={90}
-                        />
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ 
+                                duration: 1,
+                                delay: 0.2,
+                                ease: "easeOut"
+                            }}
+                            className="w-full h-full"
+                        >
+                            <Image
+                                src={`/${slides[currentSlide].image}`}
+                                alt="Nandika Jewellers"
+                                fill
+                                className={`object-cover object-center ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
+                                priority
+                                quality={90}
+                            />
+                        </motion.div>
                         
                         {/* Mobile Image - Only for small mobile devices, positioned below search */}
                         {slides[currentSlide].mobileImage && (
-                            <div className="sm:hidden w-full h-full pt-16">
+                            <motion.div 
+                                className="sm:hidden w-full h-full pt-16"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ 
+                                    duration: 1,
+                                    delay: 0.2,
+                                    ease: "easeOut"
+                                }}
+                            >
                                 <Image
                                     src={`/${slides[currentSlide].mobileImage}`}
                                     alt="Nandika Jewellers Mobile"
@@ -69,7 +101,7 @@ export default function Hero() {
                                     priority
                                     quality={90}
                                 />
-                            </div>
+                            </motion.div>
                         )}
                     </motion.div>
                 </AnimatePresence>
