@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# transaction logs
+/logs/*.log
+/logs/transactions.log
+
 # vercel
 .vercel
 

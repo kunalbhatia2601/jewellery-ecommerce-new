@@ -30,7 +30,16 @@ A Bond of trust & Quality - Premium jewelry e-commerce platform built with Next.
 - Automatic status updates via webhooks
 - Green status indicator for completed refunds
 
-### 💳 Payment Integration
+### � Rollback Transaction System (NEW!)
+- **Automatic refund on Shiprocket failure**
+- Transaction logging and audit trail
+- Stuck orders dashboard for admin
+- Manual refund processing API
+- Stock protection on failed orders
+- Cart preservation for customer retry
+- **See [ROLLBACK_TRANSACTION_SYSTEM.md](./ROLLBACK_TRANSACTION_SYSTEM.md)** for details
+
+### �💳 Payment Integration
 - Cash on Delivery (COD)
 - Online Payments (Razorpay ready)
 - Secure payment processing
@@ -63,6 +72,8 @@ A Bond of trust & Quality - Premium jewelry e-commerce platform built with Next.
 
 - **[ORDER_SYSTEM.md](./ORDER_SYSTEM.md)** - Complete order & checkout system guide
 - **[COURIER_SELECTION.md](./COURIER_SELECTION.md)** - Automatic courier selection documentation
+- **[ROLLBACK_TRANSACTION_SYSTEM.md](./ROLLBACK_TRANSACTION_SYSTEM.md)** - 🆕 Rollback & refund system guide
+- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - 🆕 Quick implementation reference
 
 ## Quick Start
 
@@ -93,6 +104,10 @@ SHIPROCKET_PICKUP_PINCODE=110001
 # Razorpay (for online payments)
 RAZORPAY_KEY_ID=your-razorpay-key-id
 RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+
+# Rollback System (for automatic refunds)
+AUTO_REFUND_ENABLED=true
+SHIPROCKET_FAILURE_AUTO_REFUND=true
 ```
 
 ### 3. Run Development Server

@@ -4,6 +4,17 @@ import Cart from '@/models/Cart';
 import Product from '@/models/Product';
 import { verifyAuth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import {
+    logOrderCreated,
+    logPaymentCaptured,
+    logShipmentCreated,
+    logShipmentFailed,
+    logRefundInitiated,
+    logRefundSuccess,
+    logRefundFailed,
+    logOrderCancelled,
+    logManualInterventionRequired
+} from '@/lib/transactionLogger';
 
 export async function GET(request) {
     try {
@@ -125,6 +136,14 @@ export async function POST(request) {
 
         await order.save();
 
+        // Log order creation
+        logOrderCreated(order.orderNumber, user.userId, totalAmount, paymentMethod);
+        
+        // Log payment if already captured
+        if (paymentStatus === 'paid' && razorpayPaymentId) {
+            logPaymentCaptured(order.orderNumber, razorpayPaymentId, totalAmount);
+        }
+
         // Create Shiprocket order
         try {
             const { createShiprocketOrder, getAvailableCouriers, generateAWB } = await import('@/lib/shiprocket');
@@ -174,6 +193,9 @@ export async function POST(request) {
                 order.shiprocketOrderId = shiprocketResponse.order_id;
                 order.shiprocketShipmentId = shiprocketResponse.shipment_id;
                 order.status = 'confirmed';
+                
+                // Log shipment creation
+                logShipmentCreated(order.orderNumber, shiprocketResponse.order_id, 'Pending courier assignment');
 
                 // Get pickup pincode from environment or config
                 const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || '110001';
@@ -221,11 +243,138 @@ export async function POST(request) {
             }
         } catch (shiprocketError) {
             console.error('Shiprocket order creation failed:', shiprocketError);
-            // Don't fail the entire order if Shiprocket fails
-            // Admin can manually create shipment later
+            
+            // Log shipment failure
+            logShipmentFailed(order.orderNumber, shiprocketError, order.paymentStatus);
+            
+            // CRITICAL: Rollback transaction for online payments
+            if (paymentMethod === 'online' && order.paymentStatus === 'paid' && order.razorpayPaymentId) {
+                console.log(`⚠️  Initiating automatic refund for order ${order.orderNumber} due to Shiprocket failure`);
+                
+                // Log refund initiation
+                logRefundInitiated(order.orderNumber, order.razorpayPaymentId, order.totalAmount, 'Shiprocket shipment creation failed');
+                
+                try {
+                    const { createRefund } = await import('@/lib/razorpay');
+                    
+                    // Initiate refund through Razorpay
+                    const refund = await createRefund(order.razorpayPaymentId);
+                    console.log(`✅ Refund initiated successfully. Refund ID: ${refund.id}`);
+                    
+                    // Log successful refund
+                    logRefundSuccess(order.orderNumber, refund.id, order.totalAmount);
+                    
+                    // Update order with refund details
+                    order.paymentStatus = 'refunded';
+                    order.status = 'cancelled';
+                    order.notes = (order.notes ? order.notes + '\n' : '') + 
+                        `[SYSTEM] Order cancelled - Shiprocket shipment creation failed: ${shiprocketError.message}. ` +
+                        `Automatic refund initiated. Refund ID: ${refund.id}. ` +
+                        `Refund will be processed to customer's account in 5-7 business days.`;
+                    await order.save();
+                    
+                    // Log order cancellation
+                    logOrderCancelled(order.orderNumber, 'Shiprocket failure with auto-refund', true);
+                    
+                    console.log(`📧 Order ${order.orderNumber} cancelled with automatic refund`);
+                    
+                    // Don't reduce stock since order failed
+                    // Don't clear cart so user can retry
+                    
+                    return NextResponse.json({ 
+                        error: 'Shipment creation failed. Your payment has been refunded automatically.',
+                        message: 'We apologize for the inconvenience. Your payment will be refunded to your account within 5-7 business days.',
+                        refundId: refund.id,
+                        orderNumber: order.orderNumber,
+                        refundAmount: order.totalAmount,
+                        refundStatus: 'processing'
+                    }, { status: 500 });
+                    
+                } catch (refundError) {
+                    console.error('❌ CRITICAL: Failed to refund payment after Shiprocket failure:', refundError);
+                    
+                    // Log refund failure
+                    logRefundFailed(order.orderNumber, order.razorpayPaymentId, order.totalAmount, refundError);
+                    
+                    // Log manual intervention requirement
+                    logManualInterventionRequired(
+                        order.orderNumber,
+                        'Auto-refund failed after shipment failure',
+                        {
+                            shiprocketError: shiprocketError.message,
+                            refundError: refundError.message,
+                            paymentId: order.razorpayPaymentId,
+                            amount: order.totalAmount
+                        }
+                    );
+                    
+                    // Mark order for urgent manual review
+                    order.status = 'cancelled';
+                    order.notes = (order.notes ? order.notes + '\n' : '') + 
+                        `[URGENT] Shiprocket failed, automatic refund failed. MANUAL REFUND REQUIRED. ` +
+                        `Shiprocket Error: ${shiprocketError.message}. Refund Error: ${refundError.message}. ` +
+                        `Payment ID: ${order.razorpayPaymentId}. Amount: ₹${order.totalAmount}`;
+                    await order.save();
+                    
+                    // Don't reduce stock
+                    // Don't clear cart
+                    
+                    console.log(`🚨 URGENT: Manual intervention required for order ${order.orderNumber}`);
+                    
+                    return NextResponse.json({ 
+                        error: 'Shipment creation failed and automatic refund encountered an issue.',
+                        message: 'Please contact our customer support immediately. Your refund will be processed manually within 24 hours.',
+                        orderNumber: order.orderNumber,
+                        supportContact: '+91 XXXXX XXXXX',
+                        priority: 'urgent'
+                    }, { status: 500 });
+                }
+            }
+            
+            // For COD orders, just cancel the order
+            if (paymentMethod === 'cod') {
+                console.log(`⚠️  COD order ${order.orderNumber} - Shiprocket failed, cancelling order`);
+                
+                order.status = 'cancelled';
+                order.notes = (order.notes ? order.notes + '\n' : '') + 
+                    `[SYSTEM] Order cancelled - Shiprocket shipment creation failed: ${shiprocketError.message}. ` +
+                    `No payment was collected (COD).`;
+                await order.save();
+                
+                // Log order cancellation
+                logOrderCancelled(order.orderNumber, 'Shiprocket failure - COD order', false);
+                
+                // Don't reduce stock
+                // Don't clear cart so user can retry
+                
+                return NextResponse.json({ 
+                    error: 'Shipment scheduling failed. Please try again.',
+                    message: 'We could not schedule pickup for your order. No payment was collected. Please try placing your order again.',
+                    orderNumber: order.orderNumber
+                }, { status: 500 });
+            }
+            
+            // Fallback: Mark for admin attention if payment method is unclear
+            logManualInterventionRequired(
+                order.orderNumber,
+                'Shiprocket failure - unclear payment status',
+                { error: shiprocketError.message, paymentMethod, paymentStatus: order.paymentStatus }
+            );
+            
+            order.status = 'pending';
+            order.notes = (order.notes ? order.notes + '\n' : '') + 
+                `[ATTENTION] Shiprocket failed - ${shiprocketError.message}. Admin must verify payment status and handle accordingly.`;
+            await order.save();
+            
+            return NextResponse.json({ 
+                error: 'Shipment creation encountered an issue.',
+                message: 'Your order is being reviewed. We will contact you shortly.',
+                orderNumber: order.orderNumber
+            }, { status: 500 });
         }
 
-        // Update stock for each product
+        // Update stock for each product (only if Shiprocket succeeded)
+        console.log(`📦 Updating stock for order ${order.orderNumber}`);
         for (const item of items) {
             const product = await Product.findById(item.productId);
             
@@ -243,8 +392,9 @@ export async function POST(request) {
             await product.save();
         }
 
-        // Clear user's cart
+        // Clear user's cart (only if order succeeded)
         await Cart.deleteMany({ user: user.userId });
+        console.log(`✅ Order ${order.orderNumber} placed successfully`);
 
         return NextResponse.json({ 
             message: 'Order placed successfully',
