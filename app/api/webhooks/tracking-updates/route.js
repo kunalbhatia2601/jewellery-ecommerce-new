@@ -4,7 +4,7 @@ import ReturnModel from '@/models/Return';
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { createRefund } from '@/lib/razorpay';
-import { logRefund, logRefundFailed, LogLevel, TransactionType } from '@/lib/transactionLogger';
+import { logRefundSuccess, logRefundFailed, LogLevel, TransactionType } from '@/lib/transactionLogger';
 
 /**
  * Shiprocket Webhook Handler
@@ -279,13 +279,10 @@ async function handleOrderUpdate(webhookData) {
                             console.log('   - Status:', refund.status);
                             
                             // Log successful refund
-                            await logRefund(
+                            logRefundSuccess(
                                 order.orderNumber,
-                                order.razorpayPaymentId,
                                 refund.id,
-                                order.totalAmount,
-                                'Automatic refund - Shipment cancelled via Shiprocket',
-                                order.user?.toString()
+                                order.totalAmount
                             );
                             
                         } catch (refundError) {
@@ -298,13 +295,11 @@ async function handleOrderUpdate(webhookData) {
                             order.notes += `\n[${new Date().toISOString()}] CRITICAL: Automatic refund failed for cancelled shipment. Error: ${refundError.message}. MANUAL INTERVENTION REQUIRED.`;
                             
                             // Log failed refund
-                            await logRefundFailed(
+                            logRefundFailed(
                                 order.orderNumber,
                                 order.razorpayPaymentId,
                                 order.totalAmount,
-                                refundError.message,
-                                'Automatic refund attempt - Shipment cancelled via Shiprocket',
-                                order.user?.toString()
+                                refundError
                             );
                             
                             console.log('⚠️  Order marked as requiring manual refund processing');
