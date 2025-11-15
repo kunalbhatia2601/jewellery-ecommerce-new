@@ -273,6 +273,8 @@ async function handleOrderUpdate(webhookData) {
                             order.notes = order.notes || '';
                             order.notes += `\n[${new Date().toISOString()}] Automatic refund initiated due to shipment cancellation. Refund ID: ${refund.id}`;
                             
+                            updated = true; // Mark as updated to trigger save
+                            
                             console.log('✅ Refund successful!');
                             console.log('   - Refund ID:', refund.id);
                             console.log('   - Amount:', order.totalAmount);
@@ -294,6 +296,8 @@ async function handleOrderUpdate(webhookData) {
                             order.notes = order.notes || '';
                             order.notes += `\n[${new Date().toISOString()}] CRITICAL: Automatic refund failed for cancelled shipment. Error: ${refundError.message}. MANUAL INTERVENTION REQUIRED.`;
                             
+                            updated = true; // Mark as updated to trigger save
+                            
                             // Log failed refund
                             logRefundFailed(
                                 order.orderNumber,
@@ -308,6 +312,7 @@ async function handleOrderUpdate(webhookData) {
                         console.log('⚠️  AUTO_REFUND disabled - Manual refund required');
                         order.notes = order.notes || '';
                         order.notes += `\n[${new Date().toISOString()}] Shipment cancelled. Manual refund required for payment ID: ${order.razorpayPaymentId}`;
+                        updated = true; // Mark as updated to trigger save
                     }
                 } else {
                     console.log('ℹ️  No refund needed:');
