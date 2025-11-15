@@ -148,7 +148,7 @@ export async function POST(request) {
         try {
             const { createShiprocketOrder, processShipment, generatePickup, generateManifest, printManifest } = await import('@/lib/shiprocket');
             
-            // Prepare order items for Shiprocket
+            // Prepare order items for Shiprocket with all details including images
             const shiprocketItems = items.map(item => ({
                 name: item.name,
                 sku: item.selectedVariant?.sku || `PROD-${item.productId}`,
@@ -157,6 +157,8 @@ export async function POST(request) {
                 discount: 0,
                 tax: 0,
                 hsn: '',
+                // Add product image URL for Shiprocket emails and invoice
+                ...(item.image && { image: item.image }),
             }));
 
             // Calculate total weight (assuming 50g per item, adjust as needed)
