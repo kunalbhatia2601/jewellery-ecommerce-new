@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
         
         // Verify admin authentication
         const user = await verifyAuth(request);
-        if (!user || user.role !== 'admin') {
+        if (!user || !user.isAdmin) {
             return Response.json(
                 { error: 'Unauthorized - Admin access required' },
                 { status: 401 }
