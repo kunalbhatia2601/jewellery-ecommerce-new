@@ -209,6 +209,9 @@ export async function POST(request) {
                         const pickupResponse = await generatePickup(shiprocketResponse.shipment_id);
                         console.log(`✅ Pickup request generated for order ${order.orderNumber}:`, pickupResponse);
                         
+                        // Wait a moment for Shiprocket to process the pickup
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
                         // Step 3: Generate Manifest
                         try {
                             console.log(`📋 Generating manifest for order ${order.orderNumber}...`);
