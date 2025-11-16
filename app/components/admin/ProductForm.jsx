@@ -57,7 +57,10 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
     ];
 
     const silverPurities = [
-        { value: '999', label: '999 (99.9% Pure Silver)' }
+        { value: '999', label: '999 (99.9% Pure Silver)' },
+        { value: '925', label: '925 (92.5% Pure - Sterling Silver)' },
+        { value: '700', label: '700 (70% Pure Silver)' },
+        { value: '650', label: '650 (65% Pure Silver)' }
     ];
 
     const metalTypes = [

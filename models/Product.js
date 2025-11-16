@@ -79,8 +79,8 @@ const productSchema = new mongoose.Schema({
     },
     silverPurity: {
         type: Number,
-        default: 999, // Only 999 purity supported
-        enum: [999]
+        default: 999, // 99.9% purity (999/1000)
+        enum: [999, 925, 700, 650] // 99.9%, 92.5%, 70%, 65%
     },
     makingChargePercent: {
         type: Number,

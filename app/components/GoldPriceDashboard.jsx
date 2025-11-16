@@ -219,24 +219,78 @@ const GoldPriceDashboard = () => {
             </div>
           </div>
 
-          {/* Silver Price Card */}
-          {metalData.detailed.silver?.['999'] && (
+          {/* Silver Prices */}
+          {metalData.detailed.silver && (
             <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Silver Price (Per Gram)</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Silver Prices (Per Gram)</h3>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-lg border-2 border-gray-300 shadow-sm"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-gray-700">Silver 999</h3>
-                    <span className="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded">99.9% Pure</span>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {formatPrice(metalData.detailed.silver['999'])}
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">per gram</p>
-                </motion.div>
+                {/* Silver 999 */}
+                {metalData.detailed.silver['999'] && (
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-lg border-2 border-gray-300 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-semibold text-gray-700">Silver 999</h3>
+                      <span className="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded">99.9% Pure</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatPrice(metalData.detailed.silver['999'])}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">per gram</p>
+                  </motion.div>
+                )}
+
+                {/* Silver 925 (Sterling Silver) */}
+                {metalData.detailed.silver['925'] && (
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-gradient-to-br from-slate-50 to-slate-100 p-5 rounded-lg border-2 border-slate-300 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-semibold text-gray-700">Silver 925</h3>
+                      <span className="text-xs bg-slate-200 text-slate-800 px-2 py-1 rounded">92.5% Pure</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatPrice(metalData.detailed.silver['925'])}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">per gram • Sterling</p>
+                  </motion.div>
+                )}
+
+                {/* Silver 700 */}
+                {metalData.detailed.silver['700'] && (
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-gradient-to-br from-zinc-50 to-zinc-100 p-5 rounded-lg border-2 border-zinc-300 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-semibold text-gray-700">Silver 700</h3>
+                      <span className="text-xs bg-zinc-200 text-zinc-800 px-2 py-1 rounded">70.0% Pure</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatPrice(metalData.detailed.silver['700'])}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">per gram</p>
+                  </motion.div>
+                )}
+
+                {/* Silver 650 */}
+                {metalData.detailed.silver['650'] && (
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-gradient-to-br from-neutral-50 to-neutral-100 p-5 rounded-lg border-2 border-neutral-300 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-semibold text-gray-700">Silver 650</h3>
+                      <span className="text-xs bg-neutral-200 text-neutral-800 px-2 py-1 rounded">65.0% Pure</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatPrice(metalData.detailed.silver['650'])}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">per gram</p>
+                  </motion.div>
+                )}
               </div>
             </div>
           )}

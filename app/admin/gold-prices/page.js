@@ -265,7 +265,7 @@ const MetalRatesManagement = () => {
           <div className="text-blue-800 space-y-2">
             <p>• <strong>Live Rates:</strong> Gold & Silver prices are fetched from Bullions.co.in in real-time</p>
             <p>• <strong>Auto Calculation:</strong> Product prices are calculated based on metal weight, purity, and making charges</p>
-            <p>• <strong>Supported Metals:</strong> Gold (24K, 22K, 20K, 18K) and Silver (999 purity only)</p>
+            <p>• <strong>Supported Metals:</strong> Gold (24K, 22K, 20K, 18K) and Silver (99.9%, 92.5%, 70%, 65%)</p>
             <p>• <strong>INR Primary:</strong> All pricing optimized for Indian market with INR as primary currency</p>
             <p>• <strong>Caching:</strong> Prices are cached for 5 minutes to reduce API calls</p>
             <p>• <strong>Fallback:</strong> If scraper is unavailable, system uses fallback prices</p>
