@@ -19,7 +19,10 @@ export default function ProductsPage() {
     const [sortBy, setSortBy] = useState('featured');
     const [viewMode, setViewMode] = useState('grid');
     const [selectedTags, setSelectedTags] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
     const [dataReady, setDataReady] = useState(false); // Track when categories/subcategories are loaded
+    
+    const PRODUCTS_PER_PAGE = 20;
     
     // Use refs to prevent unnecessary re-fetches
     const abortControllerRef = useRef(null);
@@ -222,6 +225,17 @@ export default function ProductsPage() {
                 }
             });
     }, [products, selectedTags, sortBy]);
+    
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+    
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCategory, selectedSubcategory, searchTerm, selectedTags, sortBy]);
 
     const handleCategoryClick = useCallback((categoryName) => {
         setSelectedCategory(categoryName);
@@ -588,6 +602,11 @@ export default function ProductsPage() {
                             <span className="text-xs md:text-sm font-medium text-[#2C2C2C]">
                                 {filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}
                                 {selectedCategory !== 'All' && <span className="hidden sm:inline"> in {selectedCategory}</span>}
+                                {totalPages > 1 && (
+                                    <span className="text-gray-500 ml-1">
+                                        (Page {currentPage} of {totalPages})
+                                    </span>
+                                )}
                             </span>
                         </div>
 
@@ -675,7 +694,7 @@ export default function ProductsPage() {
                 ) : (
                     <AnimatePresence mode="wait">
                         <motion.div 
-                            key={`${selectedCategory}-${viewMode}`}
+                            key={`${selectedCategory}-${viewMode}-${currentPage}`}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
@@ -686,7 +705,7 @@ export default function ProductsPage() {
                                     : "space-y-4"
                             }
                         >
-                            {filteredProducts.map((product, index) => (
+                            {paginatedProducts.map((product, index) => (
                                 viewMode === 'grid' ? (
                                     <ProductCard key={product._id} product={product} index={index} />
                                 ) : (
@@ -695,6 +714,103 @@ export default function ProductsPage() {
                             ))}
                         </motion.div>
                     </AnimatePresence>
+                )}
+                
+                {/* Pagination Controls */}
+                {!loading && filteredProducts.length > 0 && totalPages > 1 && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
+                        className="mt-8 md:mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100"
+                    >
+                        {/* Page Info */}
+                        <div className="text-sm text-gray-600">
+                            Showing <span className="font-medium text-[#D4AF76]">{startIndex + 1}</span> to{' '}
+                            <span className="font-medium text-[#D4AF76]">{Math.min(endIndex, filteredProducts.length)}</span> of{' '}
+                            <span className="font-medium text-[#D4AF76]">{filteredProducts.length}</span> products
+                        </div>
+                        
+                        {/* Pagination Buttons */}
+                        <div className="flex items-center gap-2">
+                            {/* Previous Button */}
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                    setCurrentPage(prev => Math.max(1, prev - 1));
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                disabled={currentPage === 1}
+                                className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                                    currentPage === 1
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-[#D4AF76] text-white hover:bg-[#8B6B4C] shadow-sm'
+                                }`}
+                            >
+                                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </motion.button>
+                            
+                            {/* Page Numbers */}
+                            <div className="flex items-center gap-1 md:gap-2">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                    .filter(page => {
+                                        // Show first page, last page, current page, and pages around current
+                                        return (
+                                            page === 1 ||
+                                            page === totalPages ||
+                                            Math.abs(page - currentPage) <= 1
+                                        );
+                                    })
+                                    .map((page, index, array) => (
+                                        <React.Fragment key={page}>
+                                            {/* Add ellipsis if there's a gap */}
+                                            {index > 0 && array[index - 1] !== page - 1 && (
+                                                <span className="px-2 text-gray-400">...</span>
+                                            )}
+                                            
+                                            <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => {
+                                                    setCurrentPage(page);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                                className={`w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-sm transition-all ${
+                                                    currentPage === page
+                                                        ? 'bg-[#D4AF76] text-white shadow-md'
+                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                }`}
+                                            >
+                                                {page}
+                                            </motion.button>
+                                        </React.Fragment>
+                                    ))}
+                            </div>
+                            
+                            {/* Next Button */}
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                disabled={currentPage === totalPages}
+                                className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                                    currentPage === totalPages
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-[#D4AF76] text-white hover:bg-[#8B6B4C] shadow-sm'
+                                }`}
+                            >
+                                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </motion.button>
+                        </div>
+                    </motion.div>
                 )}
             </div>
         </div>
