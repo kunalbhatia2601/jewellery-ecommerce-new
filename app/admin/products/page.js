@@ -31,11 +31,14 @@ function AdminProductsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [activeFilter, setActiveFilter] = useState('all');
+    const [metalTypeFilter, setMetalTypeFilter] = useState('all');
+    const [sortBy, setSortBy] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState('desc');
 
     useEffect(() => {
         setMounted(true);
         fetchProducts();
-    }, [pagination.page, searchTerm, categoryFilter, activeFilter]);
+    }, [pagination.page, searchTerm, categoryFilter, activeFilter, metalTypeFilter, sortBy, sortOrder]);
 
     const fetchProducts = async () => {
         try {
@@ -50,6 +53,9 @@ function AdminProductsPage() {
             if (searchTerm) params.append('search', searchTerm);
             if (categoryFilter !== 'all') params.append('category', categoryFilter);
             if (activeFilter !== 'all') params.append('isActive', activeFilter);
+            if (metalTypeFilter !== 'all') params.append('metalType', metalTypeFilter);
+            if (sortBy) params.append('sortBy', sortBy);
+            if (sortOrder) params.append('sortOrder', sortOrder);
             
             const res = await fetch(`/api/admin/products?${params.toString()}`, {
                 cache: 'no-store',
@@ -346,9 +352,9 @@ function AdminProductsPage() {
                                 </div>
                                 
                                 {/* Search and Filters */}
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                                     {/* Search */}
-                                    <div className="relative">
+                                    <div className="relative sm:col-span-2 lg:col-span-1">
                                         <input
                                             type="text"
                                             placeholder="Search products..."
@@ -357,12 +363,26 @@ function AdminProductsPage() {
                                                 setSearchTerm(e.target.value);
                                                 setPagination(prev => ({ ...prev, page: 1 }));
                                             }}
-                                            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm"
+                                            className="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm"
                                         />
-                                        <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                     </div>
+                                    
+                                    {/* Metal Type Filter */}
+                                    <select
+                                        value={metalTypeFilter}
+                                        onChange={(e) => {
+                                            setMetalTypeFilter(e.target.value);
+                                            setPagination(prev => ({ ...prev, page: 1 }));
+                                        }}
+                                        className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm bg-white"
+                                    >
+                                        <option value="all">🔶 All Metals</option>
+                                        <option value="gold">🥇 Gold Only</option>
+                                        <option value="silver">🥈 Silver Only</option>
+                                    </select>
                                     
                                     {/* Category Filter */}
                                     <select
@@ -371,7 +391,7 @@ function AdminProductsPage() {
                                             setCategoryFilter(e.target.value);
                                             setPagination(prev => ({ ...prev, page: 1 }));
                                         }}
-                                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm"
+                                        className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm bg-white"
                                     >
                                         <option value="all">All Categories</option>
                                         <option value="Rings">Rings</option>
@@ -388,13 +408,78 @@ function AdminProductsPage() {
                                             setActiveFilter(e.target.value);
                                             setPagination(prev => ({ ...prev, page: 1 }));
                                         }}
-                                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm"
+                                        className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm bg-white"
                                     >
                                         <option value="all">All Status</option>
-                                        <option value="true">Active</option>
-                                        <option value="false">Inactive</option>
+                                        <option value="true">✅ Active</option>
+                                        <option value="false">❌ Inactive</option>
+                                    </select>
+                                    
+                                    {/* Sort By */}
+                                    <select
+                                        value={`${sortBy}-${sortOrder}`}
+                                        onChange={(e) => {
+                                            const [field, order] = e.target.value.split('-');
+                                            setSortBy(field);
+                                            setSortOrder(order);
+                                            setPagination(prev => ({ ...prev, page: 1 }));
+                                        }}
+                                        className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm bg-white"
+                                    >
+                                        <option value="createdAt-desc">📅 Newest First</option>
+                                        <option value="createdAt-asc">📅 Oldest First</option>
+                                        <option value="sellingPrice-asc">💰 Price: Low to High</option>
+                                        <option value="sellingPrice-desc">💰 Price: High to Low</option>
+                                        <option value="name-asc">🔤 Name: A to Z</option>
+                                        <option value="name-desc">🔤 Name: Z to A</option>
+                                        <option value="stock-asc">📦 Stock: Low to High</option>
+                                        <option value="stock-desc">📦 Stock: High to Low</option>
                                     </select>
                                 </div>
+                                
+                                {/* Active Filters Display */}
+                                {(metalTypeFilter !== 'all' || categoryFilter !== 'all' || activeFilter !== 'all' || searchTerm) && (
+                                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
+                                        <span className="text-xs text-gray-500">Active filters:</span>
+                                        {searchTerm && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                                Search: "{searchTerm}"
+                                                <button onClick={() => setSearchTerm('')} className="hover:text-blue-900">×</button>
+                                            </span>
+                                        )}
+                                        {metalTypeFilter !== 'all' && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                                                {metalTypeFilter === 'gold' ? '🥇 Gold' : '🥈 Silver'}
+                                                <button onClick={() => setMetalTypeFilter('all')} className="hover:text-yellow-900">×</button>
+                                            </span>
+                                        )}
+                                        {categoryFilter !== 'all' && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                                                {categoryFilter}
+                                                <button onClick={() => setCategoryFilter('all')} className="hover:text-purple-900">×</button>
+                                            </span>
+                                        )}
+                                        {activeFilter !== 'all' && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                                                {activeFilter === 'true' ? 'Active' : 'Inactive'}
+                                                <button onClick={() => setActiveFilter('all')} className="hover:text-green-900">×</button>
+                                            </span>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                setSearchTerm('');
+                                                setMetalTypeFilter('all');
+                                                setCategoryFilter('all');
+                                                setActiveFilter('all');
+                                                setSortBy('createdAt');
+                                                setSortOrder('desc');
+                                            }}
+                                            className="text-xs text-red-600 hover:text-red-800 underline"
+                                        >
+                                            Clear all
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                             
                             {products.length === 0 && !loading ? (

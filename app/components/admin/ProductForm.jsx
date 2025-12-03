@@ -1331,12 +1331,11 @@ export default function ProductForm({ product, onSubmit, onCancel }) {
                                             onChange={handleInputChange}
                                             step="0.5"
                                             min="0"
-                                            max="100"
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all"
                                             placeholder="15"
                                         />
                                         <p className="text-xs text-gray-500 mt-1">
-                                            Typical: Gold 10-20%, Silver 15-25%
+                                            Typical: Gold 10-20%, Silver 15-25% (can be higher for designer pieces)
                                         </p>
                                     </div>
 

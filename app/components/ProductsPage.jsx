@@ -19,6 +19,7 @@ export default function ProductsPage() {
     const [sortBy, setSortBy] = useState('featured');
     const [viewMode, setViewMode] = useState('grid');
     const [selectedTags, setSelectedTags] = useState([]);
+    const [metalTypeFilter, setMetalTypeFilter] = useState('all');
     const [currentPage, setCurrentPage] = useState(1);
     const [dataReady, setDataReady] = useState(false); // Track when categories/subcategories are loaded
     
@@ -210,7 +211,9 @@ export default function ProductsPage() {
             .filter(product => {
                 const matchesTags = selectedTags.length === 0 || 
                     (product.tags && product.tags.some(tag => selectedTags.includes(tag)));
-                return matchesTags;
+                const matchesMetalType = metalTypeFilter === 'all' || 
+                    product.metalType === metalTypeFilter;
+                return matchesTags && matchesMetalType;
             })
             .sort((a, b) => {
                 switch (sortBy) {
@@ -224,7 +227,7 @@ export default function ProductsPage() {
                         return 0;
                 }
             });
-    }, [products, selectedTags, sortBy]);
+    }, [products, selectedTags, sortBy, metalTypeFilter]);
     
     // Pagination calculations
     const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -235,7 +238,7 @@ export default function ProductsPage() {
     // Reset to page 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedCategory, selectedSubcategory, searchTerm, selectedTags, sortBy]);
+    }, [selectedCategory, selectedSubcategory, searchTerm, selectedTags, sortBy, metalTypeFilter]);
 
     const handleCategoryClick = useCallback((categoryName) => {
         setSelectedCategory(categoryName);
@@ -582,6 +585,51 @@ export default function ProductsPage() {
                                     Clear Tags ✕
                                 </motion.button>
                             )}
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Metal Type Filter */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.35 }}
+                    className="mb-6 md:mb-8"
+                >
+                    <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100">
+                        <label className="block text-sm font-medium text-[#2C2C2C] mb-3">
+                            Filter by Metal Type
+                        </label>
+                        <div className="flex flex-wrap gap-2 md:gap-3">
+                            {[
+                                { value: 'all', label: 'All', icon: '✨' },
+                                { value: 'gold', label: 'Gold', icon: '🥇', color: 'from-yellow-400 to-amber-500' },
+                                { value: 'silver', label: 'Silver', icon: '🥈', color: 'from-gray-300 to-slate-400' }
+                            ].map((type) => (
+                                <motion.button
+                                    key={type.value}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setMetalTypeFilter(type.value)}
+                                    className={`
+                                        px-4 md:px-5 py-2 md:py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2
+                                        ${metalTypeFilter === type.value
+                                            ? type.value === 'gold'
+                                                ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-lg shadow-amber-200'
+                                                : type.value === 'silver'
+                                                    ? 'bg-gradient-to-r from-gray-400 to-slate-500 text-white shadow-lg shadow-gray-300'
+                                                    : 'bg-[#D4AF76] text-white shadow-md'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }
+                                    `}
+                                >
+                                    <span>{type.icon}</span>
+                                    <span>{type.label}</span>
+                                    {metalTypeFilter === type.value && (
+                                        <span className="ml-1">✓</span>
+                                    )}
+                                </motion.button>
+                            ))}
                         </div>
                     </div>
                 </motion.div>

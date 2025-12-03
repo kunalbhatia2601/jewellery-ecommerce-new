@@ -10,9 +10,6 @@ export async function POST(request) {
     
     const { couponCode, cartItems, userId } = await request.json();
     
-    console.log('=== COUPON VALIDATION DEBUG ===');
-    console.log('Cart items received:', JSON.stringify(cartItems, null, 2));
-    
     if (!couponCode) {
       return NextResponse.json({
         success: false,
@@ -71,31 +68,16 @@ export async function POST(request) {
     
     // Get full product details for cart items
     const productIds = cartItems.map(item => item.productId);
-    console.log('Looking for product IDs:', productIds);
     
-    const products = await Product.find({ _id: { $in: productIds } })
+    let products = await Product.find({ _id: { $in: productIds } })
       .populate('subcategory', '_id name category');
-    
-    console.log('Products from DB:', products.map(p => ({ id: p._id, name: p.name, metalType: p.metalType })));
     
     // If no products found, try using _id from cart items
     if (products.length === 0) {
       const alternateIds = cartItems.map(item => item._id || item.id);
-      console.log('Trying alternate IDs:', alternateIds);
-      
-      // Check if product exists at all
-      const checkProduct = await Product.findById(alternateIds[0]);
-      console.log('Direct check for first product:', checkProduct ? {
-        id: checkProduct._id,
-        name: checkProduct.name,
-        metalType: checkProduct.metalType,
-        category: checkProduct.category
-      } : 'NOT FOUND');
-      
       const alternateProducts = await Product.find({ _id: { $in: alternateIds } })
         .populate('subcategory', '_id name category');
-      console.log('Alternate products found:', alternateProducts.length);
-      products.push(...alternateProducts);
+      products = alternateProducts;
     }
     
     // Enrich cart items with product details including metal type
@@ -110,14 +92,6 @@ export async function POST(request) {
       // Use nested product data if available, otherwise fetch from DB
       const productData = cartItem.product || product || cartItem;
       
-      console.log(`Enriching item:`, {
-        cartItemId: productId,
-        foundProduct: !!product,
-        hasNestedProduct: !!cartItem.product,
-        metalType: productData.metalType,
-        name: productData.name
-      });
-      
       return {
         ...cartItem,
         price: productData.sellingPrice || cartItem.price,
@@ -127,9 +101,6 @@ export async function POST(request) {
         name: productData.name || cartItem.name
       };
     });
-    
-    console.log('Enriched cart items:', enrichedCartItems.map(item => ({ name: item.name, metalType: item.metalType })));
-    console.log('Coupon applicable metal type:', coupon.applicableMetalType);
     
     // Calculate cart total
     const cartTotal = enrichedCartItems.reduce((sum, item) => 

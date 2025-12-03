@@ -140,18 +140,11 @@ couponSchema.methods.calculateDiscount = async function(cartItems, cartTotal) {
 
     // Check metal type restrictions (simpler than category-based)
     if (this.applicableMetalType && this.applicableMetalType !== 'all') {
-        console.log('Checking metal type restriction:', this.applicableMetalType);
-        console.log('Cart items metal types:', cartItems.map(item => ({ name: item.name, metalType: item.metalType })));
-        
         const hasApplicableItems = cartItems.some(item => {
             // Check if item's metal type matches coupon's metal type
             // Products have metalType field (e.g., 'gold', 'silver')
-            const matches = item.metalType && item.metalType.toLowerCase() === this.applicableMetalType.toLowerCase();
-            console.log(`Item "${item.name}": metalType="${item.metalType}" matches=${matches}`);
-            return matches;
+            return item.metalType && item.metalType.toLowerCase() === this.applicableMetalType.toLowerCase();
         });
-        
-        console.log('Has applicable items:', hasApplicableItems);
         
         if (!hasApplicableItems) {
             return { 
@@ -164,8 +157,6 @@ couponSchema.methods.calculateDiscount = async function(cartItems, cartTotal) {
         cartTotal = cartItems
             .filter(item => item.metalType && item.metalType.toLowerCase() === this.applicableMetalType.toLowerCase())
             .reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
-        console.log('Filtered cart total:', cartTotal);
             
         if (cartTotal === 0) {
             return { 
