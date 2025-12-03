@@ -9,7 +9,7 @@ export function CartProvider({ children }) {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
-    const { user, triggerLoginModal } = useAuth();
+    const { user, triggerRegisterModal } = useAuth();
 
     useEffect(() => {
         setMounted(true);
@@ -111,9 +111,9 @@ export function CartProvider({ children }) {
     const addToCart = async (product, quantity = 1) => {
         try {
             if (!user) {
-                // User not authenticated - show login modal with helpful message
-                alert('Please log in or sign up to add items to your cart!');
-                triggerLoginModal();
+                // User not authenticated - show register modal with helpful message
+                alert('Please sign up or log in to add items to your cart!');
+                triggerRegisterModal();
                 return false; // Return false to indicate cart addition failed
             }
 

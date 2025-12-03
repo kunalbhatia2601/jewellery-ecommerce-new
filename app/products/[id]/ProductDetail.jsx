@@ -12,7 +12,7 @@ import { isProductOutOfStock, getEffectiveStock, hasLowStock } from '@/lib/produ
 export default function ProductDetail({ productId }) {
     const router = useRouter();
     const { addToCart, setIsCartOpen } = useCart();
-    const { user, triggerLoginModal } = useAuth();
+    const { user, triggerRegisterModal } = useAuth();
     
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
@@ -141,7 +141,7 @@ export default function ProductDetail({ productId }) {
 
     const handleAddToCart = async () => {
         if (!user) {
-            triggerLoginModal();
+            triggerRegisterModal();
             return;
         }
 

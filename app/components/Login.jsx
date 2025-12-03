@@ -153,19 +153,16 @@ export default function Login({ isOpen, onClose, onRegisterClick }) {
                                 </button>
 
                                 <div className="text-center mt-6">
-                                    <p className="text-gray-600 font-light">
-                                        Don't have an account?{' '}
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                onClose();
-                                                onRegisterClick();
-                                            }}
-                                            className="text-[#D4AF76] hover:text-[#2C2C2C] transition-colors font-normal"
-                                        >
-                                            Sign up
-                                        </button>
-                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            onClose();
+                                            onRegisterClick();
+                                        }}
+                                        className="text-[#D4AF76] hover:text-[#2C2C2C] transition-colors font-light hover:underline"
+                                    >
+                                        Create a new account
+                                    </button>
                                 </div>
                             </form>
                                 </div>

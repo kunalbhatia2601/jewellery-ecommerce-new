@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -143,6 +144,14 @@ export function AuthProvider({ children }) {
         setShowLoginModal(false);
     };
 
+    const triggerRegisterModal = () => {
+        setShowRegisterModal(true);
+    };
+
+    const closeRegisterModal = () => {
+        setShowRegisterModal(false);
+    };
+
     // Prevent hydration mismatch by not rendering until mounted
     if (!mounted) {
         return (
@@ -154,6 +163,9 @@ export function AuthProvider({ children }) {
                 showLoginModal: false,
                 triggerLoginModal: () => {},
                 closeLoginModal: () => {},
+                showRegisterModal: false,
+                triggerRegisterModal: () => {},
+                closeRegisterModal: () => {},
             }}>
                 {children}
             </AuthContext.Provider>
@@ -169,6 +181,9 @@ export function AuthProvider({ children }) {
             showLoginModal,
             triggerLoginModal,
             closeLoginModal,
+            showRegisterModal,
+            triggerRegisterModal,
+            closeRegisterModal,
         }}>
             {children}
         </AuthContext.Provider>

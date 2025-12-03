@@ -15,10 +15,9 @@ import { cn } from "../../lib/utils";
 
 export default function Navbar() {
     const { setIsCartOpen, cartItems } = useCart();
-    const { user, logout, showLoginModal, closeLoginModal, triggerLoginModal } = useAuth();
+    const { user, logout, showLoginModal, closeLoginModal, triggerLoginModal, showRegisterModal, closeRegisterModal, triggerRegisterModal } = useAuth();
     const { isNavbarHidden } = useNavbar();
     const router = useRouter();
-    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -262,12 +261,12 @@ export default function Navbar() {
                                     </div>
                                 ) : (
                                     <motion.button
-                                        onClick={() => triggerLoginModal()}
+                                        onClick={() => triggerRegisterModal()}
                                         className="px-5 py-2 text-sm font-medium text-gray-800 hover:text-black bg-black/[0.06] hover:bg-black/[0.10] rounded-xl transition-all duration-300 hover:shadow-sm"
                                         whileHover={{ scale: 1.03, y: -1 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
-                                        Sign In
+                                        Sign Up
                                     </motion.button>
                                 )}
 
@@ -277,7 +276,7 @@ export default function Navbar() {
                                         if (user) {
                                             setIsCartOpen(true);
                                         } else {
-                                            triggerLoginModal();
+                                            triggerRegisterModal();
                                         }
                                     }}
                                     className="relative p-2.5 rounded-xl bg-black/[0.06] hover:bg-black/[0.10] transition-all duration-300 hover:shadow-sm"
@@ -426,7 +425,7 @@ export default function Navbar() {
                                 if (user) {
                                     setIsCartOpen(true);
                                 } else {
-                                    triggerLoginModal();
+                                    triggerRegisterModal();
                                 }
                             }}
                             className="flex flex-col items-center p-2 space-y-1.5 relative"
@@ -556,7 +555,7 @@ export default function Navbar() {
                             </>
                         ) : (
                             <button 
-                                onClick={() => triggerLoginModal()}
+                                onClick={() => triggerRegisterModal()}
                                 className="flex flex-col items-center p-2 space-y-1"
                             >
                                 <motion.div
@@ -568,7 +567,7 @@ export default function Navbar() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                 </motion.div>
-                                <span className="text-xs text-gray-600 font-medium">Sign In</span>
+                                <span className="text-xs text-gray-600 font-medium">Sign Up</span>
                             </button>
                         )}
                     </motion.div>
@@ -580,12 +579,12 @@ export default function Navbar() {
                 <Login 
                     isOpen={showLoginModal} 
                     onClose={() => closeLoginModal()}
-                    onRegisterClick={() => setIsRegisterOpen(true)}
+                    onRegisterClick={() => triggerRegisterModal()}
                 />
             </Suspense>
             <Register 
-                isOpen={isRegisterOpen} 
-                onClose={() => setIsRegisterOpen(false)}
+                isOpen={showRegisterModal} 
+                onClose={() => closeRegisterModal()}
                 onLoginClick={() => triggerLoginModal()}
             />
             <Cart />

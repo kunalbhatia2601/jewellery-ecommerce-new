@@ -218,19 +218,16 @@ export default function Register({ isOpen, onClose, onLoginClick }) {
                                     </button>
 
                                     <div className="text-center mt-6">
-                                        <p className="text-gray-600 font-light">
-                                            Already have an account?{' '}
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    onClose();
-                                                    onLoginClick();
-                                                }}
-                                                className="text-[#D4AF76] hover:text-[#2C2C2C] transition-colors font-normal"
-                                            >
-                                                Sign in
-                                            </button>
-                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                onClose();
+                                                onLoginClick();
+                                            }}
+                                            className="text-[#D4AF76] hover:text-[#2C2C2C] transition-colors font-light hover:underline"
+                                        >
+                                            Already have an account
+                                        </button>
                                     </div>
                                 </form>
                             )}
