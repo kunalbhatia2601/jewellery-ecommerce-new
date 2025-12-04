@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import AdminLayout from '../../components/AdminLayout';
 
@@ -38,9 +38,9 @@ function AdminProductsPage() {
     useEffect(() => {
         setMounted(true);
         fetchProducts();
-    }, [pagination.page, searchTerm, categoryFilter, activeFilter, metalTypeFilter, sortBy, sortOrder]);
+    }, [fetchProducts]);
 
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         try {
             console.log('Fetching products from /api/admin/products...');
             const timestamp = Date.now();
@@ -97,7 +97,7 @@ function AdminProductsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination.page, pagination.limit, searchTerm, categoryFilter, activeFilter, metalTypeFilter, sortBy, sortOrder]);
 
     const handleAddProduct = () => {
         setEditingProduct(null);
@@ -443,7 +443,7 @@ function AdminProductsPage() {
                                         <span className="text-xs text-gray-500">Active filters:</span>
                                         {searchTerm && (
                                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                                Search: "{searchTerm}"
+                                                Search: {`"${searchTerm}"`}
                                                 <button onClick={() => setSearchTerm('')} className="hover:text-blue-900">×</button>
                                             </span>
                                         )}
