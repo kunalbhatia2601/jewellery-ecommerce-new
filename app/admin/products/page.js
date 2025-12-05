@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import AdminLayout from '../../components/AdminLayout';
 
@@ -29,19 +29,28 @@ function AdminProductsPage() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [mounted, setMounted] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeSearchTerm, setActiveSearchTerm] = useState(''); // Only updates on Enter
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [activeFilter, setActiveFilter] = useState('all');
     const [metalTypeFilter, setMetalTypeFilter] = useState('all');
     const [sortBy, setSortBy] = useState('createdAt');
     const [sortOrder, setSortOrder] = useState('desc');
+    
+    // Use ref to track if initial fetch has been done
+    const initialFetchDone = useRef(false);
 
-    useEffect(() => {
-        setMounted(true);
-        fetchProducts();
-    }, [fetchProducts]);
+    // Handle search on Enter key
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            setActiveSearchTerm(searchTerm);
+            setPagination(prev => ({ ...prev, page: 1 }));
+        }
+    };
 
-    const fetchProducts = useCallback(async () => {
+    // Fetch products function
+    const fetchProducts = async () => {
         try {
+            setLoading(true);
             console.log('Fetching products from /api/admin/products...');
             const timestamp = Date.now();
             const params = new URLSearchParams({
@@ -50,7 +59,7 @@ function AdminProductsPage() {
                 _: timestamp.toString()
             });
             
-            if (searchTerm) params.append('search', searchTerm);
+            if (activeSearchTerm) params.append('search', activeSearchTerm);
             if (categoryFilter !== 'all') params.append('category', categoryFilter);
             if (activeFilter !== 'all') params.append('isActive', activeFilter);
             if (metalTypeFilter !== 'all') params.append('metalType', metalTypeFilter);
@@ -75,8 +84,8 @@ function AdminProductsPage() {
                     setProducts(response.data);
                     setPagination(prev => ({
                         ...prev,
-                        totalProducts: response.pagination.totalProducts,
-                        totalPages: response.pagination.totalPages
+                        totalProducts: response.pagination?.totalProducts || 0,
+                        totalPages: response.pagination?.totalPages || 0
                     }));
                 } else if (Array.isArray(response)) {
                     // Backward compatibility with old format
@@ -97,7 +106,27 @@ function AdminProductsPage() {
         } finally {
             setLoading(false);
         }
-    }, [pagination.page, pagination.limit, searchTerm, categoryFilter, activeFilter, metalTypeFilter, sortBy, sortOrder]);
+    };
+
+    // Initial mount effect
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Initial fetch on mount
+    useEffect(() => {
+        if (mounted && !initialFetchDone.current) {
+            initialFetchDone.current = true;
+            fetchProducts();
+        }
+    }, [mounted]);
+
+    // Refetch when filters change (after initial load)
+    useEffect(() => {
+        if (initialFetchDone.current && mounted) {
+            fetchProducts();
+        }
+    }, [activeSearchTerm, categoryFilter, activeFilter, metalTypeFilter, sortBy, sortOrder, pagination.page, pagination.limit]);
 
     const handleAddProduct = () => {
         setEditingProduct(null);
@@ -357,12 +386,10 @@ function AdminProductsPage() {
                                     <div className="relative sm:col-span-2 lg:col-span-1">
                                         <input
                                             type="text"
-                                            placeholder="Search products..."
+                                            placeholder="Search products... (Press Enter)"
                                             value={searchTerm}
-                                            onChange={(e) => {
-                                                setSearchTerm(e.target.value);
-                                                setPagination(prev => ({ ...prev, page: 1 }));
-                                            }}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            onKeyDown={handleSearchKeyDown}
                                             className="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent text-sm"
                                         />
                                         <svg className="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,13 +465,13 @@ function AdminProductsPage() {
                                 </div>
                                 
                                 {/* Active Filters Display */}
-                                {(metalTypeFilter !== 'all' || categoryFilter !== 'all' || activeFilter !== 'all' || searchTerm) && (
+                                {(metalTypeFilter !== 'all' || categoryFilter !== 'all' || activeFilter !== 'all' || activeSearchTerm) && (
                                     <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
                                         <span className="text-xs text-gray-500">Active filters:</span>
-                                        {searchTerm && (
+                                        {activeSearchTerm && (
                                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                                Search: {`"${searchTerm}"`}
-                                                <button onClick={() => setSearchTerm('')} className="hover:text-blue-900">×</button>
+                                                Search: {`"${activeSearchTerm}"`}
+                                                <button onClick={() => { setSearchTerm(''); setActiveSearchTerm(''); }} className="hover:text-blue-900">×</button>
                                             </span>
                                         )}
                                         {metalTypeFilter !== 'all' && (
@@ -468,6 +495,7 @@ function AdminProductsPage() {
                                         <button
                                             onClick={() => {
                                                 setSearchTerm('');
+                                                setActiveSearchTerm('');
                                                 setMetalTypeFilter('all');
                                                 setCategoryFilter('all');
                                                 setActiveFilter('all');
@@ -490,16 +518,16 @@ function AdminProductsPage() {
                                         </svg>
                                     </div>
                                     <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
-                                        {searchTerm || categoryFilter !== 'all' || activeFilter !== 'all' 
+                                        {activeSearchTerm || categoryFilter !== 'all' || activeFilter !== 'all' 
                                             ? 'No products match your filters' 
                                             : 'No products yet'}
                                     </h3>
                                     <p className="text-sm sm:text-base text-gray-600 mb-6">
-                                        {searchTerm || categoryFilter !== 'all' || activeFilter !== 'all'
+                                        {activeSearchTerm || categoryFilter !== 'all' || activeFilter !== 'all'
                                             ? 'Try adjusting your filters'
                                             : 'Get started by creating your first product'}
                                     </p>
-                                    {!(searchTerm || categoryFilter !== 'all' || activeFilter !== 'all') && (
+                                    {!(activeSearchTerm || categoryFilter !== 'all' || activeFilter !== 'all') && (
                                         <button
                                             onClick={handleAddProduct}
                                             className="bg-[#8B6B4C] text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-[#725939] transition-all duration-200 font-medium shadow-sm hover:shadow-md inline-flex items-center gap-2 text-sm sm:text-base"
@@ -520,12 +548,30 @@ function AdminProductsPage() {
                                     />
                                     
                                     {/* Pagination Controls */}
-                                    {pagination.totalPages > 1 && (
+                                    {pagination.totalProducts > 0 && (
                                         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
-                                            <div className="text-sm text-gray-600">
-                                                Page {pagination.page} of {pagination.totalPages}
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-sm text-gray-600">
+                                                    Showing {((pagination.page - 1) * pagination.limit) + 1} - {Math.min(pagination.page * pagination.limit, pagination.totalProducts)} of {pagination.totalProducts} products
+                                                </div>
+                                                
+                                                {/* Items per page selector */}
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-gray-600">Per page:</span>
+                                                    <select
+                                                        value={pagination.limit}
+                                                        onChange={(e) => setPagination(prev => ({ ...prev, limit: parseInt(e.target.value), page: 1 }))}
+                                                        className="px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent bg-white"
+                                                    >
+                                                        <option value={10}>10</option>
+                                                        <option value={20}>20</option>
+                                                        <option value={50}>50</option>
+                                                        <option value={100}>100</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                             
+                                            {pagination.totalPages > 1 && (
                                             <div className="flex items-center gap-2">
                                                 {/* Previous Button */}
                                                 <button
@@ -586,6 +632,7 @@ function AdminProductsPage() {
                                                     </svg>
                                                 </button>
                                             </div>
+                                            )}
                                         </div>
                                     )}
                                 </>

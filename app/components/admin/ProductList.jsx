@@ -2,37 +2,11 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-export default function ProductList({ products, onEdit, onDelete }) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('');
-    const [sortBy, setSortBy] = useState('createdAt');
-    const [sortOrder, setSortOrder] = useState('desc');
+export default function ProductList({ products = [], onEdit, onDelete }) {
     const [expandedProducts, setExpandedProducts] = useState(new Set());
 
-    const categories = [...new Set(products.map(p => p.category))];
-
-    const filteredProducts = products
-        .filter(product => {
-            const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = !categoryFilter || product.category === categoryFilter;
-            return matchesSearch && matchesCategory;
-        })
-        .sort((a, b) => {
-            let aValue = a[sortBy];
-            let bValue = b[sortBy];
-
-            if (sortBy === 'createdAt') {
-                aValue = new Date(aValue);
-                bValue = new Date(bValue);
-            }
-
-            if (sortOrder === 'asc') {
-                return aValue > bValue ? 1 : -1;
-            } else {
-                return aValue < bValue ? 1 : -1;
-            }
-        });
+    // Ensure products is always an array
+    const safeProducts = Array.isArray(products) ? products : [];
 
     const getStockStatus = (product) => {
         const totalStock = product.hasVariants ? (product.totalStock || 0) : (product.stock || 0);
@@ -58,51 +32,6 @@ export default function ProductList({ products, onEdit, onDelete }) {
 
     return (
         <div>
-            {/* Filters */}
-            <div className="p-4 sm:p-6 border-b border-gray-200 bg-gray-50">
-                <div className="flex flex-col gap-3 sm:gap-4">
-                    <div className="w-full">
-                        <input
-                            type="text"
-                            placeholder="Search products..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full p-2.5 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
-                        />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                        <select
-                            value={categoryFilter}
-                            onChange={(e) => setCategoryFilter(e.target.value)}
-                            className="w-full p-2.5 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
-                        >
-                            <option value="">All Categories</option>
-                            {categories.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                        </select>
-                        <select
-                            value={`${sortBy}-${sortOrder}`}
-                            onChange={(e) => {
-                                const [field, order] = e.target.value.split('-');
-                                setSortBy(field);
-                                setSortOrder(order);
-                            }}
-                            className="w-full p-2.5 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B6B4C] focus:border-transparent"
-                        >
-                            <option value="createdAt-desc">Newest First</option>
-                            <option value="createdAt-asc">Oldest First</option>
-                            <option value="name-asc">Name A-Z</option>
-                            <option value="name-desc">Name Z-A</option>
-                            <option value="sellingPrice-desc">Price High to Low</option>
-                            <option value="sellingPrice-asc">Price Low to High</option>
-                            <option value="stock-desc">Stock High to Low</option>
-                            <option value="stock-asc">Stock Low to High</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
             {/* Desktop Table View - Hidden on mobile */}
             <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
@@ -129,7 +58,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredProducts.length === 0 ? (
+                        {safeProducts.length === 0 ? (
                             <tr>
                                 <td colSpan="7" className="px-6 py-12 text-center">
                                     <div className="text-gray-500">
@@ -145,7 +74,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
                                 </td>
                             </tr>
                         ) : (
-                            filteredProducts.flatMap((product) => {
+                            safeProducts.flatMap((product) => {
                                 const stockStatus = getStockStatus(product);
                                 const discount = calculateDiscount(product.mrp, product.sellingPrice);
 
@@ -397,7 +326,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
 
             {/* Mobile Card View - Shown only on mobile/tablet */}
             <div className="lg:hidden divide-y divide-gray-200">
-                {filteredProducts.length === 0 ? (
+                {safeProducts.length === 0 ? (
                     <div className="px-4 py-12 text-center">
                         <div className="text-gray-500">
                             <div className="text-4xl mb-2">📦</div>
@@ -411,7 +340,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
                         </div>
                     </div>
                 ) : (
-                    filteredProducts.map((product) => {
+                    safeProducts.map((product) => {
                         const stockStatus = getStockStatus(product);
                         const discount = calculateDiscount(product.mrp, product.sellingPrice);
 
@@ -583,7 +512,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
             {/* Summary */}
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-t bg-gray-50">
                 <div className="text-xs sm:text-sm text-gray-600">
-                    Showing {filteredProducts.length} of {products.length} products
+                    Showing {safeProducts.length} products
                 </div>
             </div>
         </div>
